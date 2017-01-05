@@ -18,8 +18,14 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::group(['prefix'=>'report'], function(){
-    Route::get('create/step1', ['as'=>'report.create.step1', 'uses'=>'ReportController@create']);
-    Route::get('create/step2', ['as'=>'report.create.step2', 'uses'=>'ReportController@createStepTwo']);
+    Route::get('/data', ['as'=>'report.list', 'uses'=>'ReportController@listData']);
     Route::get('/', ['as'=>'report.index', 'uses'=>'ReportController@index']);
+    Route::get('create/', ['as'=>'report.create.step1', 'uses'=>'ReportController@create']);
+    Route::get('create/{id}', ['as'=>'report.create.step2', 'uses'=>'ReportController@createStepTwo']);
+    Route::post('create', ['as'=>'report.store', 'uses'=>'ReportController@store']);
+    Route::get('{id}', ['as'=>'report.show', 'uses'=>'ReportController@show']);
+    Route::get('{id}/edit', ['as'=>'report.edit', 'uses'=>'ReportController@edit']);
+    Route::put('{id}', ['as'=>'report.update', 'uses'=>'ReportController@update']);
+    Route::delete('{id}', ['as'=>'report.destroy', 'uses'=>'ReportController@destroy']);
 });
 

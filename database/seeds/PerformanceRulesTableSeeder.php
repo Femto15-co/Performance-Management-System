@@ -16,7 +16,7 @@ class PerformanceRulesTableSeeder extends Seeder
             array(
                 'rule' => 'admin',
                 'desc' =>'Admin',
-                'for' => 'Admin Only',
+                'employee_type' => '1',
                 'weight' => 1
             ),
 

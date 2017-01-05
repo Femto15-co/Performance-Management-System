@@ -13,10 +13,15 @@
     <!-- Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css" integrity="sha384-XdYbMnZ/QjLh6iI4ogqCTaIjrFk87ip+ekIjefZch0Y+PvJ8CDYtEs1ipDmPorQ+" crossorigin="anonymous">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:100,300,400,700">
+    <link rel="stylesheet" href="{{asset('css/main.css')}}">
 
     <!-- Styles -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.43/css/bootstrap-datetimepicker.css">
+    <!-- Add DataTable on Demand -->
+    @if(isset($includeDataTable))
+        <link rel="stylesheet" href="{{asset('css/dataTables.bootstrap.min.css')}}">
+    @endif
     <style>
         body {
             font-family: 'Lato';
@@ -120,6 +125,13 @@
 <script type="text/javascript" src="{{asset('js/collapse.js')}}"></script>
 <script type="text/javascript" src="{{asset('js/moment.min.js')}}"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.43/js/bootstrap-datetimepicker.min.js"></script>
+<!-- Add DataTable on Demand -->
+@if(isset($includeDataTable))
+    <script> var dataTableRoute = '{{$dataTableRoute}}'; </script>
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs/dt-1.10.12/cr-1.3.2/fh-3.1.2/r-2.1.0/rr-1.1.2/se-1.2.0/datatables.min.js"></script>
+    <script type="text/javascript" src="{{asset('js/dataTables.bootstrap.min.js')}}"></script>
+    <script type="text/javascript" src="{{asset('js/dataTableCustom.js')}}"></script>
+@endif
 @yield('extra-js')
 </body>
 </html>
