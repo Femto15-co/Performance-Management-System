@@ -16,6 +16,7 @@ class CreateDefectsTable extends Migration
         Schema::create('defects', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title');
+            $table->tinyInteger('score');
             $table->timestamps();
         });
     }

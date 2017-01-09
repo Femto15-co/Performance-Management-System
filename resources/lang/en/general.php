@@ -15,7 +15,7 @@ return [
     'show' => 'Show',
     'edit' => 'Edit',
     'actions' => 'Actions',
-    'main_page' => 'Main page',
+    'main_page' => 'Main Page',
     'date' => 'Date'
 
 ];
