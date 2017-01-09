@@ -19,5 +19,4 @@ return [
     'main_page' => 'Main page',
     'date' => 'Date',
     'not_applicable' => 'N/A'
-
 ];
