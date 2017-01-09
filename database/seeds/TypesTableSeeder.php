@@ -15,6 +15,10 @@ class TypesTableSeeder extends Seeder
         //Types to add to system
         $types = [
             array(
+                'type' => 'Admin',
+            ),
+
+            array(
                 'type' => 'Developer',
             ),
 

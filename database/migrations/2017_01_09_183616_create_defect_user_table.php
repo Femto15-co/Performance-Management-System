@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateDefectsTable extends Migration
+class CreateDefectUserTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,9 @@ class CreateDefectsTable extends Migration
      */
     public function up()
     {
-        Schema::create('defects', function (Blueprint $table) {
+        Schema::create('defect_user', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('title');
+            $table->integer('user_id')->unsigned();
             $table->timestamps();
         });
     }
@@ -27,6 +27,6 @@ class CreateDefectsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('defects');
+        Schema::dropIfExists('defect_user');
     }
 }
