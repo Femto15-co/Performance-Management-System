@@ -17,7 +17,7 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::group(['prefix'=>'report'], function(){
+Route::group(['prefix'=>'report', 'middleware' => 'auth'], function(){
     Route::get('/data', ['as'=>'report.list', 'uses'=>'ReportController@listData']);
     Route::get('/', ['as'=>'report.index', 'uses'=>'ReportController@index']);
     Route::get('create/', ['as'=>'report.create.step1', 'uses'=>'ReportController@create']);

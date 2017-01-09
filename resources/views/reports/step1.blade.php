@@ -9,7 +9,7 @@
         <div class="form-group {{ $errors->has('first_name') ? 'has-error' : ''}}">
             <label for="employee" class="col-sm-3 control-label">{{trans('reports.step1_choose_employee')}}</label>
             <div class="col-sm-6">
-                <select name="employee" class= "form-control">
+                <select name="employee" id="select-employee" class="form-control">
                     @foreach($employees as $employee)
                         <option value="{{$employee->id}}">{{$employee->name}}</option>
                     @endforeach
@@ -22,7 +22,7 @@
 
         <div class="form-group">
             <div class="col-sm-offset-3 col-sm-3">
-                <button type="submit" id="submitEmployee" class="btn btn-primary form-control">{{trans('general.create')}}</button>
+                <button type="submit" id="submit-employee" class="btn btn-primary form-control">{{trans('general.create')}}</button>
             </div>
         </div>
     </form>
@@ -34,14 +34,17 @@
 
 @section('extra-js')
     <script>
-        $('#submitEmployee').click(function(e){
+        $('#submit-employee').click(function(e){
             //Stop form submission
             e.preventDefault();
 
             //Get selected employee
-            
+            var selectEmployee = $('#select-employee').val();
+            //TODO Raise error if not employee selected
 
             //Redirect to step 2
+            var stepTwoURL = "{{route('report.create.step2', ':id')}}";
+            window.location.href = stepTwoURL.replace(':id', selectEmployee);
 
         });
     </script>
