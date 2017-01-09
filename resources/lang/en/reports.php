@@ -12,6 +12,8 @@ return [
 
     'step1_choose_employee' => 'Choose Employer',
     'step1_add_report' => 'Add New Report: Step 1',
+    'step2_add_report' => 'Add New Report: Step 2',
+    'edit_report' => 'Edit Report #:id',
     'no_employee' => 'No Employee Found',
     'no_rules' =>'No Rules',
     'not_created' => 'Error while adding report',
@@ -20,6 +22,9 @@ return [
     'overall_score' => 'Overall Score',
     'employee_name' => 'Employee Name',
     'reports' => 'Reports',
-    'add_new_report' => 'Add new report'
+    'add_new_report' => 'Add new report',
+    'not_found' => 'Report not found',
+    'view_report' => 'View Report #:id',
+    'no_scores_recorded' => 'No scores registered by user',
 
 ];

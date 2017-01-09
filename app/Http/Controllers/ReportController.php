@@ -44,7 +44,7 @@ class ReportController extends Controller
         if($employees->isEmpty())
         {
             //in no employees, redirect to reports index and show error message
-            Session::flash('alert',trans('reports.no_employee'));
+            Session::flash('error',trans('reports.no_employee'));
             return redirect(route('report.index'));
         }
 
@@ -61,19 +61,20 @@ class ReportController extends Controller
 
     public function createStepTwo($id)
     {
-        //if employee not passed from step1, abort
-        if(!$id)
-        {
-            //redirect to reports index and show no error message
-            return redirect(route('report.create.step1'));
-        }
-
         //Get employee type
         $employee = User::find($id);
         if(!$employee)
         {
             //in no employees, redirect to reports index and show error message
-            Session::flash('alert',trans('reports.no_employee'));
+            Session::flash('error',trans('reports.no_employee'));
+            return redirect(route('report.index'));
+        }
+
+        //Ensure that selected employee has employee rule
+        if(strcmp($employee->roles()->first()->name,'employee') != 0)
+        {
+            //if not an employee, redirect to index
+            Session::flash('error',trans('reports.no_employee'));
             return redirect(route('report.index'));
         }
 
@@ -83,12 +84,9 @@ class ReportController extends Controller
         if($performanceRules->isEmpty())
         {
             //in no rules, redirect to reports index and show error message
-            Session::flash('alert',trans('reports.no_rules'));
+            Session::flash('error',trans('reports.no_rules'));
             return redirect(route('report.index'));
         }
-
-        //Add employee to session to be merge to step2 request
-        Session::put('employee_id', $employee->id);
 
         //Pass Counter to view
         $counter = 0;
@@ -106,23 +104,21 @@ class ReportController extends Controller
         //Validate Request
         $this->validateReport($request);
 
-        //if session has employer id passed proceed, otherwise abort
-        if(!Session::has('employee_id'))
-        {
-            //redirect to reports index and show no error message
-            return redirect(route('report.index'));
-        }
-
         //Get employee
-        $employee = User::find(Session::get('employee_id'));
-
-        //Destroy session
-        Session::forget('employee_id');
+        $employee = User::find($request->input('employee'));
 
         if(!$employee)
         {
-            //in no employees, redirect to reports index and show error message
-            Session::flash('alert',trans('reports.no_employee'));
+            //if no employees, redirect to reports index and show error message
+            Session::flash('error',trans('reports.no_employee'));
+            return redirect(route('report.index'));
+        }
+
+        //Ensure that selected employee has employee rule
+        if(strcmp($employee->roles()->first()->name,'employee') != 0)
+        {
+            //if not an employee, redirect to index
+            Session::flash('error',trans('reports.no_employee'));
             return redirect(route('report.index'));
         }
 
@@ -131,7 +127,7 @@ class ReportController extends Controller
         if(!$report)
         {
             //if not created, redirect to reports index and show error message
-            Session::flash('alert',trans('reports.not_created'));
+            Session::flash('error',trans('reports.not_created'));
             return redirect(route('report.index'));
         }
 
@@ -144,7 +140,13 @@ class ReportController extends Controller
             if(!isset($scores[$i]))
                 break;
 
-            //Check first that not record contains same reportId, reviewerId and ruleId
+            //If no doesn't belong to selected employees related rules, ignore and conitue
+            $validRule = PerformanceRule::where('employee_type', \Auth::user()->employee_type)->where('id', $ruleId)->exists();
+
+            if(!$validRule)
+                continue;
+
+            //Check first that no record contains same reportId, reviewerId and ruleId
             $foundDuplicate = $report->scores()->where('rule_id',$ruleId)->where('reviewer_id', \Auth::user()->id)->count();
             if(!$foundDuplicate)
             {
@@ -152,10 +154,8 @@ class ReportController extends Controller
             }
         }
 
-        //redirect to reports index and show no error message
-        //TODO Redirect to view
         Session::flash('success',trans('reports.created_first'));
-        return redirect(route('report.index'));
+        return redirect(route('report.show', $report->id));
     }
 
     /**
@@ -166,7 +166,45 @@ class ReportController extends Controller
      */
     public function show($id)
     {
-        //
+        //Report array
+        $reviewersScores = array();
+
+        //Unique reviewers
+        $reviewers = array();
+
+        //Unique Rules
+        $rules = array();
+
+        $report = Report::find($id);
+        if(!$report)
+        {
+            //report not found, redirect to reports index and show error message
+            Session::flash('error',trans('reports.not_found'));
+            return redirect(route('report.index'));
+        }
+
+        //----- List Data in rules by reviewer matrix -----//
+        $scores = $report->scores()->get();
+        foreach($scores as $score)
+        {
+            $reviewersScores[$score->pivot->rule_id][$score->pivot->reviewer_id] = $score->pivot->score;
+
+            //List all unique reviewers
+            $reviewers[$score->pivot->reviewer_id] = User::find($score->pivot->reviewer_id);
+
+            //List all unique rules
+            $rules[$score->pivot->rule_id] = PerformanceRule::find($score->pivot->rule_id);
+        }
+
+        //if no rules, reviewers and reviwersScores register, abort
+        if(empty($reviewersScores) && empty($rules) && empty($rules))
+        {
+            //report not found, redirect to reports index and show error message
+            Session::flash('error',trans('reports.not_found'));
+            return redirect(route('report.index'));
+        }
+
+        return view('reports.show', compact('reviewersScores', 'reviewers', 'rules', 'id'));
     }
 
     /**
@@ -177,19 +215,67 @@ class ReportController extends Controller
      */
     public function edit($id)
     {
-        //
+        $report = Report::find($id);
+
+        if(!$report)
+        {
+            //report not found, redirect to reports index and show error message
+            Session::flash('error',trans('reports.not_found'));
+            return redirect(route('report.index'));
+        }
+
+        //Get scores recorded by authenticated user who attempted edit
+        $ruleScores = $report->scores()->where('reviewer_id', \Auth::user()->id)->get();
+
+        if($ruleScores->isEmpty())
+        {
+            //no scores recorded by user, redirect to reports index and show error message
+            Session::flash('error',trans('reports.no_scores_recorded'));
+            return redirect(route('report.index'));
+        }
+        
+        //Pass Counter to view
+        $counter = 0;
+        return view('reports.edit', compact(['ruleScores', 'id', 'counter']));
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  int  $id Report ID
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
-        //
+        //Validate Request
+        $this->validateReport($request);
+
+        $report = Report::find($id);
+
+        if(!$report)
+        {
+            //report not found, redirect to reports index and show error message
+            Session::flash('error',trans('reports.not_found'));
+            return redirect(route('report.index'));
+        }
+
+        $scores = $request->input('scores');
+        $i = 0;
+
+        foreach($request->input('rules') as $ruleId)
+        {
+            //If no score is paired with that rule, abort
+            if(!isset($scores[$i]))
+                break;
+
+            //Update pivot with new scores with their ordering
+            $report->scores()->where('rule_id', $ruleId)->where('reviewer_id', \Auth::user()->id)
+                ->update(['score'=>$scores[$i++]]);
+        }
+
+        Session::flash('success',trans('reports.updated'));
+        return redirect(route('report.show', $id));
     }
 
     /**
@@ -213,7 +299,7 @@ class ReportController extends Controller
         // Some defined rules that has to be achieved
         $rules = [
             'scores.*' => 'required|digits_between:1,10',
-            'rules.*'  => 'required|exists:performance_rules,id'
+            'rules.*'  => 'required|exists:performance_rules,id',
         ];
 
         // Run the validator on request data

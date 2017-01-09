@@ -28,6 +28,13 @@ div.rule-block
     padding-bottom: 0px;
 }
 
+span.performance-desc
+{
+    font-size: 12px;
+    font-weight: 300;
+    display:block;
+}
+
 /**
  * Glyphicon style tweaks
  */

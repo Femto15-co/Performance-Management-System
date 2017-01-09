@@ -27,6 +27,17 @@ class UsersTableSeeder extends Seeder
         $designer = \App\EmployeeType::whereType('Designer')->first();
         if(!$designer)
             return false;
+        
+        
+        //Get Employee role
+        $employeeRole = \App\Role::whereName('employee')->first();
+        if(!$employeeRole)
+            return false;
+
+        //Get Admin role
+        $adminRole = \App\Role::whereName('admin')->first();
+        if(!$adminRole)
+            return false;
 
         //Add users to system
         $users = [
@@ -55,7 +66,23 @@ class UsersTableSeeder extends Seeder
         //Add to DB if not exists
         foreach($users as $user)
         {
-            User::firstOrCreate($user);
+            $user = User::updateOrCreate(
+                ['email'=>$user['email']],
+                $user);
+
+            //Attach admin rule if name is admin
+            if($user['name'] == 'Admin')
+            {
+                $user->roles()->attach($adminRole->id);
+            }
+            //otherwise, attach employee rule
+            else if(in_array($user['name'], array('Developer', 'Designer')))
+            {
+                $user->roles()->attach($employeeRole->id);
+            }
+
+            
+            
         }
     }
 }
