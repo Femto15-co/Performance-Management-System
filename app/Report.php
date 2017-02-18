@@ -15,4 +15,10 @@ class Report extends Model
     {
         return $this->belongsToMany('App\PerformanceRule', 'scores', 'report_id', 'rule_id')->withPivot('score', 'reviewer_id');
     }
+
+    //Report has one employee, the person being reviewed
+    public function employee()
+    {
+        return $this->belongsTo('App\User','user_id');
+    }
 }

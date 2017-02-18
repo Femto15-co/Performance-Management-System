@@ -20,6 +20,12 @@
                                 {{$reviewer->name}}
                             </th>
                         @endforeach
+                        {{--Show final score if ready--}}
+                        @if($avgScores)
+                            <th>
+                                {{trans('reports.final_score')}}
+                            </th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody>
@@ -32,6 +38,10 @@
                         @foreach($reviewers as $reviewer)
                             <td>{{isset($reviewersScores[$rule->id][$reviewer->id])?$reviewersScores[$rule->id][$reviewer->id]:trans('general.not_applicable')}}</td>
                         @endforeach
+                        {{--Show final score if ready--}}
+                        @if($avgScores)
+                            <td>{{number_format($avgScores[$rule->id][0]->avg_score,2)}}</td>
+                        @endif
                     </tr>
                 @endforeach
                 </tbody>

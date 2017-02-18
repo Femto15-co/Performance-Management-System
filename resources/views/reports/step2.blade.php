@@ -3,11 +3,23 @@
 @section('content')
 <div class="container">
 
-    <h1>{{trans('reports.step2_add_report')}}</h1>
+    <h1>
+        @section('add_title')
+            {{isset($title)? $title: trans('reports.step2_add_report')}}
+        @show
+    </h1>
     <hr/>
-    <form class="" action="{{route('report.store')}}" method="post">
+    <form class="" action="{{isset($route)? $route: route('report.store')}}" method="post">
         {{csrf_field()}}
-        <input type="hidden" name="employee" value="{{$employee}}">
+
+        @if(isset($method_field))
+            {{$method_field}}
+        @endif
+
+        @if(isset($employee))
+            <input type="hidden" name="employee" value="{{$employee}}">
+        @endif
+
         @foreach($performanceRules as $rule)
             <div class="row margin-bottom-md rule-block">
                 <div class="form-group {{ $errors->has('scores.'.$counter) ? 'has-error' : ''}} clearfix no-margin-bottom">
@@ -26,7 +38,7 @@
 
         <div class="form-group">
             <div class="col-sm-offset-3 col-sm-3">
-                <button type="submit" class="btn btn-primary form-control">{{trans('general.create')}}</button>
+                <button type="submit" class="btn btn-primary form-control">{{isset($buttonText)? $buttonText: trans('general.create')}}</button>
             </div>
         </div>
     </form>

@@ -26,5 +26,12 @@ return [
     'not_found' => 'Report not found',
     'view_report' => 'View Report #:id',
     'no_scores_recorded' => 'No scores registered by user',
+    'not_deleted' => 'Report not Deleted',
+    'deleted' => 'Report Deleted!',
+    'participate_in_review' => 'Participate in reviewing yourself',
+    'participate' => 'Participate',
+    'final_score' => 'Final Score',
+    'final_report'=>'Final report',
+    'no_participation' => 'No participation allowed'
 
 ];
