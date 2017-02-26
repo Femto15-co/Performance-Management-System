@@ -7,8 +7,11 @@ use App\User;
 use Yajra\Datatables\Datatables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\DB;
 
 class DefectController extends Controller {
+
+	public $rules=['defect'=>'exists:defects,id','userId'=>'exists:users,id'];
 	/**
 	 * Display a listing of the users with defects.
 	 *
@@ -34,8 +37,10 @@ class DefectController extends Controller {
 	 *
 	 * @return \Illuminate\Http\Response
 	 */
-	public function create() {
-		//
+	public function create($userId) {
+		//Get all defects
+		$defects=Defect::all();
+		return view('defects.manage',compact(['defects','userId']));
 	}
 
 	/**
@@ -44,27 +49,34 @@ class DefectController extends Controller {
 	 * @param  \Illuminate\Http\Request  $request
 	 * @return \Illuminate\Http\Response
 	 */
-	public function store(Request $request) {
-		//
-	}
+	public function store(Request $request,$userId) {
+		//Add the user ID to the request
+		$request->merge(['userId'=>$userId]);
+		//Validate input
+		$this->validateDefect($request);
 
-	/**
-	 * Display the specified resource.
-	 *
-	 * @param  \App\Defect  $defect
-	 * @return \Illuminate\Http\Response
-	 */
-	public function show(Defect $defect) {
-		//
+		//Get the inteded user
+		$user=User::find($userId);
+		if (!$user||$user->hasRole('admin'))
+		{
+			Session::flash('error',trans('defects.no_employee'));
+			return redirect()->back();
+		}
+		//Attache defect to the user.
+		$user->defects()->attach($request->defect);
+		//Return success
+		Session::flash('flash_message',trans('defects.added'));
+		return redirect()->route('defect.index',[$userId]);
+
 	}
 
 	/**
 	 * Show the form for editing the specified resource.
 	 *
-	 * @param  \App\Defect  $defect
+	 * @param  \App\Defect  $defectAttachmentId
 	 * @return \Illuminate\Http\Response
 	 */
-	public function edit(Defect $defect) {
+	public function edit($userId,$defectAttachmentId) {
 		//
 	}
 
@@ -72,21 +84,39 @@ class DefectController extends Controller {
 	 * Update the specified resource in storage.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
-	 * @param  \App\Defect  $defect
+	 * @param  \App\Defect  $defectAttachmentId
 	 * @return \Illuminate\Http\Response
 	 */
-	public function update(Request $request, Defect $defect) {
+	public function update(Request $request,$defectAttachmentId) {
 		//
 	}
 
 	/**
 	 * Remove the specified resource from storage.
 	 *
-	 * @param  \App\Defect  $defect
+	 * @param  \App\Defect  $defectAttachmentId
 	 * @return \Illuminate\Http\Response
 	 */
-	public function destroy(Defect $defect) {
-		//
+	public function destroy($defectAttachmentId) {
+
+		//Defect deleted
+		if (DB::table('defect_user')->where('id',$defectAttachmentId)->delete())
+		{
+			Session::flash('flash_message',trans('defects.deleted'));
+			return redirect()->back();
+		}
+		//Couldn't delete defect
+		Session::flash('error',trans('defects.not_deleted'));
+		return redirect()->back();
+	}
+	/**
+	 * Function to validate request
+	 * @param  Request $request The request
+	 */
+	public function validateDefect(Request $request)
+	{
+
+		$this->validate($request,$this->rules);
 	}
 	/**
 	 * Returns reports data to DataTable
@@ -100,7 +130,6 @@ class DefectController extends Controller {
 			->addColumn('action', function ($defects) {
 
 				$formHead = "<form class='form-horizontal main_form' method='POST' action='" . route('defect.destroy', $defects->id) . "'>" . csrf_field();
-				$viewLink = "<a href=" . route('defect.show', $defects->id) . " class='btn btn-xs btn-success'><i class='glyphicon glyphicon-eye-open'></i> " . trans('general.show') . "</a>&nbsp;";
 				$editLink = "<a href=" . route('defect.edit', $defects->id) . " class='btn btn-xs btn-primary'><i class='glyphicon glyphicon-edit'></i>" . trans('general.edit') . "</a>";
 				$deleteForm =
 				"  <input type='hidden' name='_method' value='DELETE'/>
@@ -109,7 +138,7 @@ class DefectController extends Controller {
                         </button>
                     </form>";
 
-				return $formHead . $viewLink . $editLink . $deleteForm;
+				return $formHead . $editLink . $deleteForm;
 
 			}) //Change the Format of report date
 			->editColumn('created_at', function ($defects) {
