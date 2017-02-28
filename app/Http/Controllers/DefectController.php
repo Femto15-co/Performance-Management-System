@@ -22,7 +22,7 @@ class DefectController extends Controller {
 		$user=User::find($userId);
 		if (!$user)
 		{
-			Session::flash('alert',trans('defects.no_employee'));
+			Session::flash('alert',trans('users.no_employee'));
 			return redirect()->route('home');
 		}
 		//Include DataTable
@@ -59,7 +59,7 @@ class DefectController extends Controller {
 		$user=User::find($userId);
 		if (!$user||$user->hasRole('admin'))
 		{
-			Session::flash('error',trans('defects.no_employee'));
+			Session::flash('error',trans('users.no_employee'));
 			return redirect()->back();
 		}
 		//Attache defect to the user.
@@ -79,6 +79,7 @@ class DefectController extends Controller {
 	public function edit($userId,$defectAttachmentId) {
 		//Get all defects
 		$defects=Defect::all();
+		//Verify that the defect belongs to the given user id
 		$user=$this->verifyDefectUser($userId,$defectAttachmentId);
 		//Otherwise return edit
 		return view('defects.edit',['selectedDefect'=>$user->defects[0]->id,'defectAttachmentId'=>$defectAttachmentId,
@@ -93,6 +94,7 @@ class DefectController extends Controller {
 	 * @return \Illuminate\Http\Response
 	 */
 	public function update(Request $request,$userId,$defectAttachmentId) {
+		//Verify that the defect belongs to the given user id
 		$user=$this->verifyDefectUser($userId,$defectAttachmentId);
 		//Update defect
 		DB::table('defect_user')->where(
@@ -132,7 +134,7 @@ class DefectController extends Controller {
 		$this->validate($request,$this->rules);
 	}
 	/**
-	 * Returns reports data to DataTable
+	 * Returns defects data to DataTable
 	 *
 	 * @return JSON
 	 */
@@ -142,7 +144,7 @@ class DefectController extends Controller {
 		return Datatables::of($defects)
 			->addColumn('action', function ($defects) use ($userId) {
 
-				$formHead = "<form class='form-horizontal main_form' method='POST' action='" . route('defect.destroy', $defects->id) . "'>" . csrf_field();
+				$formHead = "<form class='delete-form' method='POST' action='" . route('defect.destroy', $defects->id) . "'>" . csrf_field();
 				$editLink = "<a href=" . route('defect.edit',[$userId,$defects->id]) . " class='btn btn-xs btn-primary'><i class='glyphicon glyphicon-edit'></i>" . trans('general.edit') . "</a>";
 				$deleteForm =
 				"  <input type='hidden' name='_method' value='DELETE'/>
@@ -175,7 +177,7 @@ class DefectController extends Controller {
 		//Didn't get a user
 		if (empty($user))
 		{
-			Session::flash('error',trans('defects.no_employee'));
+			Session::flash('error',trans('users.no_employee'));
 			return redirect()->back()->send();
 		}
 		//Defect id isn't correct

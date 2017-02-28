@@ -1,6 +1,8 @@
 @extends('layouts.app')
 @section('content')
 <div class="container">
+	<h1>{{trans('general.edit')}} {{trans('defects.title')}}</h1>
+    <hr/>
 	<form action="{{route('defect.update',[$userId,$defectAttachmentId])}}" method="POST" role="form">
 	{{csrf_field()}}
 	{{ method_field('PUT') }}

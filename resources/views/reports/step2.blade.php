@@ -1,5 +1,7 @@
 @extends('layouts.app')
-
+@section('extra-css')
+<link rel="stylesheet" href="{{asset('/css/star-rating.min.css')}}">
+@stop
 @section('content')
 <div class="container">
 
@@ -23,14 +25,14 @@
         @foreach($performanceRules as $rule)
             <div class="row margin-bottom-md rule-block">
                 <div class="form-group {{ $errors->has('scores.'.$counter) ? 'has-error' : ''}} clearfix no-margin-bottom">
-                    <label for="employee" class="col-sm-9 control-label text-left">{{$rule->rule}}</label>
+                    <label for="employee" class="col-xs-12 col-md-7 control-label text-left">{{$rule->rule}}</label>
                     <input type="hidden" name="rules[]" value="{{$rule->id}}"/>
-                    <div class="col-sm-3">
-                        <input type="number" name="scores[]" value=""/>
+                    <div class="col-xs-12  col-md-5">
+                        <input type="number" name="scores[]" value="" class="stars" data-show-clear="false"/>
                         {!! $errors->first('scores.'.$counter++, '<p class="help-block">:message</p>') !!}
                     </div>
                 </div>
-                <div class="rule-description col-sm-9 clearfix">
+                <div class="rule-description col-xs-12 col-sm-9 clearfix">
                     {{$rule->desc}}
                 </div>
             </div>
@@ -47,3 +49,7 @@
 
 </div>
 @endsection
+@section('extra-js')
+    <script type="text/javascript" src="{{asset('/js/star-rating.min.js')}}"></script>
+    <script type="text/javascript" src="{{asset('/js/report.js')}}"></script>
+@stop

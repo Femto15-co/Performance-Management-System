@@ -69,7 +69,7 @@ class UsersTableSeeder extends Seeder
             $user = User::updateOrCreate(
                 ['email'=>$user['email']],
                 $user);
-
+            
             //Attach admin rule if name is admin
             if($user['name'] == 'Admin')
             {

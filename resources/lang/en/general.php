@@ -10,6 +10,7 @@ return [
     |
     */
 
+    'home' => 'Home',
     'create' => 'Create',
     'delete' => 'Delete',
     'show' => 'Show',
@@ -18,5 +19,11 @@ return [
     'actions' => 'Actions',
     'main_page' => 'Main page',
     'date' => 'Date',
-    'not_applicable' => 'N/A'
+    'name' => 'Name',
+    'id' => 'ID',
+    'value' => 'Value',
+    'description' => 'Description',
+    'email' => 'Email',
+    'password' => 'Password',
+    'not_applicable' => 'N/A',
 ];

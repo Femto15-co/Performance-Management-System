@@ -3,16 +3,16 @@
 @section('content')
 <div class="container">
     <div class="row">
-        <h1>{{$user->name}}'s {{ trans('defects.title') }}</h1>
+        <h1>{{ trans('users.title') }}</h1>
         <hr/>
 
     </div>
 
     <div class="row margin-bottom-md">
         <!-- Add New Room Button -->
-        <a href="{{route('defect.create',['userId'=>$user->id])}}">
+        <a href="{{route('user.create')}}">
             <button type="button" class="btn btn-primary" >
-                <span class="glyphicon glyphicon-plus"></span>{{ trans('defects.add_new_defect') }}
+                <span class="glyphicon glyphicon-plus"></span>{{ trans('users.add_new') }}
             </button>
         </a>
     </div>
@@ -24,10 +24,10 @@
         <table id="data" width="100%"  class="table direction table-bordered table-striped dataTable text-center">
             <thead>
             <tr>
-                <th >{{ trans('defects.defect_id') }}</th>
-                <th >{{ trans('users.employee_name') }}</th>
-                <th >{{ trans('defects.score') }}</th>
-                <th >{{ trans('general.date') }}</th>
+                <th >{{ trans('general.id') }}</th>
+                <th >{{ trans('general.name') }}</th>
+                <th >{{ trans('general.email') }}</th>
+                <th >{{ trans('users.role') }}</th>
                 <th data-sortable="false" data-searchable="false">{{ trans('general.actions') }}</th>
             </tr>
             </thead>
@@ -45,3 +45,7 @@
 
 </div>
 @endsection
+
+@section('extra-js')
+
+@stop

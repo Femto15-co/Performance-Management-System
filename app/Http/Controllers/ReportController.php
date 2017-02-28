@@ -14,31 +14,18 @@ use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
 {
-    //Store logged in user
-    private $loggedInUser = "";
-
-    public function __construct()
-    {
-        // In Laravel 5.3, auth is not loaded into constructor because middleware has not ran yet
-        // The below is a workaround to load logged in user
-        $this->middleware(function ($request, $next) {
-            $this->loggedInUser = Auth::user();
-            return $next($request);
-        });
-    }
-
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\View\View
      */
-    public function index()
+    public function index($userId=null)
     {
         //Include DataTable
         $includeDataTable = true;
 
         //DataTable ajax route
-        $dataTableRoute = route('report.list');
+        $dataTableRoute = ($userId)?route('report.list',[$userId]):route('report.list');
 
         return view('reports.index', compact('includeDataTable', 'dataTableRoute'));
     }
@@ -153,7 +140,7 @@ class ReportController extends Controller
         $this->addScores($scores, $rules, $report);
 
         Session::flash('success',trans('reports.created_first'));
-        return redirect(route('report.index', $report->id));
+        return redirect(route('report.index'));
     }
 
     /**
@@ -173,14 +160,14 @@ class ReportController extends Controller
         }
 
         //Admin and user being evaluated can participate
-        if(!$this->loggedInUser->hasRole('admin') && $report->user_id != $this->loggedInUser->id )
+        if(!$this->loggedInUser->hasRole('admin') && $report->user_id != Auth::id() )
         {
             Session::flash('error',trans('reports.no_participation'));
             return redirect(route('report.index'));
         }
 
         //returns true if reviewer participated in the evaluation process
-        $reviewerParticipated = $report->scores()->where('reviewer_id', $this->loggedInUser->id)->exists();
+        $reviewerParticipated = $report->scores()->where('reviewer_id', Auth::id())->exists();
 
         //Allow participation if reviewer has not participated in the evaluation process yet ||
         //If report overall score is set, no longer participation is allowed
@@ -231,14 +218,14 @@ class ReportController extends Controller
         }
 
         //Admin and user being evaluated can participate
-        if(!$this->loggedInUser->hasRole('admin') && $report->user_id != $this->loggedInUser->id )
+        if(!Auth::user()->hasRole('admin') && $report->user_id != Auth::id() )
         {
             Session::flash('error',trans('reports.no_participation'));
             return redirect(route('report.index'));
         }
 
         //returns true if reviewer participated in the evaluation process
-        $reviewerParticipated = $report->scores()->where('reviewer_id', $this->loggedInUser->id)->exists();
+        $reviewerParticipated = $report->scores()->where('reviewer_id', Auth::id())->exists();
 
         //Allow participation if reviewer has not participated in the evaluation process yet ||
         //If report overall score is set, no longer participation is allowed
@@ -261,11 +248,11 @@ class ReportController extends Controller
         }
 
         //If employee is evaluating himself, calculate overall score and prevent further participation
-        if($employee->id == $this->loggedInUser->id)
+        if($employee->id == Auth::id())
         {
             //Calculate average scores and overall score by averaging all scores for that report excluding user's own review
             $avgScores = DB::table('scores')->select('rule_id',DB::raw( 'AVG(score) as avg_score' ))->where('report_id',$report->id)
-                ->where('reviewer_id', '!=', $this->loggedInUser->id)->groupBy('rule_id')->get();
+                ->where('reviewer_id', '!=', Auth::id())->groupBy('rule_id')->get();
 
             $overallScore = 0;
 
@@ -332,7 +319,7 @@ class ReportController extends Controller
         if($report->overall_score)
         {
             $avgScores = DB::table('scores')->select('rule_id',DB::raw( 'AVG(score) as avg_score' ))->where('report_id',$report->id)
-                ->where('reviewer_id', '!=', $this->loggedInUser->id)->groupBy('rule_id')->get()->groupBy('rule_id')->toArray();
+                ->where('reviewer_id', '!=', Auth::id())->groupBy('rule_id')->get()->groupBy('rule_id')->toArray();
         }
 
 
@@ -366,7 +353,7 @@ class ReportController extends Controller
         }
 
         //Get scores recorded by authenticated user who attempted edit
-        $ruleScores = $report->scores()->where('reviewer_id', $this->loggedInUser->id)->get();
+        $ruleScores = $report->scores()->where('reviewer_id', Auth::id())->get();
 
         if($ruleScores->isEmpty())
         {
@@ -425,7 +412,7 @@ class ReportController extends Controller
                 continue;
 
             //Update pivot with new scores with their ordering
-            $report->scores()->where('rule_id', $ruleId)->where('reviewer_id', $this->loggedInUser->id)
+            $report->scores()->where('rule_id', $ruleId)->where('reviewer_id', Auth::id())
                 ->update(['score'=>$scores[$i++]]);
         }
 
@@ -474,15 +461,22 @@ class ReportController extends Controller
      *
      * @return JSON
      */
-    public function listData()
+    public function listData(Request $request,$userId=null)
     {
         $reports = Report::join('users', 'reports.user_id', '=', 'users.id')
             ->select(['reports.id', 'users.name', 'reports.overall_score', 'reports.created_at']);
 
-        //If user is not admin, load users reports only
-        if(!$this->loggedInUser->hasRole('admin'))
+        //Consider the user id if we got one
+        //To display user's related reports only.
+        if ($userId)
         {
-            $reports = $reports->where('reports.user_id',$this->loggedInUser->id);
+            $reports=$reports->where('users.id',$userId);
+        }
+
+        //If user is not admin, load users reports only
+        if(!Auth::user()->hasRole('admin'))
+        {
+            $reports = $reports->where('reports.user_id',Auth::id());
         }
 
 
@@ -491,7 +485,7 @@ class ReportController extends Controller
                 //Current user
 
                 //returns true if reviewer participated in the evaluation process
-                $reviewerParticipated = $report->scores()->where('reviewer_id', $this->loggedInUser->id)->exists();
+                $reviewerParticipated = $report->scores()->where('reviewer_id', Auth::id())->exists();
 
                 //Show link, show only if overall score is defined
                 $viewLink = "";
@@ -510,7 +504,7 @@ class ReportController extends Controller
 
                 //Edit link, show while overall score is not defined, admin and reviewer has participated in the evaluation process
                 $editLink = "";
-                if(!$report->overall_score && $reviewerParticipated && $this->loggedInUser->hasRole('admin'))
+                if(!$report->overall_score && $reviewerParticipated && Auth::user()->hasRole('admin'))
                 {
                     $editLink = "<a href=".route('report.edit',$report->id)." class='btn btn-xs btn-primary'><i class='glyphicon glyphicon-edit'></i>".trans('general.edit')."</a>";
                 }
@@ -518,9 +512,9 @@ class ReportController extends Controller
                 //Delete form, show if admin
                 $deleteForm = "";
                 $formHead = "";
-                if($this->loggedInUser->hasRole('admin'))
+                if(Auth::user()->hasRole('admin'))
                 {
-                    $formHead = "<form class='form-horizontal main_form' method='POST' action='".route('report.destroy',$report->id)."'>".csrf_field();
+                    $formHead = "<form class='delete-form' method='POST' action='".route('report.destroy',$report->id)."'>".csrf_field();
                     $deleteForm =
                         "  <input type='hidden' name='_method' value='DELETE'/>
                         <button type='submit' class='btn btn-xs btn-danger main_delete'>
@@ -569,10 +563,10 @@ class ReportController extends Controller
                 continue;
 
             //Check first that no record contains same reportId, reviewerId and ruleId
-            $foundDuplicate = $report->scores()->where('rule_id',$ruleId)->where('reviewer_id', $this->loggedInUser->id)->count();
+            $foundDuplicate = $report->scores()->where('rule_id',$ruleId)->where('reviewer_id', Auth::id())->count();
             if(!$foundDuplicate)
             {
-                $report->scores()->attach([$ruleId => ['reviewer_id'=>$this->loggedInUser->id, 'score'=>$scores[$i++]]]);
+                $report->scores()->attach([$ruleId => ['reviewer_id'=>Auth::id(), 'score'=>$scores[$i++]]]);
             }
         }
 

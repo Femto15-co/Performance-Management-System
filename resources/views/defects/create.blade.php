@@ -1,6 +1,8 @@
 @extends('layouts.app')
 @section('content')
 <div class="container">
+	<h1>{{trans('general.create')}} {{trans('defects.title')}}</h1>
+    <hr/>
 	<form action="{{route('defect.store',[$userId])}}" method="POST" role="form">
 	{{csrf_field()}}
 		<div class="form-group">

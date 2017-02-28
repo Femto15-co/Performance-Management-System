@@ -8,7 +8,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Performance Management System') }}</title>
+    <title>{{ config('app.name', 'PMS') }}</title>
 
     <!-- Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css" integrity="sha384-XdYbMnZ/QjLh6iI4ogqCTaIjrFk87ip+ekIjefZch0Y+PvJ8CDYtEs1ipDmPorQ+" crossorigin="anonymous">
@@ -20,6 +20,7 @@
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.43/css/bootstrap-datetimepicker.css">
     <!-- Add DataTable on Demand -->
     @if(isset($includeDataTable))
+        <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.1.1/css/responsive.dataTables.min.css">
         <link rel="stylesheet" href="{{asset('css/dataTables.bootstrap.min.css')}}">
     @endif
     <style>
@@ -30,6 +31,9 @@
             margin-right: 6px;
         }
     </style>
+    @section('extra-css')
+        {{-- expr --}}
+    @show
     <!-- Scripts -->
     <script>
         window.Laravel = <?php echo json_encode([
@@ -60,8 +64,15 @@
             <div class="collapse navbar-collapse" id="app-navbar-collapse">
                 <!-- Left Side Of Navbar -->
                 <ul class="nav navbar-nav">
-                    <li><a href="{{ url('/') }}">Home</a></li>
-                    <li><a href="{{ route('report.index') }}">Reports</a></li>
+                @if (Auth::check())
+                    <li><a href="{{ route('report.index') }}">{{trans('reports.reports')}}</a></li>
+                    @if (Auth::user()->hasRole('employee'))
+                        <li><a href="{{ route('defect.index',[Auth::id()]) }}">{{trans('defects.title')}}</a></li>
+                        <li><a href="{{ route('bonus.index',[Auth::id()]) }}">{{trans('bonuses.title')}}</a></li>
+                    @elseif (Auth::user()->hasRole('admin'))
+                        <li><a href="{{ route('user.index') }}">{{trans('users.title')}}</a></li>
+                    @endif
+                @endif                    
                 </ul>
                 <!-- Right Side Of Navbar -->
                 <ul class="nav navbar-nav navbar-right">
@@ -130,6 +141,7 @@
 @if(isset($includeDataTable))
     <script> var dataTableRoute = '{{$dataTableRoute}}'; </script>
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs/dt-1.10.12/cr-1.3.2/fh-3.1.2/r-2.1.0/rr-1.1.2/se-1.2.0/datatables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.1.1/js/dataTables.responsive.min.js"></script>
     <script type="text/javascript" src="{{asset('js/dataTables.bootstrap.min.js')}}"></script>
     <script type="text/javascript" src="{{asset('js/dataTableCustom.js')}}"></script>
 @endif
