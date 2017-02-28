@@ -97,23 +97,25 @@
     <!-- Notifications Center  -->
     <!-- this is alert for Success operations -->
     <div class="container">
-        @section('session_flash')
-            @if(Session::has('flash_message'))
-                <div class=" callout callout-success alert alert-success" id="success-alert">
-                    <button type="button" class="close" data-dismiss="alert" style="float: right">x</button>
-                    <strong>Success!</strong>
-                    {{ Session::get('flash_message') }}
-                </div>
-            @endif
-        <!-- this is alert for Failure operations -->
-            @if(Session::has('error'))
-                <div class=" callout callout-danger alert alert-danger" id="success-alert">
-                    <button type="button" class="close" data-dismiss="alert" style="float: right">x</button>
-                    <strong>Problem! </strong>
-                    {{ Session::get('error') }}
-                </div>
-            @endif
-        @show
+        <div class="row">
+            @section('session_flash')
+                @if(Session::has('flash_message'))
+                    <div class=" callout callout-success alert alert-success" id="success-alert">
+                        <button type="button" class="close" data-dismiss="alert" style="float: right">x</button>
+                        <strong>Success!</strong>
+                        {{ Session::get('flash_message') }}
+                    </div>
+                @endif
+            <!-- this is alert for Failure operations -->
+                @if(Session::has('error'))
+                    <div class=" callout callout-danger alert alert-danger" id="success-alert">
+                        <button type="button" class="close" data-dismiss="alert" style="float: right">x</button>
+                        <strong>Problem! </strong>
+                        {{ Session::get('error') }}
+                    </div>
+                @endif
+            @show
+        </div>
     </div>
     @yield('content')
 </div>

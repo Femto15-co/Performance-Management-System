@@ -18,6 +18,6 @@ class Defect extends Model
      */
     public function users()
     {
-    	return $this->belongsToMany('App\User')->withTimestamps();
+    	return $this->belongsToMany('App\User')->withPivot('id','defect_id','user_id')->withTimestamps();
     }
 }

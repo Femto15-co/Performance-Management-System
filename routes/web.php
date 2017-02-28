@@ -39,7 +39,7 @@ Route::group(['prefix' => 'defect','middleware'=>'role:admin'], function () {
 	Route::get('/{userId}', ['as' => 'defect.index', 'uses' => 'DefectController@index']);
 	Route::get('{userId}/create', ['as' => 'defect.create', 'uses' => 'DefectController@create']);
 	Route::post('{userId}/create', ['as' => 'defect.store', 'uses' => 'DefectController@store']);
-	Route::get('{id}/edit', ['as' => 'defect.edit', 'uses' => 'DefectController@edit']);
+	Route::get('{userId}/{id}/edit', ['as' => 'defect.edit', 'uses' => 'DefectController@edit']);
 	Route::put('{userId}/{id}', ['as' => 'defect.update', 'uses' => 'DefectController@update']);
 	Route::delete('{id}', ['as' => 'defect.destroy', 'uses' => 'DefectController@destroy']);
 });

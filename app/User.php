@@ -31,6 +31,6 @@ class User extends Authenticatable
 
     public function defects()
     {
-        return $this->belongsToMany('App\Defect')->withTimestamps();;
+        return $this->belongsToMany('App\Defect')->withPivot('id','defect_id','user_id')->withTimestamps();
     }
 }

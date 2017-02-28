@@ -40,7 +40,7 @@ class DefectController extends Controller {
 	public function create($userId) {
 		//Get all defects
 		$defects=Defect::all();
-		return view('defects.manage',compact(['defects','userId']));
+		return view('defects.create',compact(['defects','userId']));
 	}
 
 	/**
@@ -77,7 +77,12 @@ class DefectController extends Controller {
 	 * @return \Illuminate\Http\Response
 	 */
 	public function edit($userId,$defectAttachmentId) {
-		//
+		//Get all defects
+		$defects=Defect::all();
+		$user=$this->verifyDefectUser($userId,$defectAttachmentId);
+		//Otherwise return edit
+		return view('defects.edit',['selectedDefect'=>$user->defects[0]->id,'defectAttachmentId'=>$defectAttachmentId,
+			'userId'=>$userId,'defects'=>$defects]);
 	}
 
 	/**
@@ -87,8 +92,16 @@ class DefectController extends Controller {
 	 * @param  \App\Defect  $defectAttachmentId
 	 * @return \Illuminate\Http\Response
 	 */
-	public function update(Request $request,$defectAttachmentId) {
-		//
+	public function update(Request $request,$userId,$defectAttachmentId) {
+		$user=$this->verifyDefectUser($userId,$defectAttachmentId);
+		//Update defect
+		DB::table('defect_user')->where(
+			[
+			'id'=>$defectAttachmentId,
+			'user_id'=>$userId
+			])->update(['defect_id'=>$request->defect]);
+		Session::flash('flash_message',trans('defects.updated'));
+		return redirect()->route('defect.index',[$userId]);
 	}
 
 	/**
@@ -127,10 +140,10 @@ class DefectController extends Controller {
 		//Get defects related to a user by userId
 		$defects=User::join('defect_user','users.id','defect_user.user_id')->join('defects','defect_user.defect_id','defects.id')->select(['defect_user.id','defects.title','defects.score','defect_user.created_at'])->where('users.id',$userId);
 		return Datatables::of($defects)
-			->addColumn('action', function ($defects) {
+			->addColumn('action', function ($defects) use ($userId) {
 
 				$formHead = "<form class='form-horizontal main_form' method='POST' action='" . route('defect.destroy', $defects->id) . "'>" . csrf_field();
-				$editLink = "<a href=" . route('defect.edit', $defects->id) . " class='btn btn-xs btn-primary'><i class='glyphicon glyphicon-edit'></i>" . trans('general.edit') . "</a>";
+				$editLink = "<a href=" . route('defect.edit',[$userId,$defects->id]) . " class='btn btn-xs btn-primary'><i class='glyphicon glyphicon-edit'></i>" . trans('general.edit') . "</a>";
 				$deleteForm =
 				"  <input type='hidden' name='_method' value='DELETE'/>
                         <button type='submit' class='btn btn-xs btn-danger main_delete'>
@@ -145,5 +158,33 @@ class DefectController extends Controller {
 				return date('d M Y', strtotime($defects->created_at));
 			}) // To Update the Offdays Section and Convert it to String
 			->make();
+	}
+	/**
+	 * Verify the selected defect + user compination
+	 * @param  integer $userId             The user Id
+	 * @param  Integer $defectAttachmentId Defect User Pivot Id
+	 * @return mixed   User object on success or redirect otherwise
+	 */
+	public function verifyDefectUser($userId,$defectAttachmentId)
+	{
+		//Get the user with the selected defect.
+		$user=User::with(['defects'=>function($query) use ($defectAttachmentId)
+		{
+			$query->where('defect_user.id',$defectAttachmentId);
+		}])->where('id',$userId)->first();
+		//Didn't get a user
+		if (empty($user))
+		{
+			Session::flash('error',trans('defects.no_employee'));
+			return redirect()->back()->send();
+		}
+		//Defect id isn't correct
+		if (!isset($user->defects[0]->pivot))
+		{
+			Session::flash('error',trans('defects.no_defect'));
+			return redirect()->back()->send();;
+		}
+
+		return $user;
 	}
 }

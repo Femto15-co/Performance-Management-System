@@ -19,7 +19,9 @@ return [
     'defects' => 'Defects',
     'add_new_defect' => 'Add New Defect',
     'added'=>'Defect Added Succesfully!',
+    'updated'=>'Defect Updated Succesfully!',
     'deleted'=>'Defect Deleted Succesfully!',
     'not_deleted'=>"Defect Couldn't Be Deleted!",
+    'no_defect'=>"No defect attached!",
 
 ];
