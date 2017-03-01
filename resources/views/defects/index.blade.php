@@ -3,28 +3,30 @@
 @section('content')
 <div class="container">
     <div class="row">
-        <h1>@role ('admin')
-        {{$user->name}}'s 
-        @endrole{{ trans('defects.title') }}</h1>
-        <hr/>
-
+        <div class="col-xs-12">
+            <h1>@role ('admin')
+            {{$user->name}}'s 
+            @endrole{{ trans('defects.title') }}</h1>
+            <hr/>
+        </div>
     </div>
 
     <div class="row margin-bottom-md">
-        @role ('admin')
-        <!-- Add New Room Button -->
-        <a href="{{route('defect.create',['userId'=>$user->id])}}">
-            <button type="button" class="btn btn-primary" >
-                <span class="glyphicon glyphicon-plus"></span>{{ trans('defects.add_new_defect') }}
-            </button>
-        </a>
-        @endrole
+        <div class="col-xs-12">
+            @role ('admin')
+            <!-- Add New Room Button -->
+            <a href="{{route('defect.create',['userId'=>$user->id])}}">
+                <button type="button" class="btn btn-primary" >
+                    <span class="glyphicon glyphicon-plus"></span>{{ trans('defects.add_new_defect') }}
+                </button>
+            </a>
+            @endrole
+        </div>
     </div>
 
 
 
     <!-- The which display the all data of Expenses -->
-    <div class="row margin-bottom-md">
         <table id="data" width="100%"  class="table direction table-bordered table-striped dataTable text-center">
             <thead>
             <tr>
@@ -43,7 +45,6 @@
         <a href="/">
             <button type="button" class="btn btn-primary" ><span class="glyphicon glyphicon-home"></span>{{ trans('general.main_page') }} </button>
         </a>
-    </div>
 
 
 

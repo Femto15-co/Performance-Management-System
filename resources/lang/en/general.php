@@ -28,4 +28,5 @@ return [
     'not_applicable' => 'N/A',
     'not_ready' => 'Not ready yet',
     'of' => 'Of',
+    'month' => 'Month',
 ];

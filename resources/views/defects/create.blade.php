@@ -18,3 +18,7 @@
 	</form>
 </div>
 @stop
+
+@section('packages')
+	@include('packages.select2')
+@stop

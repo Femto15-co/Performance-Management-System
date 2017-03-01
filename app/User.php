@@ -35,6 +35,15 @@ class User extends Authenticatable
         return $this->belongsToMany('App\Defect')->withPivot('id','defect_id','user_id')->withTimestamps();
     }
 
+    public function reports()
+    {
+        return $this->hasMany('App\Report');
+    }
+    public function bonuses()
+    {
+        return $this->hasMany('App\Bonus');
+    }
+
     public function setPasswordAttribute($value)
     {
         $this->attributes['password']=Hash::make($value);

@@ -55,3 +55,10 @@ Route::group(['middleware'=>['auth','role:admin']],function ()
     Route::get('user/data', ['as'=>'user.list', 'uses'=>'UserController@listData']);
     Route::resource('user','UserController');    # code...
 });
+
+//Monthly Statistics routes
+Route::group(['prefix' => 'statistics','middleware'=>['auth','role:employee']],function ()
+{
+   Route::get('/',['as'=>'statistics.view','uses'=>'StatisticsController@index']); 
+   Route::post('/get',['as'=>'statistics.get','uses'=>'StatisticsController@get']); 
+});

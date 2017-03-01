@@ -32,7 +32,7 @@
                         {!! $errors->first('scores.'.$counter++, '<p class="help-block">:message</p>') !!}
                     </div>
                 </div>
-                <div class="rule-description col-xs-12 col-sm-9 clearfix">
+                <div class="rule-description col-xs-12 col-sm-7 clearfix">
                     {{$rule->desc}}
                 </div>
             </div>

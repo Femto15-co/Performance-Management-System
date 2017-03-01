@@ -19,4 +19,18 @@ jQuery(document).ready(function($) {
 		},
 		clearCaption: '0 Starts'
 	});
+	$('input.starz').rating({
+	displayOnly: true,
+	stars: 6,
+	max: 10,
+	size: 'xs',
+	starCaptions: {
+		1: '1 star',
+		2: '2 stars',
+		3: '3 stars',
+		4: '4 stars',
+		5: '5 stars',
+	},
+	clearCaption: '0 Starts'
+});
 });

@@ -140,7 +140,7 @@ class ReportController extends Controller
         //Attach scores to report
         $this->addScores($scores, $rules, $report);
 
-        Session::flash('success',trans('reports.created_first'));
+        Session::flash('flash_message',trans('reports.created_first'));
         return redirect(route('report.index'));
     }
 
@@ -273,11 +273,11 @@ class ReportController extends Controller
             //Commit changes to database
             $report->save();
 
-            Session::flash('success',trans('reports.created_first'));
+            Session::flash('flash_message',trans('reports.created_first'));
             return redirect(route('report.show', $report->id));
         }
 
-        Session::flash('success',trans('reports.created_first'));
+        Session::flash('flash_message',trans('reports.created_first'));
         return redirect(route('report.index', $report->id));
     }
 
@@ -430,7 +430,7 @@ class ReportController extends Controller
                 ->update(['score'=>$scores[$i++]]);
         }
 
-        Session::flash('success',trans('reports.updated'));
+        Session::flash('flash_message',trans('reports.updated'));
         return redirect(route('report.index'));
     }
 
@@ -449,7 +449,7 @@ class ReportController extends Controller
             return redirect(route('report.index', $id));
         }
 
-        Session::flash('success',trans('reports.deleted'));
+        Session::flash('flash_message',trans('reports.deleted'));
         return redirect(route('report.index', $id));
 
     }

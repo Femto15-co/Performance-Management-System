@@ -37,8 +37,8 @@
     <!-- Scripts -->
     <script>
         window.Laravel = <?php echo json_encode([
-                'csrfToken' => csrf_token(),
-        ]); ?>
+	'csrfToken' => csrf_token(),
+]); ?>
     </script>
 </head>
 <body>
@@ -69,10 +69,11 @@
                     @if (Auth::user()->hasRole('employee'))
                         <li><a href="{{ route('defect.index',[Auth::id()]) }}">{{trans('defects.title')}}</a></li>
                         <li><a href="{{ route('bonus.index',[Auth::id()]) }}">{{trans('bonuses.title')}}</a></li>
+                        <li><a href="{{ route('statistics.view') }}">{{trans('statistics.title')}}</a></li>
                     @elseif (Auth::user()->hasRole('admin'))
                         <li><a href="{{ route('user.index') }}">{{trans('users.employees')}}</a></li>
                     @endif
-                @endif                    
+                @endif
                 </ul>
                 <!-- Right Side Of Navbar -->
                 <ul class="nav navbar-nav navbar-right">
@@ -146,5 +147,6 @@
     <script type="text/javascript" src="{{asset('js/dataTableCustom.js')}}"></script>
 @endif
 @yield('extra-js')
+@yield('packages')
 </body>
 </html>
