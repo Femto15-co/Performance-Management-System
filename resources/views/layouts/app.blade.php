@@ -70,7 +70,7 @@
                         <li><a href="{{ route('defect.index',[Auth::id()]) }}">{{trans('defects.title')}}</a></li>
                         <li><a href="{{ route('bonus.index',[Auth::id()]) }}">{{trans('bonuses.title')}}</a></li>
                     @elseif (Auth::user()->hasRole('admin'))
-                        <li><a href="{{ route('user.index') }}">{{trans('users.title')}}</a></li>
+                        <li><a href="{{ route('user.index') }}">{{trans('users.employees')}}</a></li>
                     @endif
                 @endif                    
                 </ul>
@@ -112,7 +112,7 @@
             @section('session_flash')
                 @if(Session::has('flash_message'))
                     <div class=" callout callout-success alert alert-success" id="success-alert">
-                        <button type="button" class="close" data-dismiss="alert" style="float: right">x</button>
+                        <i class="close glyphicon glyphicon-remove" data-dismiss="alert" style="float: right"></i>
                         <strong>Success!</strong>
                         {{ Session::get('flash_message') }}
                     </div>
@@ -120,7 +120,7 @@
             <!-- this is alert for Failure operations -->
                 @if(Session::has('error'))
                     <div class=" callout callout-danger alert alert-danger" id="success-alert">
-                        <button type="button" class="close" data-dismiss="alert" style="float: right">x</button>
+                        <i class="close glyphicon glyphicon-remove" data-dismiss="alert" style="float: right"></i>
                         <strong>Problem! </strong>
                         {{ Session::get('error') }}
                     </div>

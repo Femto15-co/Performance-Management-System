@@ -26,4 +26,6 @@ return [
     'email' => 'Email',
     'password' => 'Password',
     'not_applicable' => 'N/A',
+    'not_ready' => 'Not ready yet',
+    'of' => 'Of',
 ];

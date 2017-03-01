@@ -27,7 +27,7 @@ class ReportController extends Controller
         //DataTable ajax route
         $dataTableRoute = ($userId)?route('report.list',[$userId]):route('report.list');
 
-        return view('reports.index', compact('includeDataTable', 'dataTableRoute'));
+        return view('reports.index', compact('includeDataTable', 'dataTableRoute','userId'));
     }
 
     /**
@@ -117,15 +117,16 @@ class ReportController extends Controller
         }
 
         //Ensure that selected employee has employee rule
-        if(strcmp($employee->roles()->first()->name,'employee') != 0)
+        if(!$employee->hasRole('employee'))
         {
             //if not an employee, redirect to index
             Session::flash('error',trans('reports.no_employee'));
             return redirect(route('report.index'));
         }
-
+        //Get the max possible score
+        $maxScore=PerformanceRule::select(DB::raw('SUM(weight)*10 as final'))->where('employee_type',$employee->employee_type)->first();
         //Create Report
-        $report = Report::create(['user_id'=>$employee->id]);
+        $report = Report::create(['user_id'=>$employee->id,'max_score'=>intval($maxScore->final)]);
         if(!$report)
         {
             //if not created, redirect to reports index and show error message
@@ -160,7 +161,7 @@ class ReportController extends Controller
         }
 
         //Admin and user being evaluated can participate
-        if(!$this->loggedInUser->hasRole('admin') && $report->user_id != Auth::id() )
+        if(!Auth::user()->hasRole('admin') && $report->user_id != Auth::id() )
         {
             Session::flash('error',trans('reports.no_participation'));
             return redirect(route('report.index'));
@@ -258,7 +259,12 @@ class ReportController extends Controller
 
             foreach($avgScores as $ruleScore)
             {
-                $overallScore += $ruleScore->avg_score;
+                $rule=PerformanceRule::find($ruleScore->rule_id);
+                if (!$rule)
+                {
+                    continue;
+                }
+                $overallScore += $ruleScore->avg_score*$rule->weight;
             }
 
 
@@ -301,6 +307,14 @@ class ReportController extends Controller
             return redirect(route('report.index'));
         }
 
+        //Trying to see other users reports
+        if (!Auth::user()->hasRole('admin')&&$report->user_id!=Auth::id())
+        {
+           //report not found, redirect to reports index and show error message
+            Session::flash('error',trans('reports.not_found'));
+            return redirect(route('report.index')); 
+        }
+
         //----- List Data in rules by reviewer matrix -----//
         $scores = $report->scores()->get();
         foreach($scores as $score)
@@ -319,7 +333,7 @@ class ReportController extends Controller
         if($report->overall_score)
         {
             $avgScores = DB::table('scores')->select('rule_id',DB::raw( 'AVG(score) as avg_score' ))->where('report_id',$report->id)
-                ->where('reviewer_id', '!=', Auth::id())->groupBy('rule_id')->get()->groupBy('rule_id')->toArray();
+                ->where('reviewer_id', '!=', $report->user_id)->groupBy('rule_id')->get()->groupBy('rule_id')->toArray();
         }
 
 
@@ -331,7 +345,7 @@ class ReportController extends Controller
             return redirect(route('report.index'));
         }
 
-        return view('reports.show', compact('reviewersScores', 'reviewers', 'rules', 'id', 'avgScores'));
+        return view('reports.show', compact('reviewersScores', 'reviewers', 'rules', 'id', 'avgScores','report'));
     }
 
     /**
@@ -417,7 +431,7 @@ class ReportController extends Controller
         }
 
         Session::flash('success',trans('reports.updated'));
-        return redirect(route('report.index', $id));
+        return redirect(route('report.index'));
     }
 
     /**
@@ -464,19 +478,20 @@ class ReportController extends Controller
     public function listData(Request $request,$userId=null)
     {
         $reports = Report::join('users', 'reports.user_id', '=', 'users.id')
-            ->select(['reports.id', 'users.name', 'reports.overall_score', 'reports.created_at']);
+            ->select(['reports.id', 'users.name', 'reports.overall_score', 'reports.max_score', 'reports.created_at']);
 
-        //Consider the user id if we got one
-        //To display user's related reports only.
-        if ($userId)
-        {
-            $reports=$reports->where('users.id',$userId);
-        }
+        
 
         //If user is not admin, load users reports only
         if(!Auth::user()->hasRole('admin'))
         {
             $reports = $reports->where('reports.user_id',Auth::id());
+        }
+        //Consider the user id if we got one
+        //To display user's related reports only.
+        elseif($userId)
+        {
+            $reports=$reports->where('reports.user_id',$userId);
         }
 
 
@@ -491,7 +506,7 @@ class ReportController extends Controller
                 $viewLink = "";
                 if($report->overall_score){
                     $viewLink = "<a href=".route('report.show',$report->id)." class='btn btn-xs btn-success'>
-                    <i class='glyphicon glyphicon-view'></i> ".trans('reports.final_report')."</a>&nbsp;";
+                    <i class='glyphicon glyphicon-eye-open'></i> ".trans('reports.final_report')."</a>&nbsp;";
                 }
 
                 //Participate link, show while overall score is not defined and reviewer has not participated in the evaluation process yet
@@ -499,7 +514,7 @@ class ReportController extends Controller
                 if(!$report->overall_score && !$reviewerParticipated)
                 {
                     $participateLink = "<a href=".route('report.getParticipate',$report->id)." class='btn btn-xs btn-success'>
-                <i class='glyphicon glyphicon-view'></i> ".trans('reports.participate')."</a>&nbsp;";
+                <i class='glyphicon glyphicon-pencil'></i> ".trans('reports.participate')."</a>&nbsp;";
                 }
 
                 //Edit link, show while overall score is not defined, admin and reviewer has participated in the evaluation process
@@ -518,7 +533,7 @@ class ReportController extends Controller
                     $deleteForm =
                         "  <input type='hidden' name='_method' value='DELETE'/>
                         <button type='submit' class='btn btn-xs btn-danger main_delete'>
-                            <i class='glyphicon glyphicon-delete'></i> ".trans('general.delete')."
+                            <i class='glyphicon glyphicon-trash'></i> ".trans('general.delete')."
                         </button>
                     </form>";
                 }
@@ -529,7 +544,12 @@ class ReportController extends Controller
             }) //Change the Format of report date
             ->editColumn('created_at', function ($reports) {
                 return date('d M Y', strtotime($reports->created_at));
-            }) // To Update the Offdays Section and Convert it to String
+            })->editColumn('overall_score',function($report)
+            {
+                return ($report->overall_score==0)?trans('general.not_ready'):$report->overall_score.' '.trans('of').' '.$report->max_score;
+            })
+            //Remove max_score
+            ->removeColumn('max_score')
             ->make();
     }
 

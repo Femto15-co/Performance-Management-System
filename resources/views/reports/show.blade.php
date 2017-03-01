@@ -44,6 +44,11 @@
                         @endif
                     </tr>
                 @endforeach
+                <th class="col-md-3">
+                    {{trans('reports.result')}}
+                </th>
+                <td colspan='3' class="text-center">{{trans('reports.scoreOf',['x'=>$report->overall_score,'y'=>$report->max_score])}}</td>
+
                 </tbody>
             </table>
         </div>

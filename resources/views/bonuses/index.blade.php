@@ -3,18 +3,22 @@
 @section('content')
 <div class="container">
     <div class="row">
-        <h1>{{$user->name}}'s {{ trans('bonuses.title') }}</h1>
+        <h1>@role ('admin')
+        {{$user->name}}'s 
+        @endrole{{ trans('bonuses.title') }}</h1>
         <hr/>
 
     </div>
 
     <div class="row margin-bottom-md">
+    @role ('admin')
         <!-- Add New Room Button -->
         <a href="{{route('bonus.create',['userId'=>$user->id])}}">
             <button type="button" class="btn btn-primary" >
                 <span class="glyphicon glyphicon-plus"></span>{{ trans('bonuses.add_new') }}
             </button>
         </a>
+    @endrole
     </div>
 
 

@@ -18,5 +18,6 @@ return [
 	'added' => 'User Added Successfully!',
 	'not_added' => "User Couldn't Be Added!",
 	'no_employee' => 'No Employee Found',
+	'employees'=>'Employees'
 
 ];

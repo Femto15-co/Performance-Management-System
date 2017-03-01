@@ -24,7 +24,7 @@
 			<label for="">{{trans('users.role')}}:</label>
 			<select class="form-control" id="employee_type" name="employee_type">
 				@foreach ($roles as $role)
-				<option value="{{$role->id}}">{{$role->type}}</option>
+				<option value="{{$role->id}}" {{(old('type')==$role->type)?'selected':''}}>{{$role->type}}</option>
 				@endforeach
 			</select>
 			{!! $errors->first('role', '<p class="help-block">:message</p>') !!}

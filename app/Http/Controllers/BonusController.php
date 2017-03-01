@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Bonus;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Yajra\Datatables\Datatables;
 
@@ -19,6 +20,12 @@ class BonusController extends Controller {
 	 * @return \Illuminate\Http\Response
 	 */
 	public function index($userId) {
+
+		//Only admin can pick whatever id they like
+		if (!Auth::user()->hasRole('admin')) {
+			$userId = Auth::id();
+		}
+
 		//Get the user and return an error if no user
 		$user = User::find($userId);
 		if (!$user) {
@@ -100,7 +107,7 @@ class BonusController extends Controller {
 	 * @return \Illuminate\Http\Response
 	 */
 	public function update(Request $request, $userId, $id) {
-        $request->merge(['user_id'=>$userId]);
+		$request->merge(['user_id' => $userId]);
 		//Validate input
 		$this->validateBonus($request);
 		//Validate that we got the correct bonus
@@ -171,22 +178,31 @@ class BonusController extends Controller {
 	public function listData($userId) {
 		//Get bonuses related to a user by userId
 		$bonuses = User::join('bonuses', 'users.id', 'bonuses.user_id')
-			->select(['bonuses.id', 'bonuses.description', 'bonuses.value', 'bonuses.created_at'])
-			->where('users.id', $userId);
+			->select(['bonuses.id', 'bonuses.description', 'bonuses.value', 'bonuses.created_at']);
+
+		//Make sure that user can't see other users data
+		if (Auth::user()->hasRole('admin')) {
+			$bonuses = $bonuses->where('users.id', $userId);
+		} else {
+			$bonuses = $bonuses->where('users.id', Auth::id());
+		}
 
 		return Datatables::of($bonuses)
 			->addColumn('action', function ($bonuses) use ($userId) {
+				if (Auth::user()->hasRole('admin')) {
+					$formHead = "<form class='delete-form' method='POST' action='" . route('bonus.destroy', $bonuses->id) . "'>" . csrf_field();
+					$editLink = "<a href=" . route('bonus.edit', [$userId, $bonuses->id]) . " class='btn btn-xs btn-primary'><i class='glyphicon glyphicon-edit'></i>" . trans('general.edit') . "</a>";
+					$deleteForm =
+					"  <input type='hidden' name='_method' value='DELETE'/>
+                            <button type='submit' class='btn btn-xs btn-danger main_delete'>
+                                <i class='glyphicon glyphicon-trash'></i> " . trans('general.delete') . "
+                            </button>
+                        </form>";
 
-				$formHead = "<form class='delete-form' method='POST' action='" . route('bonus.destroy', $bonuses->id) . "'>" . csrf_field();
-				$editLink = "<a href=" . route('bonus.edit', [$userId, $bonuses->id]) . " class='btn btn-xs btn-primary'><i class='glyphicon glyphicon-edit'></i>" . trans('general.edit') . "</a>";
-				$deleteForm =
-				"  <input type='hidden' name='_method' value='DELETE'/>
-                        <button type='submit' class='btn btn-xs btn-danger main_delete'>
-                            <i class='glyphicon glyphicon-trash'></i> " . trans('general.delete') . "
-                        </button>
-                    </form>";
-
-				return $formHead . $editLink . $deleteForm;
+					return $formHead . $editLink . $deleteForm;
+				}
+				//Otherwise no actions
+				return '-';
 
 			}) //Change the Format of report date
 			->editColumn('created_at', function ($bonuses) {

@@ -9,13 +9,14 @@
     </div>
 
     <div class="row margin-bottom-md">
-
+        @role ('admin')
         <!-- Add New Room Button -->
-        <a href="{{route('report.create.step1')}}">
+        <a href="{{(isset($userId))?route('report.create.step2',[$userId]):route('report.create.step1')}}">
             <button type="button" class="btn btn-primary" >
                 <span class="glyphicon glyphicon-plus"></span>{{ trans('reports.add_new_report') }}
             </button>
         </a>
+        @endrole
     </div>
 
 

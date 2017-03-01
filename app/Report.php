@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Report extends Model
 {
     public $fillable = array(
-        'user_id'
+        'user_id','max_score'
     );
 
     //Report has many scores, it link to performance rules in a many to many relationship

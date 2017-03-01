@@ -29,25 +29,26 @@ Route::group(['prefix'=>'report', 'middleware' => 'auth'], function(){
     Route::delete('{id}', ['as'=>'report.destroy', 'uses'=>'ReportController@destroy'])->middleware('role:admin');
 });
 //Defect routes
-Route::group(['prefix' => 'defect','middleware'=>['auth','role:admin']], function () {
-	Route::get('{userId}/data', ['as' => 'defect.list', 'uses' => 'DefectController@listData']);
-	Route::get('/{userId}', ['as' => 'defect.index', 'uses' => 'DefectController@index']);
-	Route::get('{userId}/create', ['as' => 'defect.create', 'uses' => 'DefectController@create']);
-	Route::post('{userId}/create', ['as' => 'defect.store', 'uses' => 'DefectController@store']);
-	Route::get('{userId}/{id}/edit', ['as' => 'defect.edit', 'uses' => 'DefectController@edit']);
-	Route::put('{userId}/{id}', ['as' => 'defect.update', 'uses' => 'DefectController@update']);
-	Route::delete('{id}', ['as' => 'defect.destroy', 'uses' => 'DefectController@destroy']);
+Route::group(['prefix' => 'defect','middleware'=>'auth'], function () {
+	Route::get('{userId}/data', ['as' => 'defect.list', 'uses' => 'DefectController@listData'])->middleware('role:admin|employee');
+	Route::get('/{userId}', ['as' => 'defect.index', 'uses' => 'DefectController@index'])->middleware('role:admin|employee');
+	Route::get('{userId}/create', ['as' => 'defect.create', 'uses' => 'DefectController@create'])->middleware('role:admin');
+	Route::post('{userId}/create', ['as' => 'defect.store', 'uses' => 'DefectController@store'])->middleware('role:admin');
+	Route::get('{userId}/{id}/edit', ['as' => 'defect.edit', 'uses' => 'DefectController@edit'])->middleware('role:admin');
+	Route::put('{userId}/{id}', ['as' => 'defect.update', 'uses' => 'DefectController@update'])->middleware('role:admin');
+	Route::delete('{id}', ['as' => 'defect.destroy', 'uses' => 'DefectController@destroy'])->middleware('role:admin');
 });
 //Bonus routes
-Route::group(['prefix' => 'bonus','middleware'=>['auth','role:admin']], function () {
-    Route::get('{userId}/data', ['as' => 'bonus.list', 'uses' => 'BonusController@listData']);
-    Route::get('/{userId}', ['as' => 'bonus.index', 'uses' => 'BonusController@index']);
-    Route::get('{userId}/create', ['as' => 'bonus.create', 'uses' => 'BonusController@create']);
-    Route::post('{userId}/create', ['as' => 'bonus.store', 'uses' => 'BonusController@store']);
-    Route::get('{userId}/{id}/edit', ['as' => 'bonus.edit', 'uses' => 'BonusController@edit']);
-    Route::put('{userId}/{id}', ['as' => 'bonus.update', 'uses' => 'BonusController@update']);
-    Route::delete('{id}', ['as' => 'bonus.destroy', 'uses' => 'BonusController@destroy']);
+Route::group(['prefix' => 'bonus','middleware'=>'auth'], function () {
+    Route::get('{userId}/data', ['as' => 'bonus.list', 'uses' => 'BonusController@listData'])->middleware('role:admin|employee');
+    Route::get('/{userId}', ['as' => 'bonus.index', 'uses' => 'BonusController@index'])->middleware('role:admin|employee');
+    Route::get('{userId}/create', ['as' => 'bonus.create', 'uses' => 'BonusController@create'])->middleware('role:admin');
+    Route::post('{userId}/create', ['as' => 'bonus.store', 'uses' => 'BonusController@store'])->middleware('role:admin');
+    Route::get('{userId}/{id}/edit', ['as' => 'bonus.edit', 'uses' => 'BonusController@edit'])->middleware('role:admin');
+    Route::put('{userId}/{id}', ['as' => 'bonus.update', 'uses' => 'BonusController@update'])->middleware('role:admin');
+    Route::delete('{id}', ['as' => 'bonus.destroy', 'uses' => 'BonusController@destroy'])->middleware('role:admin');
 });
+
 //Users routes
 Route::group(['middleware'=>['auth','role:admin']],function ()
 {

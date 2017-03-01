@@ -60,7 +60,7 @@ class UserController extends Controller {
 		}
 
 		//We got an admin
-		$adminType=EmployeeType::getEmployeeTypeIdByName('admin');
+		$adminType=Role::getRoleIdByName('admin');
 		if ($request->employee_type==$adminType)
 		{
 			$role=$adminType;
@@ -68,9 +68,8 @@ class UserController extends Controller {
 		else
 		{
 			//Otherwise it's just an employee
-			$role=EmployeeType::getEmployeeTypeIdByName('employee');
+			$role=Role::getRoleIdByName('employee');
 		}
-
 		//Add the role to user
 		$user->attachRole($role);
 		//Return success
