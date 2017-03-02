@@ -37,7 +37,7 @@ class PerformanceRulesTableSeeder extends Seeder
                 'weight' => 2
             ),
             array(
-                'rule' => 'Attendence',
+                'rule' => 'Attendance',
                 'desc' =>'Showing up on time for scrum meetings and avoiding unnecessary absence.',
                 'employee_type' => $developer->id,
                 'weight' => 2
@@ -49,7 +49,7 @@ class PerformanceRulesTableSeeder extends Seeder
                 'weight' => 1
             ),
             array(
-                'rule' => 'Team Work',
+                'rule' => 'Teamwork',
                 'desc' =>'Working well with other teammates and helping other teammates.',
                 'employee_type' => $developer->id,
                 'weight' => 2
@@ -79,7 +79,7 @@ class PerformanceRulesTableSeeder extends Seeder
                 'weight' => 2
             ),
             array(
-                'rule' => 'Security Awarence',
+                'rule' => 'Security Awareness',
                 'desc' =>'Is the written code secure? Does it have the minimum number of security issue?',
                 'employee_type' => $developer->id,
                 'weight' => 1
@@ -111,7 +111,7 @@ class PerformanceRulesTableSeeder extends Seeder
                 'weight' => 2
             ),
             array(
-                'rule' => 'Attendence',
+                'rule' => 'Attendance',
                 'desc' =>'Showing up on time for meetings and avoiding unnecessary absence.',
                 'employee_type' => $designer->id,
                 'weight' => 2
@@ -119,7 +119,7 @@ class PerformanceRulesTableSeeder extends Seeder
             array(
                 'rule' => 'Communication',
                 'desc' =>'Communicating with other company members. Also repotring progress.',
-                'employee_type' => $developer->id,
+                'employee_type' => $designer->id,
                 'weight' => 2
             ),
             //Designer rules
