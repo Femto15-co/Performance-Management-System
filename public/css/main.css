@@ -24,6 +24,18 @@
 }
 
 /**
+ * Navbar style
+ */
+ul.nav.navbar-nav.navbar-right {
+    margin-top: 16px;
+}
+ul.nav.navbar-nav {
+    margin-top: 16px;
+}
+div.navbar-header > button {
+    margin-top: 24px;
+}
+/**
  * Report Styles
  */
 div.rule-block {

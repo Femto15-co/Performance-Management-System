@@ -56,8 +56,8 @@
                 </button>
 
                 <!-- Branding Image -->
-                <a class="navbar-brand" href="{{ url('/') }}">
-                    {{ config('app.name', 'Laravel') }}
+                <a href="{{ url('/') }}">
+                    <img src="{{asset('img/femto15.png')}}">
                 </a>
             </div>
 
