@@ -11,6 +11,7 @@ return [
     */
 
     'home' => 'Home',
+    'add' => 'Add',
     'create' => 'Create',
     'delete' => 'Delete',
     'show' => 'Show',

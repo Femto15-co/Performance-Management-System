@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
 <div class="container">
-	<h1>{{trans('general.create')}} {{trans('bonuses.title')}}</h1>
+	<h1>{{trans('general.create')}} {{trans('users.title')}}</h1>
     <hr/>
 	<form action="{{route('user.store')}}" method="POST" role="form">
 	{{csrf_field()}}
