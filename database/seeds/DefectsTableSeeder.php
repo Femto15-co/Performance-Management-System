@@ -12,31 +12,31 @@ class DefectsTableSeeder extends Seeder {
 	public function run() {
 		$defects = [
 			[
-				'title' => 'Not showing up on daily scrum.',
+				'title' => 'Not showing up on daily scrum',
 				'score' => '2',
 			],
 			[
-				'title' => 'Violating any coding guideline.',
+				'title' => 'Violating any coding guideline',
 				'score' => '1',
 			],
 			[
-				'title' => 'Delivering a code that doesn’t match the requirements.',
+				'title' => 'Delivering a code that doesn’t match the requirements',
 				'score' => '1',
 			],
 			[
-				'title' => 'Delivering a code that has a straightforward bug that could be avoided.',
+				'title' => 'Delivering a code that has a straightforward bug that could be avoided',
 				'score' => '2',
 			],
 			[
-				'title' => 'Misbehaving with other team members.',
+				'title' => 'Misbehaving with other team members',
 				'score' => '4',
 			],
 			[
-				'title' => 'Showing one hour late.',
+				'title' => 'Showing one hour late',
 				'score' => '6',
 			],
 			[
-				'title' => 'Not showing without a notification.',
+				'title' => 'Not showing without a notification',
 				'score' => '12',
 			],
 

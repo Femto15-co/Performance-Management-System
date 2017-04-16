@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Zizaco\Entrust\Traits\EntrustUserTrait;
+use Illuminate\Support\Facades\Hash;
 
 
 class User extends Authenticatable
@@ -17,7 +18,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password','employee_type'
     ];
 
     /**
@@ -31,6 +32,20 @@ class User extends Authenticatable
 
     public function defects()
     {
-        $this->belongsToMany('App\Defect');
+        return $this->belongsToMany('App\Defect')->withPivot('id','defect_id','user_id')->withTimestamps();
+    }
+
+    public function reports()
+    {
+        return $this->hasMany('App\Report');
+    }
+    public function bonuses()
+    {
+        return $this->hasMany('App\Bonus');
+    }
+
+    public function setPasswordAttribute($value)
+    {
+        $this->attributes['password']=Hash::make($value);
     }
 }

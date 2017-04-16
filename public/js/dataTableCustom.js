@@ -15,7 +15,6 @@ $(document).ready(function() {
             [0, "desc"]
         ],
         "pageLength": 10,
-        "responsive": true,
     };
 
     //Init datatables

@@ -11,5 +11,13 @@ class Defect extends Model
      *
      * @var array
      */
-    protected $fillable = ['title','score'];    
+    protected $fillable = ['title','score'];
+
+    /**
+     * Users relationship
+     */
+    public function users()
+    {
+    	return $this->belongsToMany('App\User')->withPivot('id','defect_id','user_id')->withTimestamps();
+    }
 }

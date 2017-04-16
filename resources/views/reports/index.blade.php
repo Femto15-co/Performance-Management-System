@@ -3,26 +3,29 @@
 @section('content')
 <div class="container">
     <div class="row">
-        <h1>{{ trans('reports.reports') }}</h1>
-        <hr/>
-
+        <div class="col-xs-12">
+            <h1>{{ trans('reports.reports') }}</h1>
+            <hr/>
+        </div>
     </div>
 
     <div class="row margin-bottom-md">
-
-        <!-- Add New Room Button -->
-        <a href="{{route('report.create.step1')}}">
-            <button type="button" class="btn btn-primary" >
-                <span class="glyphicon glyphicon-plus"></span>{{ trans('reports.add_new_report') }}
-            </button>
-        </a>
+        <div class="col-xs-12">
+            @role ('admin')
+            <!-- Add New Room Button -->
+            <a href="{{(isset($userId))?route('report.create.step2',[$userId]):route('report.create.step1')}}">
+                <button type="button" class="btn btn-primary" >
+                    <span class="glyphicon glyphicon-plus"></span>{{ trans('reports.add_new_report') }}
+                </button>
+            </a>
+            @endrole
+        </div>
     </div>
 
 
 
     <!-- The which display the all data of Expenses -->
-    <div class="row margin-bottom-md">
-        <table id="data" width="100%"  class="table direction table-bordered table-striped dataTable text-center">
+        <table id="data" class="table direction table-bordered table-striped dataTable text-center">
             <thead>
             <tr>
                 <th >{{ trans('reports.report_id') }}</th>
@@ -40,7 +43,7 @@
         <a href="/">
             <button type="button" class="btn btn-primary" ><span class="glyphicon glyphicon-home"></span>{{ trans('general.main_page') }} </button>
         </a>
-    </div>
+
 
 
 
