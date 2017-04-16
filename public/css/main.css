@@ -1,47 +1,71 @@
 /**
  * General Classes
  */
-
-.no-margin-bottom
-{
-    margin-bottom:0 !important;
+.no-margin-bottom {
+    margin-bottom: 0 !important;
 }
-
-.margin-bottom-md
-{
-    margin-bottom:20px;
+.margin-bottom-md {
+    margin-bottom: 20px;
+}
+.delete-form {
+    display: inline-block;
+}
+.text-lg{
+    font-size:18px;
+}
+.text-md{
+    font-size:16px;   
+}
+.text-sm{
+    font-size:12px;
+}
+.text-xs{
+    font-size:10px;
 }
 
 /**
+ * Navbar style
+ */
+ul.nav.navbar-nav.navbar-right {
+    margin-top: 16px;
+}
+ul.nav.navbar-nav {
+    margin-top: 16px;
+}
+div.navbar-header > button {
+    margin-top: 24px;
+}
+/**
  * Report Styles
  */
-
-div.rule-block
-{
+div.rule-block {
     border-bottom: 2px solid #c3c1c1;
     padding-bottom: 20px;
 }
-
-.rule-block:last-of-type
-{
+.rule-block:last-of-type {
     border-bottom: none !important;
     padding-bottom: 0px;
 }
+span.performance-desc {
+    font-size: 13px;
+    font-weight: 500;
+    display: block;
+}
 
-span.performance-desc
-{
-    font-size: 12px;
-    font-weight: 300;
-    display:block;
+/**
+ * Select2
+ */
+.select2-selection {
+    height: 32px !important;
+    padding-top: 2px !important;
+}
+.select2-selection__arrow {
+    margin-top: 2px !important;
 }
 
 /**
  * Glyphicon style tweaks
  */
-
-.glyphicon
-{
-    margin-right:5px;
+.glyphicon {
+    margin-right: 5px;
 }
-
-

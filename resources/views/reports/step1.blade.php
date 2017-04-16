@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @section('content')
 <div class="container">
 
@@ -48,5 +47,7 @@
 
         });
     </script>
-
+@stop
+@section('packages')
+    @include('packages.select2')
 @stop

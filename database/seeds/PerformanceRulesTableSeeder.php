@@ -31,33 +31,117 @@ class PerformanceRulesTableSeeder extends Seeder
         $rules = [
             //developer rules
             array(
-                'rule' => 'Troubleshooting',
-                'desc' =>'Troubleshooting',
+                'rule' => 'Sprint Delivery',
+                'desc' =>'Delivering sprints on time.',
                 'employee_type' => $developer->id,
-                'weight' => 5
+                'weight' => 2
+            ),
+            array(
+                'rule' => 'Attendance',
+                'desc' =>'Showing up on time for scrum meetings and avoiding unnecessary absence.',
+                'employee_type' => $developer->id,
+                'weight' => 2
+            ),
+            array(
+                'rule' => 'Self Learning',
+                'desc' =>'Learning new skills that would help the company.',
+                'employee_type' => $developer->id,
+                'weight' => 1
+            ),
+            array(
+                'rule' => 'Teamwork',
+                'desc' =>'Working well with other teammates and helping other teammates.',
+                'employee_type' => $developer->id,
+                'weight' => 2
+            ),
+            array(
+                'rule' => 'Behavior',
+                'desc' =>'Being polite and respectful with other company members.',
+                'employee_type' => $developer->id,
+                'weight' => 2
+            ),
+            array(
+                'rule' => 'Communication',
+                'desc' =>'Communicating with other company members and reaching out for help or advice when needed. Also repotring progress.',
+                'employee_type' => $developer->id,
+                'weight' => 2
+            ),
+            array(
+                'rule' => 'Code Efficiency',
+                'desc' =>"Writing code that doesn't waste resources.",
+                'employee_type' => $developer->id,
+                'weight' => 2
+            ),
+            array(
+                'rule' => 'Documentation',
+                'desc' =>'Is the code well commented and functions well documented.',
+                'employee_type' => $developer->id,
+                'weight' => 2
+            ),
+            array(
+                'rule' => 'Security Awareness',
+                'desc' =>'Is the written code secure? Does it have the minimum number of security issue?',
+                'employee_type' => $developer->id,
+                'weight' => 1
+            ),
+            array(
+                'rule' => 'Testing Skills',
+                'desc' =>'Is the written code working? Does it have the minimum number of bugs?',
+                'employee_type' => $developer->id,
+                'weight' => 2
+            ),
+            array(
+                'rule' => 'Troubleshooting Skills',
+                'desc' =>'The ability to find the bug cause and solving it on their own.',
+                'employee_type' => $developer->id,
+                'weight' => 3
             ),
 
             array(
-                'rule' => 'Problem solving',
-                'desc' =>'Problem Solving',
+                'rule' => 'Problem Solving Skills',
+                'desc' =>'Being able to find an effeicient solution for any given problem.',
                 'employee_type' => $developer->id,
-                'weight' => 4
+                'weight' => 3
             ),
-
+            //Designer Rules
+            array(
+                'rule' => 'Task Delivery',
+                'desc' =>'Delivering tasks on time.',
+                'employee_type' => $designer->id,
+                'weight' => 2
+            ),
+            array(
+                'rule' => 'Attendance',
+                'desc' =>'Showing up on time for meetings and avoiding unnecessary absence.',
+                'employee_type' => $designer->id,
+                'weight' => 2
+            ),
+            array(
+                'rule' => 'Communication',
+                'desc' =>'Communicating with other company members. Also repotring progress.',
+                'employee_type' => $designer->id,
+                'weight' => 2
+            ),
             //Designer rules
             array(
                 'rule' => 'Creativity',
-                'desc' =>'Creativity',
+                'desc' =>'Using imagination to create original and catching designs.',
                 'employee_type' => $designer->id,
-                'weight' => 5
+                'weight' => 3
             ),
 
             //Designer rules
             array(
-                'rule' => 'Innovation',
-                'desc' =>'Innovation',
+                'rule' => 'Following Standerds',
+                'desc' =>'Alignment Principles, UX Standers etc.',
                 'employee_type' => $designer->id,
-                'weight' => 4
+                'weight' => 3
+            ),
+            array(
+                'rule' => 'Positive Feedback',
+                'desc' =>'How often a client positive feedback is given.',
+                'employee_type' => $designer->id,
+                'weight' => 1
             ),
 
         ];

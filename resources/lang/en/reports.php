@@ -32,6 +32,8 @@ return [
     'participate' => 'Participate',
     'final_score' => 'Final Score',
     'final_report'=>'Final report',
-    'no_participation' => 'No participation allowed'
+    'no_participation' => 'No participation allowed',
+    'result'=>'You overall score is:',
+    'scoreOf'=>':x of :y',
 
 ];
