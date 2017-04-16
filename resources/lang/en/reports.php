@@ -14,9 +14,10 @@ return [
     'step1_add_report' => 'Add New Report: Step 1',
     'step2_add_report' => 'Add New Report: Step 2',
     'edit_report' => 'Edit Report #:id',
-    'no_employee' => 'No Employee Found',
     'no_rules' =>'No Rules',
+    'rule_not_found' => 'Rule not found',
     'not_created' => 'Error while adding report',
+    'not_updated' => 'Error while updating report',
     'created_first' => 'Your rating has been saved successfully. Thanks for your participation',
     'report_id' => 'ID',
     'overall_score' => 'Overall Score',
@@ -35,5 +36,8 @@ return [
     'no_participation' => 'No participation allowed',
     'result'=>'You overall score is:',
     'scoreOf'=>':x of :y',
-
+    'no_prior_evaluation'=>'No prior evaluation found',
+    'update_no_longer_allowed'=>'Report modification is no longer allowed',
+    'no_operation' => 'No operation is allowed',
+    'no_max_score' => 'Max score is not defined'
 ];
