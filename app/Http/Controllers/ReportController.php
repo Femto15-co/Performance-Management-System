@@ -227,7 +227,7 @@ class ReportController extends Controller
          * List Data in rules by reviewer matrix
          */
         $scores = $report->scores()->get();
-
+        //TODO
         foreach($scores as $score)
         {
             $reviewersScores[$score->pivot->rule_id][$score->pivot->reviewer_id] = $score->pivot->score;
@@ -274,7 +274,7 @@ class ReportController extends Controller
             $this->reportService->openModification($report);
 
             //Get scores recorded by authenticated user who attempted edit
-            $ruleScores = $this->reportService->getReviewerScores($report, Auth::user());
+            $ruleScores = $this->reportService->reportRepository->getReviewerScores($report, Auth::user());
         }
         catch(\Exception $e)
         {
@@ -321,6 +321,7 @@ class ReportController extends Controller
      */
     public function destroy($id)
     {
+        //TODO
         //Delete report and all corresponding stuff
         if(!Report::destroy($id))
         {
@@ -354,6 +355,7 @@ class ReportController extends Controller
      *
      * @return JSON
      */
+    //TODO
     public function listData(Request $request,$userId=null)
     {
         $reports = Report::join('users', 'reports.user_id', '=', 'users.id')

@@ -5,10 +5,7 @@ use App\PerformanceRule;
 use App\Report;
 use App\Repositories\PerformanceRule\PerformanceRuleInterface;
 use App\Repositories\Report\ReportInterface;
-use App\User;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Mockery\CountValidator\Exception;
 
 class ReportService
 {
@@ -124,7 +121,7 @@ class ReportService
             {
                 $rule= $this->performanceRuleRepository->getRuleById($ruleScore->rule_id);
             }
-            catch(Exception $e)
+            catch(\Exception $e)
             {
                 continue;
             }
@@ -156,14 +153,14 @@ class ReportService
 
 
             //If rule doesn't belong to selected employees related rules, ignore and continue
-            $validRule = PerformanceRule::where('employee_type', $employee->employee_type)->where('id', $ruleId)->exists();
+            $validRule = $this->performanceRuleRepository->isRuleExistsForType($employee->employee_type, $ruleId);
             if(!$validRule)
                 continue;
 
             // If score are being update, just update them
             if($update)
             {
-                //Update pivot with new scores with their ordering
+                //TODO Update pivot with new scores with their ordering
                 $report->scores()->where('rule_id', $ruleId)->where('reviewer_id', Auth::id())
                     ->update(['score'=>$scores[$i++]]);
                 continue;
@@ -178,6 +175,7 @@ class ReportService
 
             if(!$foundDuplicate)
             {
+                //TODO
                 $report->scores()->attach([$ruleId => ['reviewer_id'=>Auth::id(), 'score'=>$scores[$i++]]]);
             }
         }
@@ -219,7 +217,7 @@ class ReportService
      */
     private function participated($report, $user)
     {
-        $reviewerParticipated = $report->scores()->where('reviewer_id', $user->id)->exists();
+        $reviewerParticipated = $this->reportRepository->hasReviewerParticipated($report->id, $user->id);
 
         if($reviewerParticipated)
         {
@@ -253,23 +251,5 @@ class ReportService
         if (!$user->hasRole('admin') && $report->user_id != $user->id) {
             throw new \Exception(trans('reports.not_found'));
         }
-    }
-
-    /**
-     * Get scores recorded by authenticated user who attempted edit
-     * @param $report
-     * @return mixed scores
-     * @throws \Exception
-     */
-    public function getReviewerScores($report, $user)
-    {
-        $ruleScores = $report->scores()->where('reviewer_id', $user->id)->get();
-
-        if($ruleScores->isEmpty())
-        {
-            throw new \Exception(trans('reports.no_scores_recorded'));
-        }
-
-        return $ruleScores;
     }
 }

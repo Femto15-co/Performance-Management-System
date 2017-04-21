@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+
+use App\Bonus;
+use App\Repositories\Bonus\BonusRepository;
+
 use App\Report;
 use App\Repositories\Report\ReportRepository;
 
@@ -51,6 +55,13 @@ class RepositoryServiceProvider extends ServiceProvider
          */
         $this->app->bind('App\Repositories\PerformanceRule\PerformanceRuleInterface', function(){
             return new PerformanceRuleRepository(new PerformanceRule());
+        });
+
+        /*
+         * Bind Bonus Repository
+         */
+        $this->app->bind('App\Repositories\Bonus\BonusInterface', function(){
+            return new BonusRepository(new Bonus());
         });
     }
 }

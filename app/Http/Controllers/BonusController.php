@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Bonus;
+use App\Services\BonusService;
 use App\User;
+use App\Services\UserService;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -14,24 +17,39 @@ class BonusController extends Controller {
 	//Controller validation rules
 	public $rules = ['description' => 'required|string', 'value' => 'required|integer', 'user_id' => 'required|exists:users,id'];
 
+    /**
+     * User Repository
+     * @var
+     */
+	protected $userService;
+
+    /**
+     * Bonus service
+     * @var
+     */
+	protected $bonusService;
+    public function __construct(UserService $userService, BonusService $bonusService)
+    {
+        $this->userService = $userService;
+        $this->bonusService = $bonusService;
+	}
+
 	/**
-	 * Display a listing of the resource.
-	 *
+	 * Display a listing of the bonuses.
 	 * @return \Illuminate\Http\Response
 	 */
 	public function index($userId) {
+        try
+        {
+            //Only admin can pick whatever id they like
+            $user = $this->userService->getLoggedOrSelected($userId);
+        }
+        catch(\Exception $e)
+        {
+            Session::flash('alert', $e->getMessage());
+            return redirect()->route('home');
+        }
 
-		//Only admin can pick whatever id they like
-		if (!Auth::user()->hasRole('admin')) {
-			$userId = Auth::id();
-		}
-
-		//Get the user and return an error if no user
-		$user = User::find($userId);
-		if (!$user) {
-			Session::flash('alert', trans('users.no_employee'));
-			return redirect()->route('home');
-		}
 		//Include DataTable
 		$includeDataTable = true;
 		//DataTable ajax route
@@ -45,47 +63,49 @@ class BonusController extends Controller {
 	 * @return \Illuminate\Http\Response
 	 */
 	public function create($userId) {
+        try
+        {
+            //Ensure that passed user exists and is employee
+            $this->userService->isEmployee($this->userService->userRepository->getUserById($userId));
+        }
+        catch(\Exception $e)
+        {
+            Session::flash('alert', $e->getMessage());
+            return redirect()->route('home');
+        }
 		return view('bonuses.create', compact(['userId']));
 	}
 
 	/**
-	 * Store a newly created resource in storage.
+	 * Store a newly created bonus in database.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
 	 * @return \Illuminate\Http\Response
 	 */
 	public function store(Request $request, $userId) {
 		//Add the user ID to the request
-		$request->merge(['user_id' => $userId]);
-		//Validate input
-		$this->validateBonus($request);
+        $request->merge(['user_id' => $userId]);
 
-		//Get the inteded user
-		$user = User::find($userId);
-		if (!$user || $user->hasRole('admin')) {
-			Session::flash('error', trans('users.no_employee'));
-			return redirect()->back();
-		}
-		//Add bonus for user
-		if (Bonus::create($request->all())) {
-			//Return success
-			Session::flash('flash_message', trans('bonuses.added'));
-			return redirect()->route('bonus.index', [$userId]);
-		}
-		//Something is wrong!
-		Session::flash('error', trans('bonuses.not_added'));
-		return redirect()->route('bonus.index', [$userId]);
+        //Validate input
+        $this->validateBonus($request);
+
+		try
+        {
+            $this->userService->isEmployee($this->userService->userRepository->getUserById($userId));
+            $this->bonusService->bonusRepository->create($request->all());
+        }
+        catch(\Exception $e)
+        {
+            Session::flash('alert', $e->getMessage());
+            return redirect()->route('home');
+        }
+
+
+        //Return success
+        Session::flash('flash_message', trans('bonuses.added'));
+        return redirect()->route('bonus.index', [$userId]);
 	}
 
-	/**
-	 * Display the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return \Illuminate\Http\Response
-	 */
-	public function show($id) {
-		//
-	}
 
 	/**
 	 * Show the form for editing the specified resource.
@@ -95,12 +115,20 @@ class BonusController extends Controller {
 	 */
 	public function edit($userId, $id) {
 		//Validate that we got the correct bonus
-		$bonus = $this->verifyBonus($userId, $id);
+        try
+        {
+            $bonus = $this->bonusService->bonusRepository->getBonusForAUser($userId, $id);
+        }
+        catch(\Exception $e)
+        {
+            Session::flash('alert', $e->getMessage());
+            return redirect()->route('home');
+        }
 		return view('bonuses.edit', compact(['bonus', 'userId']));
 	}
 
 	/**
-	 * Update the specified resource in storage.
+	 * Update the specified bonus in database.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
 	 * @param  int  $id
@@ -110,39 +138,46 @@ class BonusController extends Controller {
 		$request->merge(['user_id' => $userId]);
 		//Validate input
 		$this->validateBonus($request);
-		//Validate that we got the correct bonus
-		$bonus = $this->verifyBonus($userId, $id);
 
-		//Update bonus
-		if ($bonus->update($request->all())) {
-			//Return success
-			Session::flash('flash_message', trans('bonuses.updated'));
-			return redirect()->route('bonus.index', [$userId]);
-		}
-		//Something is wrong!
-		Session::flash('error', trans('bonuses.not_updated'));
-		return redirect()->route('bonus.index', [$userId]);
-	}
+        try
+        {
+            $bonus = $this->bonusService->bonusRepository->getBonusForAUser($userId, $id);
+            if(!$bonus->update($request->all()))
+            {
+                throw new \Exception('bonuses.not_updated');
+            }
+        }
+        catch(\Exception $e)
+        {
+            Session::flash('alert', $e->getMessage());
+            return redirect()->route('home');
+        }
+
+        //Return success
+        Session::flash('flash_message', trans('bonuses.updated'));
+        return redirect()->route('bonus.index', [$userId]);
+    }
 
 	/**
-	 * Remove the specified resource from storage.
+	 * Remove the specified bonus from database.
 	 *
 	 * @param  int  $id
 	 * @return \Illuminate\Http\Response
 	 */
 	public function destroy($id) {
-		$bonus = Bonus::find($id);
-		if (!$bonus) {
-			//Something is wrong!
-			Session::flash('error', trans('bonuses.not_deleted'));
-			return redirect()->back();
-		}
-		//Delete bonus
-		if ($bonus->delete()) {
-			//Success
-			Session::flash('flash_message', trans('bonuses.deleted'));
-			return redirect()->back();
-		}
+	    try
+        {
+            $this->bonusService->bonusRepository->destroy($id);
+        }
+        catch(\Exception $e)
+        {
+            Session::flash('alert', $e->getMessage());
+            return redirect()->route('home');
+        }
+
+        //Success
+        Session::flash('flash_message', trans('bonuses.deleted'));
+        return redirect()->back();
 	}
 
 	/**
@@ -154,22 +189,6 @@ class BonusController extends Controller {
 		$this->validate($request, $this->rules);
 	}
 
-	/**
-	 * Verify that the bonus belongs to the given user!
-	 * @param  integer $userId The user id
-	 * @param  integer $id     The bonus id
-	 * @return mixed         Return Bonus object on success or redirect with error on failur
-	 */
-	public function verifyBonus($userId, $id) {
-		//Get the intended bonus
-		$bonus = Bonus::where(['id' => $id, 'user_id' => $userId])->first();
-		if (!$bonus) {
-			//Something is wrong!
-			Session::flash('error', trans('bonuses.not_found'));
-			return redirect()->route('bonus.index', [$userId])->withErrors()->withInput()->send();
-		}
-		return $bonus;
-	}
 	/**
 	 * Returns bonuses data to DataTable
 	 *

@@ -78,4 +78,15 @@ class PerformanceRuleRepository extends BaseRepository implements PerformanceRul
         return $rule;
     }
 
+    /**
+     * Does rule exist for a given type
+     * @param $employeeType
+     * @param $ruleId
+     * @return mixed
+     */
+    public function isRuleExistsForType($employeeType, $ruleId)
+    {
+        return $this->performanceRuleModel->where('employee_type', $employeeType)->where('id', $ruleId)->exists();
+    }
+
 }

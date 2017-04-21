@@ -2,6 +2,7 @@
 namespace App\Services;
 
 use App\Repositories\User\UserInterface;
+use Illuminate\Support\Facades\Auth;
 
 class UserService
 {
@@ -12,6 +13,11 @@ class UserService
         $this->userRepository = $userRepository;
     }
 
+    /**
+     * Ensure that user has employee rule
+     * @param $user
+     * @throws \Exception
+     */
     public function isEmployee($user)
     {
         //Ensure that selected employee has employee rule
@@ -19,5 +25,19 @@ class UserService
         {
             throw new \Exception(trans('reports.no_employee'));
         }
+    }
+
+    /**
+     * return selected user if user attempting is admin
+     * or return logged in user, Only admin can pick whatever id they like
+     * @param $userId
+     * @return integer userId
+     */
+    public function getLoggedOrSelected($userId)
+    {
+        if (!Auth::user()->hasRole('admin'))
+            return Auth::user();
+
+        return $this->userRepository->getUserById($userId);
     }
 }
