@@ -29,6 +29,21 @@ class ReportRepository extends BaseRepository implements ReportInterface
     }
 
     /**
+     * Create new report
+     * @param $data array of key-value pairs
+     * @return \App\Report
+     * @throws \Exception
+     */
+    public function create($data)
+    {
+        $report = $this->reportModel->create($data);
+        if (!$report) {
+            throw new \Exception(trans('reports.not_created'));
+        }
+        return $report;
+    }
+
+    /**
      * Retrieves report by id
      * @param $id
      * @return Model report
@@ -45,21 +60,6 @@ class ReportRepository extends BaseRepository implements ReportInterface
         return $report;
     }
 
-    /**
-     * Create new report
-     * @param $data array of key-value pairs
-     * @return \App\Report
-     * @throws \Exception
-     */
-    public function create($data)
-    {
-        $report = $this->reportModel->create($data);
-        if(!$report)
-        {
-            throw new \Exception(trans('reports.not_created'));
-        }
-        return $report;
-    }
 
     /**
      * Calculate average scores and overall score by averaging all scores for
@@ -94,4 +94,42 @@ class ReportRepository extends BaseRepository implements ReportInterface
             throw new \Exception('reports.not_updated');
         }
     }
+
+    /**
+     * returns true if reviewer already participated
+     * @param $reportId
+     * @param $userId
+     * @return bool
+     */
+    public function hasReviewerParticipated($reportId, $userId)
+    {
+        return $this->reportModel->where('id', $reportId)->hasReviewed($userId)->exists();
+    }
+
+    /**
+     * Get scores recorded by authenticated user who attempted edit
+     * @param $reportId
+     * @param $userId
+     * @return mixed scores
+     * @throws \Exception
+     */
+    public function getReviewerScores($reportId, $userId)
+    {
+        $ruleScores = $this->reportModel->where('id', $reportId)->hasReviewed($userId)->withReviewer($userId)->get();
+
+        if($ruleScores->isEmpty())
+        {
+            throw new \Exception(trans('reports.no_scores_recorded'));
+        }
+
+        return $ruleScores;
+    }
+
+    /*public function updateScore()
+    {
+        $this->reportModel->
+        
+        $report->scores()->where('rule_id', $ruleId)->where('reviewer_id', Auth::id())
+            ->update(['score'=>$scores[$i++]]);
+    }*/
 }

@@ -21,4 +21,24 @@ class Report extends Model
     {
         return $this->belongsTo('App\User','user_id');
     }
+
+    /**
+     * Appends a filter of whether user has reviewed
+     * @param $query
+     * @param $userId
+     * @return mixed
+     */
+    public function scopeHasReviewed($query, $userId)
+    {
+        return $query->whereHas('scores', function($query) use ($userId){
+            $query->where('reviewer_id', $userId);
+        });
+    }
+
+    public function scopeWithReviewer($query, $userId)
+    {
+        return $query->with(['scores'=> function($query) use ($userId){
+            $query->where('reviewer_id', $userId);
+        }]);
+    }
 }

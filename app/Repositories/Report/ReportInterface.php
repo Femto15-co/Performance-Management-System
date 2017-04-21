@@ -12,4 +12,6 @@ interface ReportInterface
     public function create($data);
     public function getFinalScores($id, $user);
     public function update($id, $data, $attribute = "id");
+    public function hasReviewerParticipated($reportId, $userId);
+    public function getReviewerScores($reportId, $userId);
 }

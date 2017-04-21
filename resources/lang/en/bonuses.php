@@ -12,7 +12,7 @@ return [
    'title'=>'Bonuses',
    'add_new'=>'Add Bonus',
    'added'=>'Bonus Added Successfully!',
-   'not_added'=>"Bonus Couldn't Be Aded!",
+   'not_added'=>"Bonus Couldn't Be Added!",
    'updated'=>'Bonus Update Successfully!',
    'not_updated'=>"Bonus Couldn't Be Update!",
    'deleted'=>'Bonus Deleted Successfully!',
