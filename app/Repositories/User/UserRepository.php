@@ -63,4 +63,27 @@ class UserRepository extends BaseRepository implements UserInterface
 
         return $employees;
     }
+
+    /**
+     * Query scope that gets bonuses for a user
+     * @param bool $isAdmin
+     * @param Integer $loggedInUserId
+     * @param Integer $sentUserId
+     * @return mixed
+     */
+    public function getBonusesForUserScope($isAdmin, $loggedInUserId, $sentUserId)
+    {
+        //Get bonuses related to a user by userId
+        $bonuses = $this->userModel->join('bonuses', 'users.id', 'bonuses.user_id')
+            ->select(['bonuses.id', 'bonuses.description', 'bonuses.value', 'bonuses.created_at']);
+
+        //Make sure that user can't see other users data
+        if ($isAdmin) {
+            $bonuses = $bonuses->where('users.id', $sentUserId);
+        } else {
+            $bonuses = $bonuses->where('users.id', $loggedInUserId);
+        }
+
+        return $bonuses;
+    }
 }

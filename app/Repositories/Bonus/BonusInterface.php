@@ -11,5 +11,5 @@ interface BonusInterface
     public function create($data);
     public function getBonusForAUser($userId, $bonusId);
     public function destroy($id, $attribute = "id");
-
+    public function update($id, $data, $attribute = "id");
 }

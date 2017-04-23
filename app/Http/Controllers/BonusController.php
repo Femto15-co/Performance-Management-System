@@ -66,7 +66,7 @@ class BonusController extends Controller {
         try
         {
             //Ensure that passed user exists and is employee
-            $this->userService->isEmployee($this->userService->userRepository->getUserById($userId));
+            $this->userService->onlyEmployee($this->userService->userRepository->getUserById($userId));
         }
         catch(\Exception $e)
         {
@@ -91,7 +91,7 @@ class BonusController extends Controller {
 
 		try
         {
-            $this->userService->isEmployee($this->userService->userRepository->getUserById($userId));
+            $this->userService->onlyEmployee($this->userService->userRepository->getUserById($userId));
             $this->bonusService->bonusRepository->create($request->all());
         }
         catch(\Exception $e)
@@ -142,10 +142,7 @@ class BonusController extends Controller {
         try
         {
             $bonus = $this->bonusService->bonusRepository->getBonusForAUser($userId, $id);
-            if(!$bonus->update($request->all()))
-            {
-                throw new \Exception('bonuses.not_updated');
-            }
+            $this->bonusService->bonusRepository->update($id, $request->all());
         }
         catch(\Exception $e)
         {
@@ -195,30 +192,14 @@ class BonusController extends Controller {
 	 * @return JSON
 	 */
 	public function listData($userId) {
-		//Get bonuses related to a user by userId
-		$bonuses = User::join('bonuses', 'users.id', 'bonuses.user_id')
-			->select(['bonuses.id', 'bonuses.description', 'bonuses.value', 'bonuses.created_at']);
+        $isAdmin = Auth::user()->hasRole('admin');
 
-		//Make sure that user can't see other users data
-		if (Auth::user()->hasRole('admin')) {
-			$bonuses = $bonuses->where('users.id', $userId);
-		} else {
-			$bonuses = $bonuses->where('users.id', Auth::id());
-		}
+		$bonuses = $this->userService->userRepository->getBonusesForUserScope($isAdmin, Auth::id(), $userId);
 
 		return Datatables::of($bonuses)
-			->addColumn('action', function ($bonuses) use ($userId) {
-				if (Auth::user()->hasRole('admin')) {
-					$formHead = "<form class='delete-form' method='POST' action='" . route('bonus.destroy', $bonuses->id) . "'>" . csrf_field();
-					$editLink = "<a href=" . route('bonus.edit', [$userId, $bonuses->id]) . " class='btn btn-xs btn-primary'><i class='glyphicon glyphicon-edit'></i>" . trans('general.edit') . "</a>";
-					$deleteForm =
-					"  <input type='hidden' name='_method' value='DELETE'/>
-                            <button type='submit' class='btn btn-xs btn-danger main_delete'>
-                                <i class='glyphicon glyphicon-trash'></i> " . trans('general.delete') . "
-                            </button>
-                        </form>";
-
-					return $formHead . $editLink . $deleteForm;
+			->addColumn('action', function ($bonus) use ($userId, $isAdmin) {
+				if ($isAdmin) {
+                    return $this->bonusService->dataTableControllers($userId, $bonus);
 				}
 				//Otherwise no actions
 				return '-';
