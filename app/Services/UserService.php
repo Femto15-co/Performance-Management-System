@@ -18,7 +18,7 @@ class UserService
      * @param $user
      * @throws \Exception
      */
-    public function isEmployee($user)
+    public function onlyEmployee($user)
     {
         //Ensure that selected employee has employee rule
         if(!$user->hasRole('employee'))

@@ -93,7 +93,7 @@ class ReportController extends Controller
         {
             $employee = $this->userService->userRepository->getUserById($id);
 
-            $this->userService->isEmployee($employee);
+            $this->userService->onlyEmployee($employee);
 
             $performanceRules = $this->performanceRuleService->performanceRuleRepository->getRulesByType($employee->employee_type);
         }
@@ -122,7 +122,7 @@ class ReportController extends Controller
         {
             $employee = $this->userService->userRepository->getUserById($request->employee);
 
-            $this->userService->isEmployee($employee);
+            $this->userService->onlyEmployee($employee);
 
             $this->reportService->addReport($employee, $request->input('scores'), $request->input('rules'));
         }

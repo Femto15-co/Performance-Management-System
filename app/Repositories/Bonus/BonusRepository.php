@@ -5,6 +5,7 @@ namespace App\Repositories\Bonus;
 use Illuminate\Database\Eloquent\Model;
 use App\Repositories\BaseRepository;
 
+
 /**
  * BonusRepository is a class that contains common queries for bonuses
  */
@@ -30,7 +31,7 @@ class BonusRepository extends BaseRepository implements BonusInterface
     /**
      * Create new bonus
      * @param $data array of key-value pairs
-     * @return \App\Bonus
+     * @return Model
      * @throws \Exception
      */
     public function create($data)
@@ -41,6 +42,21 @@ class BonusRepository extends BaseRepository implements BonusInterface
         }
         return $bonus;
     }
+
+
+    /**
+     * update bonus
+     * @param $data
+     * @throws \Exception
+     */
+    public function update($id, $data, $attribute = "id")
+    {
+        if(!$this->bonusModel->where($attribute, '=', $id)->update(array_intersect_key($data, array_flip($this->bonusModel->getFillable()))) )
+        {
+            throw new \Exception('reports.not_updated');
+        }
+    }
+
 
     /**
      * Get bonus for a user and verifies that bonus belongs to user
@@ -73,6 +89,7 @@ class BonusRepository extends BaseRepository implements BonusInterface
             throw new \Exception('bonuses.not_deleted');
         }
     }
+
 
 
 }
