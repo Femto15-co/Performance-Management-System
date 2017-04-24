@@ -8,10 +8,24 @@ namespace App\Repositories\Report;
  */
 interface ReportInterface
 {
-    public function getReportById($id);
-    public function create($data);
+    /**
+     * @param $id
+     * @param $user
+     * @return mixed
+     */
     public function getFinalScores($id, $user);
-    public function update($id, $data, $attribute = "id");
+
+    /**
+     * @param $reportId
+     * @param $userId
+     * @return mixed
+     */
     public function hasReviewerParticipated($reportId, $userId);
+
+    /**
+     * @param $reportId
+     * @param $userId
+     * @return mixed
+     */
     public function getReviewerScores($reportId, $userId);
 }
