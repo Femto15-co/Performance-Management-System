@@ -31,7 +31,7 @@ class ReportRepository extends BaseRepository implements ReportInterface
     /**
      * Create new report
      * @param $data array of key-value pairs
-     * @return \App\Report
+     * @return Model report to be created
      * @throws \Exception
      */
     public function create($data)

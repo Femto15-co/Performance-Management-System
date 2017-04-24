@@ -18,6 +18,8 @@ return [
 	'added' => 'User Added Successfully!',
 	'not_added' => "User Couldn't Be Added!",
 	'no_employee' => 'No Employee Found',
-	'employees'=>'Employees'
+	'employees'=>'Employees',
+    'employee_types'=>'No Employee Types found',
+    'role_not_found'=>'Rule not found'
 
 ];

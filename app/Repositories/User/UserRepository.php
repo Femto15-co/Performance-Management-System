@@ -29,6 +29,21 @@ class UserRepository extends BaseRepository implements UserInterface
     }
 
     /**
+     * Create new User
+     * @param $data array of key-value pairs
+     * @return Model user data
+     * @throws \Exception
+     */
+    public function create($data)
+    {
+        $user = $this->userModel->create($data);
+        if (!$user) {
+            throw new \Exception(trans('users.not_created'));
+        }
+        return $user;
+    }
+
+    /**
      * Retrieves user by id
      * @param $id
      * @return Model user
@@ -79,11 +94,48 @@ class UserRepository extends BaseRepository implements UserInterface
 
         //Make sure that user can't see other users data
         if ($isAdmin) {
-            $bonuses = $bonuses->where('users.id', $sentUserId);
-        } else {
-            $bonuses = $bonuses->where('users.id', $loggedInUserId);
+            return $bonuses->where('users.id', $sentUserId);
         }
 
-        return $bonuses;
+        return $bonuses->where('users.id', $loggedInUserId);
+    }
+
+    /**
+     * Get Users exclude role query scope
+     * @param $roleId
+     * @return mixed
+     */
+    public function getUsersForRoleScope($roleId)
+    {
+        $users = User::join('role_user', 'users.id', '=', 'role_user.user_id')
+            ->join('employee_types', 'users.employee_type', '=', 'employee_types.id')
+            ->where('role_user.role_id', '!=', $roleId)
+            ->select(['users.id', 'users.name', 'users.email', 'employee_types.type']);
+
+        return $users;
+    }
+
+    /**
+     * Attach role to user
+     * @param $user
+     * @param $role
+     */
+    public function attachRole($user, $role)
+    {
+        $user->attachRole($role);
+    }
+
+    /**
+     * Delete user from database
+     * @param $id
+     * @param string $attribute
+     * @throws \Exception
+     */
+    public function destroy($id, $attribute="id")
+    {
+        if(!$this->userModel->where($attribute, '=', $id)->delete())
+        {
+            throw new \Exception('users.not_deleted');
+        }
     }
 }

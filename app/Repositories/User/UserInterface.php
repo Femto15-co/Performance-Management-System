@@ -8,6 +8,14 @@ namespace App\Repositories\User;
  */
 interface UserInterface
 {
+
+    /**
+     * Create new User
+     * @param $data array of key-value pairs
+     * @return Model user data
+     * @throws \Exception
+     */
+    public function create($data);
     public function getUserById($id);
     public function getAllEmployees();
     /**
@@ -19,4 +27,23 @@ interface UserInterface
      */
     public function getBonusesForUserScope($isAdmin, $loggedInUserId, $sentUserId);
 
+    /**
+     * Attach role to user
+     * @param $user
+     * @param $role
+     */
+    public function attachRole($user, $role);
+    /**
+     * Delete user from database
+     * @param $id
+     * @param string $attribute
+     * @throws \Exception
+     */
+    public function destroy($id, $attribute="id");
+    /**
+     * Get Users for a role query scope
+     * @param $roleId
+     * @return mixed
+     */
+    public function getUsersForRoleScope($roleId);
 }
