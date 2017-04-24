@@ -1,6 +1,6 @@
 # Performance Management Application
 
-Performance Management is an application developed by [Femto15](http://femto15.com) Team. PMS is meant for organizations to give them the ability to assess the performance of their employees. The application is divided into Four modules: 
+Performance Management is an application developed by [Femto15](http://femto15.com) Team. PMS is meant for organizations to give them the ability to assess the performance of their employees. The application is divided into four modules: 
 * Report generation
 * Bonuses
 * Defects (hope you won't have to use that module)
