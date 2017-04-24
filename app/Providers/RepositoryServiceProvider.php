@@ -15,6 +15,9 @@ use App\Repositories\User\UserRepository;
 use App\PerformanceRule;
 use App\Repositories\PerformanceRule\PerformanceRuleRepository;
 
+use App\Defect;
+use App\Repositories\Bonus\DefectRepository;
+
 use Illuminate\Support\ServiceProvider;
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -62,6 +65,13 @@ class RepositoryServiceProvider extends ServiceProvider
          */
         $this->app->bind('App\Repositories\Bonus\BonusInterface', function(){
             return new BonusRepository(new Bonus());
+        });
+
+        /*
+         * Bind Defect Repository
+         */
+        $this->app->bind('App\Repositories\Defect\DefectInterface', function(){
+            return new DefectRepository(new Defect());
         });
     }
 }

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Defect;
+use App\Services\DefectService;
 use App\User;
+use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -14,23 +16,38 @@ class DefectController extends Controller {
 
 	public $rules = ['defect' => 'exists:defects,id', 'userId' => 'exists:users,id'];
 	/**
+     * User Repository
+     * @var
+     */
+	protected $userService;
+
+    /**
+     * Bonus service
+     * @var
+     */
+	protected $defectService;
+    public function __construct(UserService $userService, DefectService $defectService)
+    {
+        $this->userService = $userService;
+        $this->defectService = $defectService;
+	}
+	/**
 	 * Display a listing of the users with defects.
 	 *
 	 * @return \Illuminate\Http\Response
 	 */
 	public function index($userId) {
 
-		//Only admin can pick whatever id they like
-		if (!Auth::user()->hasRole('admin')) {
-			$userId = Auth::id();
-		}
-
-		//Get the user and return an error if no user
-		$user = User::find($userId);
-		if (!$user) {
-			Session::flash('alert', trans('users.no_employee'));
-			return redirect()->route('home');
-		}
+		try
+        {
+            //Only admin can pick whatever id they like
+            $user = $this->userService->getLoggedOrSelected($userId);
+        }
+        catch(\Exception $e)
+        {
+            Session::flash('alert', $e->getMessage());
+            return redirect()->route('home');
+        }
 		//Include DataTable
 		$includeDataTable = true;
 		//DataTable ajax route
@@ -44,8 +61,16 @@ class DefectController extends Controller {
 	 * @return \Illuminate\Http\Response
 	 */
 	public function create($userId) {
-		//Get all defects
-		$defects = Defect::all();
+		try
+        {
+            //get all defects
+            $defect = $this->defectService->getAll();
+        }
+        catch(\Exception $e)
+        {
+            Session::flash('alert', $e->getMessage());
+            return redirect()->route('home');
+        }
 		return view('defects.create', compact(['defects', 'userId']));
 	}
 
@@ -60,15 +85,18 @@ class DefectController extends Controller {
 		$request->merge(['userId' => $userId]);
 		//Validate input
 		$this->validateDefect($request);
-
-		//Get the inteded user
-		$user = User::find($userId);
-		if (!$user || $user->hasRole('admin')) {
-			Session::flash('error', trans('users.no_employee'));
-			return redirect()->back();
-		}
-		//Attache defect to the user.
-		$user->defects()->attach($request->defect);
+		try
+        {
+            $user=$this->userService->onlyEmployee($this->userService->userRepository->getUserById($userId));
+            //Attache defect to the user.
+			$this->defectService->attachToUser($user,$request->defect);
+            
+        }
+        catch(\Exception $e)
+        {
+            Session::flash('alert', $e->getMessage());
+            return redirect()->route('home');
+        }
 		//Return success
 		Session::flash('flash_message', trans('defects.added'));
 		return redirect()->route('defect.index', [$userId]);
@@ -82,13 +110,20 @@ class DefectController extends Controller {
 	 * @return \Illuminate\Http\Response
 	 */
 	public function edit($userId, $defectAttachmentId) {
-		//Get all defects
-		$defects = Defect::all();
+		try
+        {
+            //get all defects
+            $defect = $this->defectService->getAll();
+        }
+        catch(\Exception $e)
+        {
+            Session::flash('alert', $e->getMessage());
+            return redirect()->route('home');
+        }
 		//Verify that the defect belongs to the given user id
-		$user = $this->verifyDefectUser($userId, $defectAttachmentId);
+		$user = $this->defectService->verifyDefectUser($userId, $defectAttachmentId);
 		//Otherwise return edit
-		return view('defects.edit', ['selectedDefect' => $user->defects[0]->id, 'defectAttachmentId' => $defectAttachmentId,
-			'userId' => $userId, 'defects' => $defects]);
+		return view('defects.edit', ['selectedDefect' => $user->defects[0]->id, 'defectAttachmentId' => $defectAttachmentId,'userId' => $userId, 'defects' => $defects]);
 	}
 
 	/**
@@ -100,7 +135,7 @@ class DefectController extends Controller {
 	 */
 	public function update(Request $request, $userId, $defectAttachmentId) {
 		//Verify that the defect belongs to the given user id
-		$user = $this->verifyDefectUser($userId, $defectAttachmentId);
+		$user = $this->defectService->verifyDefectUser($userId, $defectAttachmentId);
 		//Update defect
 		DB::table('defect_user')->where(
 			[
@@ -173,28 +208,5 @@ class DefectController extends Controller {
 			}) // To Update the Offdays Section and Convert it to String
 			->make();
 	}
-	/**
-	 * Verify the selected defect + user compination
-	 * @param  integer $userId             The user Id
-	 * @param  Integer $defectAttachmentId Defect User Pivot Id
-	 * @return mixed   User object on success or redirect otherwise
-	 */
-	public function verifyDefectUser($userId, $defectAttachmentId) {
-		//Get the user with the selected defect.
-		$user = User::with(['defects' => function ($query) use ($defectAttachmentId) {
-			$query->where('defect_user.id', $defectAttachmentId);
-		}])->where('id', $userId)->first();
-		//Didn't get a user
-		if (empty($user)) {
-			Session::flash('error', trans('users.no_employee'));
-			return redirect()->back()->send();
-		}
-		//Defect id isn't correct
-		if (!isset($user->defects[0]->pivot)) {
-			Session::flash('error', trans('defects.no_defect'));
-			return redirect()->back()->send();
-		}
 
-		return $user;
-	}
 }

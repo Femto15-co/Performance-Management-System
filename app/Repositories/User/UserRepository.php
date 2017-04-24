@@ -86,4 +86,32 @@ class UserRepository extends BaseRepository implements UserInterface
 
         return $bonuses;
     }
+
+    /**
+     * Query scope that gets defects for a user
+     * @param Integer $defectAttachmentId
+     * @param Integer $userId
+     * @return mixed
+     */
+    public function getDefectsForUserScope($defectAttachmentId, $userId)
+    {
+        //Get defects related to a user by userId
+        $userDefects = $this->userModel->with(['defects' => function ($query) use ($defectAttachmentId) {
+            $query->where('defect_user.id', $defectAttachmentId);
+        }])->where('id', $userId)->first()
+
+        //Didn't get a user
+        if (empty($userDefects)) {
+            throw new \Exception(trans('users.no_employee'));
+        } 
+        //Defect id isn't correct
+        if (!isset($userDefects->defects[0]->pivot)) {
+             throw new \Exception(trans('defects.no_defect'));
+        }
+
+        return $userDefects;
+    }
+
+
+     
 }
