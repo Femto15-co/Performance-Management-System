@@ -71,14 +71,13 @@ class ReportRepository extends BaseRepository implements ReportInterface
      */
     public function getFinalScores($id, $user)
     {
-        $avgScores = DB::table('scores')->select('rule_id',DB::raw( 'AVG(score) as avg_score' ))->where('report_id',$id)
+        $avgScores = DB::table('scores')->select('rule_id', DB::raw('AVG(score) as avg_score'))
+            ->where('report_id', $id)
             ->where('reviewer_id', '!=', $user->id)->groupBy('rule_id')->get();
 
-        if(!$avgScores)
-        {
+        if (!$avgScores) {
             throw new \Exception(trans('reports.no_prior_evaluation'));
         }
-
         return $avgScores;
     }
 
@@ -117,19 +116,10 @@ class ReportRepository extends BaseRepository implements ReportInterface
     {
         $ruleScores = $this->reportModel->where('id', $reportId)->hasReviewed($userId)->withReviewer($userId)->get();
 
-        if($ruleScores->isEmpty())
-        {
+        if ($ruleScores->isEmpty()) {
             throw new \Exception(trans('reports.no_scores_recorded'));
         }
 
         return $ruleScores;
     }
-
-    /*public function updateScore()
-    {
-        $this->reportModel->
-        
-        $report->scores()->where('rule_id', $ruleId)->where('reviewer_id', Auth::id())
-            ->update(['score'=>$scores[$i++]]);
-    }*/
 }
