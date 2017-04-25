@@ -90,7 +90,7 @@ class ReportController extends Controller
     public function createStepTwo($id)
     {
         try {
-            $employee = $this->userService->userRepository->getItemByID($id);
+            $employee = $this->userService->userRepository->getItem($id);
 
             $this->userService->onlyEmployee($employee);
 
@@ -118,7 +118,7 @@ class ReportController extends Controller
         $this->validateReport($request);
 
         try {
-            $employee = $this->userService->userRepository->getItemByID($request->employee);
+            $employee = $this->userService->userRepository->getItem($request->employee);
 
             $this->userService->onlyEmployee($employee);
 
@@ -141,7 +141,7 @@ class ReportController extends Controller
     public function getParticipate($id)
     {
         try {
-            $report = $this->reportService->reportRepository->getItemByID($id);
+            $report = $this->reportService->reportRepository->getItem($id);
 
             //Can current user participate?
             $this->reportService->canParticipate($report, Auth::user());
@@ -202,7 +202,7 @@ class ReportController extends Controller
     {
         try {
             //Load report with scores
-            $report = $this->reportService->reportRepository->getItemByID($id, ['scores']);
+            $report = $this->reportService->reportRepository->getItem($id, ['scores']);
 
             $this->reportService->allowedView($report, Auth::user());
 

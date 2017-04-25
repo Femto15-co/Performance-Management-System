@@ -11,14 +11,13 @@ use App\Repositories\BaseRepository;
 class RoleRepository extends BaseRepository implements RoleInterface
 {
     /**
-     * EmployeeType Model
-     * @var Model
+     * RoleRepository constructor.
+     * @param Model $model
      */
-    protected $model;
-
     public function __construct(Model $model)
     {
-        $this->model = $model;
+        $this->setModel($model);
+        $this->originalModel = $this->getModel();
     }
 
     /**
@@ -29,10 +28,9 @@ class RoleRepository extends BaseRepository implements RoleInterface
      */
     public function getRoleByName($roleName)
     {
-        $role=$this->model->where('name',$roleName)->first();
+        $role = $this->model->where('name', $roleName)->first();
 
-        if (!$role)
-        {
+        if (!$role) {
             throw new \Exception(trans('users.role_not_found'));
         }
 

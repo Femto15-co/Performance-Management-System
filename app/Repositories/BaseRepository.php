@@ -61,14 +61,15 @@ class BaseRepository implements RepositoryContract
 
     /**
      * Get Single Entity By id
-     * @param $itemId
+     * @param $attributeValue
      * @param array $relations to eager load
+     * @param $attribute
      * @return Model
      * @throws \Exception
      */
-    public function getItemByID($itemId, $relations = [])
+    public function getItem($attributeValue, $relations = [], $attribute = 'id')
     {
-        $item = $this->model->with($relations)->find($itemId);
+        $item = $this->model->where($attribute, '=', $attributeValue)->with($relations)->first();
 
         if (!$item) {
             throw  new \Exception(trans('general.not_found'));
