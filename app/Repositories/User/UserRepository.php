@@ -11,13 +11,6 @@ use App\Repositories\BaseRepository;
  */
 class UserRepository extends BaseRepository implements UserInterface
 {
-
-    /**
-     * Holds user model
-     * @var Model
-     */
-    protected $userModel;
-
     /**
      * UserRepository constructor.
      * Inject whatever passed model
@@ -25,7 +18,7 @@ class UserRepository extends BaseRepository implements UserInterface
      */
     public function __construct(Model $user)
     {
-        $this->userModel = $user;
+        $this->setModel($user);
     }
 
     /**
@@ -36,7 +29,7 @@ class UserRepository extends BaseRepository implements UserInterface
      */
     public function create($data)
     {
-        $user = $this->userModel->create($data);
+        $user = $this->getModel()->create($data);
         if (!$user) {
             throw new \Exception(trans('users.not_created'));
         }
@@ -51,10 +44,9 @@ class UserRepository extends BaseRepository implements UserInterface
      */
     public function getUserById($id)
     {
-        $user = $this->userModel->find($id);
+        $user = $this->getModel()->find($id);
 
-        if(!$user)
-        {
+        if (!$user) {
             throw new \Exception(trans('users.no_employee'));
         }
         return $user;
@@ -67,12 +59,11 @@ class UserRepository extends BaseRepository implements UserInterface
      */
     public function getAllEmployees()
     {
-        $employees = $this->userModel->whereHas('roles', function($q){
-            $q->where('name','=','employee');
+        $employees = $this->getModel()->whereHas('roles', function ($q) {
+            $q->where('name', '=', 'employee');
         })->get();
 
-        if(!$employees || $employees->isEmpty())
-        {
+        if (!$employees || $employees->isEmpty()) {
             throw new \Exception(trans('reports.no_employee'));
         }
 
@@ -89,7 +80,7 @@ class UserRepository extends BaseRepository implements UserInterface
     public function getBonusesForUserScope($isAdmin, $loggedInUserId, $sentUserId)
     {
         //Get bonuses related to a user by userId
-        $bonuses = $this->userModel->join('bonuses', 'users.id', 'bonuses.user_id')
+        $bonuses = $this->getModel()->join('bonuses', 'users.id', 'bonuses.user_id')
             ->select(['bonuses.id', 'bonuses.description', 'bonuses.value', 'bonuses.created_at']);
 
         //Make sure that user can't see other users data
@@ -131,10 +122,9 @@ class UserRepository extends BaseRepository implements UserInterface
      * @param string $attribute
      * @throws \Exception
      */
-    public function destroy($id, $attribute="id")
+    public function destroy($id, $attribute = "id")
     {
-        if(!$this->userModel->where($attribute, '=', $id)->delete())
-        {
+        if (!$this->getModel()->where($attribute, '=', $id)->delete()) {
             throw new \Exception('users.not_deleted');
         }
     }

@@ -24,6 +24,12 @@ interface RepositoryContract
     public function getModel();
 
     /**
+     * un-boot model
+     */
+    public function resetModel();
+
+
+    /**
      * Add New Entity
      * @param array $data
      * @return Model
@@ -31,30 +37,43 @@ interface RepositoryContract
     public function addItem(array $data);
 
     /**
-     * Update Single Entity By Id
-     * @param $itemId
+     * update entity by key-value
+     * @param $attributeValue
      * @param array $data
-     * @return Model Item
+     * @param string $attribute
+     * @return mixed
+     * @throws \Exception
      */
-    public function editItem($itemId, array $data);
+    public function editItem($attributeValue, $data, $attribute = "id");
 
     /**
      * Get Single Entity By id
      * @param $itemId
+     * @param array $relations to eager load
      * @return Model
      */
-    public function getItemByID($itemId);
+    public function getItemByID($itemId, $relations = []);
 
     /**
      * Delete Item By Id
-     * @param integer $itemId
-     * @return integer
+     * @param $attributeValue
+     * @param string $attribute
+     * @return mixed
      */
-    public function deleteItemById($itemId);
+    public function deleteItem($attributeValue, $attribute = "id");
 
     /**
      * Get All Entities at table
      * @return array $items
      */
     public function getAllItems();
+
+    /**
+     * Ensure model is booted
+     * @param string $key that must exist to indicate boot
+     * @return bool
+     * @throws \Exception
+     */
+    public function ensureBooted($key = 'id');
+
 }

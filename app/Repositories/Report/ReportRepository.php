@@ -11,13 +11,6 @@ use Illuminate\Support\Facades\DB;
  */
 class ReportRepository extends BaseRepository implements ReportInterface
 {
-
-    /**
-     * Holds report model
-     * @var Model
-     */
-    protected $reportModel;
-
     /**
      * ReportRepository constructor.
      * Inject whatever passed model
@@ -25,41 +18,9 @@ class ReportRepository extends BaseRepository implements ReportInterface
      */
     public function __construct(Model $report)
     {
-        $this->reportModel = $report;
+        $this->setModel($report);
+        $this->originalModel = $this->getModel();
     }
-
-    /**
-     * Create new report
-     * @param $data array of key-value pairs
-     * @return Model report to be created
-     * @throws \Exception
-     */
-    public function create($data)
-    {
-        $report = $this->reportModel->create($data);
-        if (!$report) {
-            throw new \Exception(trans('reports.not_created'));
-        }
-        return $report;
-    }
-
-    /**
-     * Retrieves report by id
-     * @param $id
-     * @return Model report
-     * @throws \Exception
-     */
-    public function getReportById($id)
-    {
-        $report = $this->reportModel->find($id);
-
-        if(!$report)
-        {
-            throw new \Exception(trans('reports.not_found'));
-        }
-        return $report;
-    }
-
 
     /**
      * Calculate average scores and overall score by averaging all scores for
@@ -71,7 +32,9 @@ class ReportRepository extends BaseRepository implements ReportInterface
      */
     public function getFinalScores($id, $user)
     {
-        $avgScores = DB::table('scores')->select('rule_id', DB::raw('AVG(score) as avg_score'))
+        $avgScores = DB::table('scores')
+            ->select('rule_id', DB::raw('AVG(score) as avg_score'), 'performance_rules.weight')
+            ->join('performance_rules', 'scores.rule_id', 'performance_rules.id')
             ->where('report_id', $id)
             ->where('reviewer_id', '!=', $user->id)->groupBy('rule_id')->get();
 
@@ -82,19 +45,6 @@ class ReportRepository extends BaseRepository implements ReportInterface
     }
 
     /**
-     * update report
-     * @param $data
-     * @throws \Exception
-     */
-    public function update($id, $data, $attribute = "id")
-    {
-        if(!$this->reportModel->where($attribute, '=', $id)->update($data))
-        {
-            throw new \Exception('reports.not_updated');
-        }
-    }
-
-    /**
      * returns true if reviewer already participated
      * @param $reportId
      * @param $userId
@@ -102,11 +52,11 @@ class ReportRepository extends BaseRepository implements ReportInterface
      */
     public function hasReviewerParticipated($reportId, $userId)
     {
-        return $this->reportModel->where('id', $reportId)->hasReviewed($userId)->exists();
+        return $this->getModel()->where('id', $reportId)->hasReviewed($userId)->exists();
     }
 
     /**
-     * Get scores recorded by authenticated user who attempted edit
+     * Get report with scores recorded by authenticated user who attempted edit
      * @param $reportId
      * @param $userId
      * @return mixed scores
@@ -114,12 +64,98 @@ class ReportRepository extends BaseRepository implements ReportInterface
      */
     public function getReviewerScores($reportId, $userId)
     {
-        $ruleScores = $this->reportModel->where('id', $reportId)->hasReviewed($userId)->withReviewer($userId)->get();
+        $reportWithScores = $this->getModel()->where('id', $reportId)->hasReviewed($userId)
+            ->withReviewer($userId)->first();
 
-        if ($ruleScores->isEmpty()) {
+        if (!$reportWithScores) {
             throw new \Exception(trans('reports.no_scores_recorded'));
         }
 
-        return $ruleScores;
+        return $reportWithScores;
+    }
+
+    /**
+     * Update score for a given rule and user
+     * @param $ruleId
+     * @param $score
+     * @param $loggedId
+     * @return mixed
+     */
+    public function updateScore($ruleId, $score, $loggedId)
+    {
+        $this->ensureBooted();
+
+        return $this->getModel()->scores()->where('rule_id', $ruleId)->where('reviewer_id', $loggedId)
+            ->update(['score' => $score]);
+    }
+
+    /**
+     * get average score for a report
+     * @param $id
+     * @param $reportUserId
+     * @return mixed
+     */
+    public function getAvgScore($id, $reportUserId)
+    {
+        $avgScores = DB::table('scores')->select('rule_id', DB::raw('AVG(score) as avg_score'))->where('report_id', $id)
+            ->where('reviewer_id', '!=', $reportUserId)->groupBy('rule_id')->get()->groupBy('rule_id')->toArray();
+
+        return $avgScores;
+    }
+
+    /**
+     * Ensure score is unique for a given user and id
+     * @param $ruleId
+     * @param $loggedUserId
+     */
+    public function ensureScoreUniqueness($ruleId, $loggedUserId)
+    {
+        $this->ensureBooted();
+
+        return $this->getModel()->scores()->where('rule_id', $ruleId)->where('reviewer_id', $loggedUserId)->count();
+    }
+
+    /**
+     * Attach score to a report for a reviewer
+     * @param $ruleId
+     * @param $loggedUserId
+     * @param $score
+     * @return mixed
+     */
+    public function attachScore($ruleId, $loggedUserId, $score)
+    {
+        $this->ensureBooted();
+
+        return $this->getModel()->scores()
+            ->attach([$ruleId => ['reviewer_id' => $loggedUserId, 'score' => $score]]);
+    }
+
+    /**
+     * Get Reports for a specified user or for all users if current
+     * logged in user is admin
+     * @param $userId
+     * @param integer $loggedInUserId
+     * @param bool $isAdmin
+     * @return mixed
+     */
+    public function getReportsForAUserScope($isAdmin, $loggedInUserId, $userId = null)
+    {
+        $reports = $this->getModel()->join('users', 'reports.user_id', '=', 'users.id')
+            ->select([
+                'reports.id', 'reports.user_id', 'users.name', 'reports.overall_score',
+                'reports.max_score', 'reports.created_at'
+            ]);
+
+        //If user is not admin, load users reports only
+        if (!$isAdmin) {
+            return $reports->where('reports.user_id', $loggedInUserId);
+        }
+
+        //Otherwise, display user's related reports only if any user ID
+        if ($userId) {
+            return $reports->where('reports.user_id', $userId);
+        }
+
+        return $reports;
     }
 }
