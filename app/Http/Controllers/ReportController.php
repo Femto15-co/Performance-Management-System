@@ -36,8 +36,11 @@ class ReportController extends Controller
      */
     protected $reportService;
 
-    public function __construct(UserService $userService, PerformanceRuleService $performanceRuleService, ReportService $reportService)
-    {
+    public function __construct(
+        UserService $userService,
+        PerformanceRuleService $performanceRuleService,
+        ReportService $reportService
+    ) {
         /*
          * Initialize controller dependencies
          */
@@ -51,7 +54,7 @@ class ReportController extends Controller
      * @param $userId
      * @return \Illuminate\View\View
      */
-    public function index($userId=null)
+    public function index($userId = null)
     {
         //Include DataTable
         $includeDataTable = true;
@@ -146,7 +149,7 @@ class ReportController extends Controller
     {
         try
         {
-            $report = $this->reportService->reportRepository->getReportById($id);
+            $report = $this->reportService->reportRepository->getItemByID($id);
 
             //Can current user participate?
             $this->reportService->canParticipate($report, Auth::user());
@@ -219,7 +222,7 @@ class ReportController extends Controller
         $rules = array();
 
         
-        $report = $this->reportService->reportRepository->getReportById($id);
+        $report = $this->reportService->reportRepository->getItemByID($id);
 
         $this->reportService->allowedView($report, Auth::user());
 
@@ -269,7 +272,7 @@ class ReportController extends Controller
     {
         try
         {
-            $report = $this->reportService->reportRepository->getReportById($id);
+            $report = $this->reportService->reportRepository->getItemByID($id);
 
             $this->reportService->openModification($report);
 
