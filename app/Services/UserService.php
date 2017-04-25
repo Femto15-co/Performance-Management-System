@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\Repositories\Role\RoleInterface;
@@ -31,8 +32,7 @@ class UserService
     public function onlyEmployee($user)
     {
         //Ensure that selected employee has employee rule
-        if(!$user->hasRole('employee'))
-        {
+        if (!$user->hasRole('employee')) {
             throw new \Exception(trans('reports.no_employee'));
         }
     }
@@ -45,10 +45,11 @@ class UserService
      */
     public function getLoggedOrSelected($userId)
     {
-        if (!Auth::user()->hasRole('admin'))
+        if (! Auth::user()->hasRole('admin')) {
             return Auth::user();
+        }
 
-        return $this->userRepository->getUserById($userId);
+        return $this->userRepository->getItem($userId);
     }
 
     /**
@@ -58,14 +59,13 @@ class UserService
      */
     public function getRoleFromType($type)
     {
-        if(strtolower($type) == 'admin')
-        {
+        if (strtolower($type) == 'admin') {
             //Get admin role
-            return $this->roleRepository->getRoleByName('admin');
+            return $this->roleRepository->getItem('admin', [], 'name');
         }
 
         //Otherwise, return employee role
-        return $this->roleRepository->getRoleByName('employee');
+        return $this->roleRepository->getItem('employee', [], 'name');
     }
 
     /**
@@ -76,9 +76,12 @@ class UserService
      */
     public function dataTableControllers($user, $isLoggedAdmin)
     {
-        $actions = '<a href="' . route('bonus.index', [$user->id]) . '" class="btn btn-xs btn-success"><i class="glyphicon glyphicon-star"></i>' . trans('bonuses.title') . '</a> ';
-        $actions .= '<a href="' . route('defect.index', [$user->id]) . '" class="btn btn-xs btn-warning"><i class="glyphicon glyphicon-remove"></i>' . trans('defects.title') . '</a> ';
-        $actions .= '<a href="' . route('report.user.index', [$user->id]) . '" class="btn btn-xs btn-info"><i class="glyphicon glyphicon-file"></i>' . trans('reports.reports') . '</a> ';
+        $actions = '<a href="' . route('bonus.index', [$user->id]) . '" class="btn btn-xs btn-success">'.
+            '<i class="glyphicon glyphicon-star"></i>' . trans('bonuses.title') . '</a> ';
+        $actions .= '<a href="' . route('defect.index', [$user->id]) . '" class="btn btn-xs btn-warning">'.
+            '<i class="glyphicon glyphicon-remove"></i>' . trans('defects.title') . '</a> ';
+        $actions .= '<a href="' . route('report.user.index', [$user->id]) . '" class="btn btn-xs btn-info">'.
+            '<i class="glyphicon glyphicon-file"></i>' . trans('reports.reports') . '</a> ';
 
         //Delete form, show if admin
         if ($isLoggedAdmin) {
