@@ -8,6 +8,11 @@ class BaseRepository implements RepositoryContract
     protected $model;
 
     /**
+     * Keeps an image of original non-booted model
+     * @var Model
+     */
+    protected $originalModel;
+    /**
      * Get Class Model
      * @return Model
      */
@@ -27,6 +32,14 @@ class BaseRepository implements RepositoryContract
     }
 
     /**
+     * un-boot model
+     */
+    public function resetModel()
+    {
+        $this->model = $this->originalModel;
+    }
+
+    /**
      * Add New Entity
      * @param array $data
      * @return Model
@@ -38,40 +51,9 @@ class BaseRepository implements RepositoryContract
             throw new \Exception(trans('general.no_data'));
         }
 
-        foreach ($data as $key => $value) {
-            if ($value) {
-                $this->model->$key = $value;
-            }
-        }
-
-        $this->model->save();
-        return $this->model;
-    }
-
-    /**
-     * Get Single Entity By id
-     * @param $itemId
-     * @param array $data
-     * @return mixed
-     * @throws \Exception
-     */
-    public function editItem($itemId, array $data)
-    {
-        $item =  $this->getItemByID($itemId);
-
-        if ($data) {
-            throw new \Exception(trans('general.no_data'));
-        }
-
-        foreach ($data as $key => $value) {
-            if ($value) {
-                $item->$key = $value;
-            }
-        }
-        $updated  = $item->save();
-
-        if (!$updated) {
-            throw  new \Exception(trans('general.not_updated'));
+        $item = $this->model->create($data);
+        if (!$item) {
+            throw new \Exception(trans('general.not_created'));
         }
 
         return $item;
@@ -80,39 +62,91 @@ class BaseRepository implements RepositoryContract
     /**
      * Get Single Entity By id
      * @param $itemId
+     * @param array $relations to eager load
      * @return Model
      * @throws \Exception
      */
-    public function getItemByID($itemId)
+    public function getItemByID($itemId, $relations = [])
     {
-        $item = $this->model->find($itemId);
+        $item = $this->model->with($relations)->find($itemId);
+
         if (!$item) {
             throw  new \Exception(trans('general.not_found'));
         }
+
         return $item;
     }
 
     /**
-     * Delete Item By Id
-     * @param integer $itemId
-     * @return int
+     * update entity by key-value
+     * @param $attributeValue
+     * @param array $data
+     * @param string $attribute
+     * @return mixed
      * @throws \Exception
      */
-    public function deleteItemById($itemId)
+    public function editItem($attributeValue, $data, $attribute = "id")
     {
-        $deleted = $this->model->delete($itemId);
+        $fillable = array_flip($this->model->getFillable());
+
+        $updated = $this->model->where($attribute, '=', $attributeValue)
+            ->update(array_intersect_key($data, $fillable));
+
+        if (!$updated) {
+            throw new \Exception('general.not_updated');
+        }
+
+        return $updated;
+    }
+
+    /**
+     * Delete item by attribute
+     * @param $attributeValue
+     * @param string $attribute
+     * @return mixed
+     * @throws \Exception
+     */
+    public function deleteItem($attributeValue, $attribute = "id")
+    {
+        $deleted = $this->model->where($attribute, '=', $attributeValue)->delete();
+
         if (!$deleted) {
             throw new \Exception(trans('general.not_deleted'));
         }
+
         return $deleted;
     }
 
     /**
      * Get All Entities at table
      * @return array $items
+     * @throws \Exception
      */
     public function getAllItems()
     {
-        return $this->model->all();
+        $items = $this->model->all();
+
+        if (!$items || $items->isEmpty()) {
+            throw new \Exception(trans('general.no_data'));
+        }
+
+        return $items;
+    }
+
+    /**
+     * Ensure model is booted
+     * @param string $key that must exist to indicate boot
+     * @return bool
+     * @throws \Exception
+     */
+    public function ensureBooted($key = 'id')
+    {
+        //Check if report model is booted
+        if (!$this->model->$key) {
+            throw new \Exception(trans('general.not_found'));
+        }
+
+        return true;
     }
 }
+

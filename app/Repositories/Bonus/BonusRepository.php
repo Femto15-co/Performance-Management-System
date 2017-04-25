@@ -11,21 +11,14 @@ use App\Repositories\BaseRepository;
  */
 class BonusRepository extends BaseRepository implements BonusInterface
 {
-
-    /**
-     * Holds user model
-     * @var Model
-     */
-    protected $bonusModel;
-
     /**
      * UserRepository constructor.
      * Inject whatever passed model
-     * @param Model $bonusModel
+     * @param Model $bonus
      */
-    public function __construct(Model $bonusModel)
+    public function __construct(Model $bonus)
     {
-        $this->bonusModel = $bonusModel;
+        $this->setModel($bonus);
     }
 
     /**
@@ -36,7 +29,7 @@ class BonusRepository extends BaseRepository implements BonusInterface
      */
     public function create($data)
     {
-        $bonus = $this->bonusModel->create($data);
+        $bonus = $this->getModel()->create($data);
         if (!$bonus) {
             throw new \Exception(trans('bonuses.not_added'));
         }
@@ -51,7 +44,7 @@ class BonusRepository extends BaseRepository implements BonusInterface
      */
     public function update($id, $data, $attribute = "id")
     {
-        if(!$this->bonusModel->where($attribute, '=', $id)->update(array_intersect_key($data, array_flip($this->bonusModel->getFillable()))) )
+        if(!$this->getModel()->where($attribute, '=', $id)->update(array_intersect_key($data, array_flip($this->getModel()->getFillable()))) )
         {
             throw new \Exception('reports.not_updated');
         }
@@ -67,7 +60,7 @@ class BonusRepository extends BaseRepository implements BonusInterface
      */
     public function getBonusForAUser($userId, $bonusId)
     {
-        $bonus = $this->bonusModel->where(['id' => $bonusId, 'user_id' => $userId])->first();
+        $bonus = $this->getModel()->where(['id' => $bonusId, 'user_id' => $userId])->first();
 
         if (!$bonus) {
             throw new \Exception(trans('bonuses.not_found'));
@@ -84,7 +77,7 @@ class BonusRepository extends BaseRepository implements BonusInterface
      */
     public function destroy($id, $attribute="id")
     {
-        if(!$this->bonusModel->where($attribute, '=', $id)->delete())
+        if(!$this->getModel()->where($attribute, '=', $id)->delete())
         {
             throw new \Exception('bonuses.not_deleted');
         }
