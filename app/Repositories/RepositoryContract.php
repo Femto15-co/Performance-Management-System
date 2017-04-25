@@ -48,11 +48,13 @@ interface RepositoryContract
 
     /**
      * Get Single Entity By id
-     * @param $itemId
+     * @param $attributeValue
      * @param array $relations to eager load
+     * @param $attribute
      * @return Model
+     * @throws \Exception
      */
-    public function getItemByID($itemId, $relations = []);
+    public function getItem($attributeValue, $relations = [], $attribute = 'id');
 
     /**
      * Delete Item By Id

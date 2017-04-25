@@ -75,7 +75,7 @@ class ReportService
      */
     public function reportParticipate($id, $scores, $rules)
     {
-        $report = $this->reportRepository->getItemByID($id);
+        $report = $this->reportRepository->getItem($id);
 
         $this->canParticipate($report, Auth::user());
 
@@ -105,7 +105,7 @@ class ReportService
      */
     public function updateReport($id, $scores, $rules)
     {
-        $report = $this->reportRepository->getItemByID($id);
+        $report = $this->reportRepository->getItem($id);
         $this->openModification($report);
         $employee = $this->getReportEmployee($report);
 
@@ -270,10 +270,10 @@ class ReportService
             $reviewersScores[$score->pivot->rule_id][$score->pivot->reviewer_id] = $score->pivot->score;
 
             //List all unique reviewers
-            $reviewers[$score->pivot->reviewer_id] = $this->userRepository->getItemByID($score->pivot->reviewer_id);
+            $reviewers[$score->pivot->reviewer_id] = $this->userRepository->getItem($score->pivot->reviewer_id);
 
             //List all unique rules
-            $rules[$score->pivot->rule_id] = $this->performanceRuleRepository->getItemByID($score->pivot->rule_id);
+            $rules[$score->pivot->rule_id] = $this->performanceRuleRepository->getItem($score->pivot->rule_id);
         }
 
         //Get avg score if overall score is set

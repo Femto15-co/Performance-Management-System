@@ -8,10 +8,4 @@ namespace App\Repositories\EmployeeType;
  */
 interface EmployeeTypeInterface
 {
-    /**
-     * Get all EmployeeTypes
-     * @throws \Exception
-     * @return EmployeeType[]
-     */
-    public function getAll();
 }

@@ -8,16 +8,13 @@ namespace App\Repositories\User;
  */
 interface UserInterface
 {
-
     /**
-     * Create new User
-     * @param $data array of key-value pairs
-     * @return Model user data
+     * Get All users with role employee
+     * @return \App\User[]
      * @throws \Exception
      */
-    public function create($data);
-    public function getUserById($id);
     public function getAllEmployees();
+
     /**
      * Query scope that gets bonuses for a user
      * @param bool $isAdmin
@@ -29,17 +26,10 @@ interface UserInterface
 
     /**
      * Attach role to user
-     * @param $user
      * @param $role
      */
-    public function attachRole($user, $role);
-    /**
-     * Delete user from database
-     * @param $id
-     * @param string $attribute
-     * @throws \Exception
-     */
-    public function destroy($id, $attribute="id");
+    public function attachRole($role);
+
     /**
      * Get Users for a role query scope
      * @param $roleId

@@ -19,37 +19,7 @@ class UserRepository extends BaseRepository implements UserInterface
     public function __construct(Model $user)
     {
         $this->setModel($user);
-    }
-
-    /**
-     * Create new User
-     * @param $data array of key-value pairs
-     * @return Model user data
-     * @throws \Exception
-     */
-    public function create($data)
-    {
-        $user = $this->getModel()->create($data);
-        if (!$user) {
-            throw new \Exception(trans('users.not_created'));
-        }
-        return $user;
-    }
-
-    /**
-     * Retrieves user by id
-     * @param $id
-     * @return Model user
-     * @throws \Exception
-     */
-    public function getUserById($id)
-    {
-        $user = $this->getModel()->find($id);
-
-        if (!$user) {
-            throw new \Exception(trans('users.no_employee'));
-        }
-        return $user;
+        $this->originalModel = $this->getModel();
     }
 
     /**
@@ -98,7 +68,7 @@ class UserRepository extends BaseRepository implements UserInterface
      */
     public function getUsersForRoleScope($roleId)
     {
-        $users = User::join('role_user', 'users.id', '=', 'role_user.user_id')
+        $users = $this->model->join('role_user', 'users.id', '=', 'role_user.user_id')
             ->join('employee_types', 'users.employee_type', '=', 'employee_types.id')
             ->where('role_user.role_id', '!=', $roleId)
             ->select(['users.id', 'users.name', 'users.email', 'employee_types.type']);
@@ -108,24 +78,12 @@ class UserRepository extends BaseRepository implements UserInterface
 
     /**
      * Attach role to user
-     * @param $user
      * @param $role
      */
-    public function attachRole($user, $role)
+    public function attachRole($role)
     {
-        $user->attachRole($role);
-    }
+        $this->ensureBooted();
 
-    /**
-     * Delete user from database
-     * @param $id
-     * @param string $attribute
-     * @throws \Exception
-     */
-    public function destroy($id, $attribute = "id")
-    {
-        if (!$this->getModel()->where($attribute, '=', $id)->delete()) {
-            throw new \Exception('users.not_deleted');
-        }
+        $this->model->attachRole($role);
     }
 }
