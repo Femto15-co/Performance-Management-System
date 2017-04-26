@@ -14,7 +14,7 @@ use Yajra\Datatables\Datatables;
 
 class DefectController extends Controller {
 
-	public $rules = ['defect' => 'exists:defects,id', 'userId' => 'exists:users,id'];
+	
 	/**
      * User Repository
      * @var
@@ -30,6 +30,11 @@ class DefectController extends Controller {
     {
         $this->userService = $userService;
         $this->defectService = $defectService;
+     	$this->rules = [
+            'defect' => 'exists:defects,id',
+            'userId'       => 'exists:users,id',
+           
+        ];
 	}
 	/**
 	 * Display a listing of the users with defects.
@@ -38,16 +43,14 @@ class DefectController extends Controller {
 	 */
 	public function index($userId) {
 
-		try
-        {
+		try {
             //Only admin can pick whatever id they like
             $user = $this->userService->getLoggedOrSelected($userId);
-        }
-        catch(\Exception $e)
-        {
+        } catch(\Exception $e) {
             Session::flash('alert', $e->getMessage());
             return redirect()->route('home');
         }
+
 		//Include DataTable
 		$includeDataTable = true;
 		//DataTable ajax route
@@ -61,13 +64,10 @@ class DefectController extends Controller {
 	 * @return \Illuminate\Http\Response
 	 */
 	public function create($userId) {
-		try
-        {
+		try {
             //get all defects
-            $defect = $this->defectService->getAll();
-        }
-        catch(\Exception $e)
-        {
+            $defects = $this->defectService->defectRepository->getAllItems();
+        } catch(\Exception $e) {
             Session::flash('alert', $e->getMessage());
             return redirect()->route('home');
         }
@@ -85,15 +85,19 @@ class DefectController extends Controller {
 		$request->merge(['userId' => $userId]);
 		//Validate input
 		$this->validateDefect($request);
-		try
-        {
-            $user=$this->userService->onlyEmployee($this->userService->userRepository->getUserById($userId));
-            //Attache defect to the user.
-			$this->defectService->attachToUser($user,$request->defect);
+		try {
+        	
+           	$user=$this->userService->userRepository->getItem($userId);
+           	$this->userService->onlyEmployee($user);
+       		//Boot model
+            $this->userService->userRepository->setModel($user);
+           	//Attache defect to the user.
+			$this->userService->userRepository->attachDefectToUser($user,$request->defect);
+			//un-boot model
+            $this->userService->userRepository->resetModel();
             
-        }
-        catch(\Exception $e)
-        {
+        } catch(\Exception $e) {
+        	
             Session::flash('alert', $e->getMessage());
             return redirect()->route('home');
         }
@@ -110,37 +114,34 @@ class DefectController extends Controller {
 	 * @return \Illuminate\Http\Response
 	 */
 	public function edit($userId, $defectAttachmentId) {
-		try
-        {
+		try {
             //get all defects
-            $defects = $this->defectService->getAll();
-        }
-        catch(\Exception $e)
-        {
+            $defects = $this->defectService->defectRepository->getAllItems();
+            //Verify that the defect belongs to the given user id
+			$user = $this->userService->userRepository->getDefectsRelatedToUser($defectAttachmentId ,$userId);
+        } catch(\Exception $e) {
             Session::flash('alert', $e->getMessage());
             return redirect()->route('home');
         }
-		//Verify that the defect belongs to the given user id
-		$user = $this->defectService->verifyDefectUser($userId, $defectAttachmentId);
+		
 		//Otherwise return edit
 		return view('defects.edit', ['selectedDefect' => $user->defects[0]->id, 'defectAttachmentId' => $defectAttachmentId,'userId' => $userId, 'defects' => $defects]);
 	}
 
 	/**
-	 * Update the specified resource in storage.
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @param  \App\Defect  $defectAttachmentId
-	 * @return \Illuminate\Http\Response
-	 */
+	* Update the specified resource in storage.
+	*
+	* @param  \Illuminate\Http\Request  $request
+	* @param  \App\Defect  $defectAttachmentId
+	* @return \Illuminate\Http\Response
+	*/
 	public function update(Request $request, $userId, $defectAttachmentId) {
-		//Verify that the defect belongs to the given user id
-		$this->defectService->verifyDefectUser($userId, $defectAttachmentId);
-		try{
+		try {
+		 	//Verify that the defect belongs to the given user id
+			$this->userService->userRepository->getDefectsRelatedToUser($defectAttachmentId ,$userId);
 			//Update defect
-			$this->defectService->update($userId, $defectAttachmentId,$request->defect);
-		}
-		catch{
+			$this->userService->userRepository->updateDefectOfUser($userId, $defectAttachmentId,$request->defect);
+		} catch(\Exception $e){
 		 	Session::flash('alert', $e->getMessage());
             return redirect()->route('home');
 		}
@@ -155,11 +156,12 @@ class DefectController extends Controller {
 	 * @return \Illuminate\Http\Response
 	 */
 	public function destroy($defectAttachmentId) {
-		try{
+
+		try {
 			//Defect deleted
-			$this->defectService->destroy($defectAttachmentId);
-		}
-		catch{
+			$this->userService->userRepository->detachDefectFromUser($defectAttachmentId);
+		} catch(\Exception $e) {
+			
 			//Couldn't delete defect
 		 	Session::flash('alert', $e->getMessage());
             return redirect()->back();
@@ -177,6 +179,7 @@ class DefectController extends Controller {
 	public function validateDefect(Request $request) {
 
 		$this->validate($request, $this->rules);
+
 	}
 	/**
 	 * Returns defects data to DataTable
@@ -184,14 +187,13 @@ class DefectController extends Controller {
 	 * @return JSON
 	 */
 	public function listData($userId) {
-		
-	 	$isAdmin = Auth::user()->hasRole('admin');
-		//Get defects related to a user by userId
-		$defects = $this->userService->userRepository->getDefectsForUserScope($isAdmin, Auth::id(), $userId);
+
+	 	//Get defects related to a user by userId
+		$defects = $this->userService->userRepository->getDefectsForUserScope(Auth::user()->hasRole('admin'), Auth::id(), $userId);
 		
 		return Datatables::of($defects)
 			->addColumn('action', function ($defects) use ($userId) {
-				if ($isAdmin) {
+				if (Auth::user()->hasRole('admin')) {
 					$formHead = "<form class='delete-form' method='POST' action='" . route('defect.destroy', $defects->id) . "'>" . csrf_field();
 					$editLink = "<a href=" . route('defect.edit', [$userId, $defects->id]) . " class='btn btn-xs btn-primary'><i class='glyphicon glyphicon-edit'></i>" . trans('general.edit') . "</a>";
 					$deleteForm =

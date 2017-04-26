@@ -20,7 +20,7 @@ use App\Repositories\PerformanceRule\PerformanceRuleRepository;
 
 
 use App\Defect;
-use App\Repositories\Bonus\DefectRepository;
+use App\Repositories\Defect\DefectRepository;
 
 use App\EmployeeType;
 use App\Repositories\EmployeeType\EmployeeTypeRepository;
@@ -76,21 +76,21 @@ class RepositoryServiceProvider extends ServiceProvider
         });
 
         /*
-
-         * Bind Defect Repository
-         */
+        * Bind Defect Repository
+        */
         $this->app->bind('App\Repositories\Defect\DefectInterface', function(){
             return new DefectRepository(new Defect());
-
-         * Bind EmployeeType Repository
-         */
+        });
+        /*
+        * Bind EmployeeType Repository
+        */
         $this->app->bind('App\Repositories\EmployeeType\EmployeeTypeInterface', function(){
             return new EmployeeTypeRepository(new EmployeeType());
         });
 
         /*
-         * Bind Role Repository
-         */
+        * Bind Role Repository
+        */
         $this->app->bind('App\Repositories\Role\RoleInterface', function(){
             return new RoleRepository(new Role());
 

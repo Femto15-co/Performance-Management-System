@@ -31,6 +31,7 @@ class UserService
      */
     public function onlyEmployee($user)
     {
+       
         //Ensure that selected employee has employee rule
         if (!$user->hasRole('employee')) {
             throw new \Exception(trans('reports.no_employee'));

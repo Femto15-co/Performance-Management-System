@@ -1,8 +1,10 @@
 <?php
 namespace App\Services;
 
-use App\Repositories\Bonus\DefectInterface;
+use App\Repositories\Defect\DefectInterface;
 use App\Repositories\User\UserInterface;
+use Illuminate\Support\Facades\Session;
+
 
 class DefectService
 {
@@ -33,25 +35,5 @@ class DefectService
 
         return $formHead . $editLink . $deleteForm;
     }
-    /**
-     * Verify the selected defect + user compination
-     * @param  integer $userId             The user Id
-     * @param  Integer $defectAttachmentId Defect User Pivot Id
-     * @return mixed   User object on success or redirect otherwise
-     */
-    public function verifyDefectUser($userId, $defectAttachmentId) {
-        try
-        {
-            //Get the user with the selected defect.
-            $this->userRepository->getDefectsRelatedToUser($userId, $defectAttachmentId);
-        }
-        catch(\Exception $e)
-        {
-            Session::flash('alert', $e->getMessage());
-            return redirect()->back()->send();
-        }
-        
-
-        
-    }
+    
 }

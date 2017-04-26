@@ -8,9 +8,8 @@ namespace App\Repositories\Defect;
  */
 interface DefectInterface
 {
-    public function getAll();
- 	public function update($userId, $defectAttachmentId,$requestDefect);
- 	public function attachToUser($user,$defectId);
- 	public function destroy($defectAttachmentId);
+   
+ 	
+ 
   
 }
