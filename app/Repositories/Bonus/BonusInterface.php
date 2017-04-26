@@ -8,8 +8,12 @@ namespace App\Repositories\Bonus;
  */
 interface BonusInterface
 {
-    public function create($data);
+    /**
+     * Get bonus for a user and verifies that bonus belongs to user
+     * @param  integer $userId The user id
+     * @param  integer $bonusId    The bonus id
+     * @throws \Exception
+     * @return mixed         Return Bonus object on success or redirect with error on failure
+     */
     public function getBonusForAUser($userId, $bonusId);
-    public function destroy($id, $attribute = "id");
-    public function update($id, $data, $attribute = "id");
 }

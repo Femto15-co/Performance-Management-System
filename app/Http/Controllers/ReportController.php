@@ -36,8 +36,11 @@ class ReportController extends Controller
      */
     protected $reportService;
 
-    public function __construct(UserService $userService, PerformanceRuleService $performanceRuleService, ReportService $reportService)
-    {
+    public function __construct(
+        UserService $userService,
+        PerformanceRuleService $performanceRuleService,
+        ReportService $reportService
+    ) {
         /*
          * Initialize controller dependencies
          */
@@ -51,15 +54,15 @@ class ReportController extends Controller
      * @param $userId
      * @return \Illuminate\View\View
      */
-    public function index($userId=null)
+    public function index($userId = null)
     {
         //Include DataTable
         $includeDataTable = true;
 
         //DataTable ajax route
-        $dataTableRoute = ($userId)?route('report.list',[$userId]):route('report.list');
+        $dataTableRoute = ($userId) ? route('report.list', [$userId]) : route('report.list');
 
-        return view('reports.index', compact('includeDataTable', 'dataTableRoute','userId'));
+        return view('reports.index', compact('includeDataTable', 'dataTableRoute', 'userId'));
     }
 
     /**
@@ -69,48 +72,44 @@ class ReportController extends Controller
      */
     public function create()
     {
-        try
-        {
+        try {
             $employees = $this->userService->userRepository->getAllEmployees();
-        }
-        catch(\Exception $e)
-        {
-            Session::flash('error',$e->getMessage());
+        } catch (\Exception $e) {
+            Session::flash('error', $e->getMessage());
             return redirect(route('report.index'));
         }
 
-        return view('reports.step1', compact(['employees']));
+        return view('reports.step1')->with('employees', $employees);
     }
 
     /**
      * Show step2 form for creating a new report.
      * @param $id
-     * @return \Illuminate\Routing\Redirector
+     * @return $this|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
     public function createStepTwo($id)
     {
-        try
-        {
-            $employee = $this->userService->userRepository->getUserById($id);
+        try {
+            $employee = $this->userService->userRepository->getItem($id);
 
             $this->userService->onlyEmployee($employee);
 
-            $performanceRules = $this->performanceRuleService->performanceRuleRepository->getRulesByType($employee->employee_type);
-        }
-        catch(\Exception $e)
-        {
-            Session::flash('error',$e->getMessage());
+            $performanceRules = $this->performanceRuleService
+                ->performanceRuleRepository->getRulesByType($employee->employee_type);
+        } catch (\Exception $e) {
+            Session::flash('error', $e->getMessage());
             return redirect(route('report.index'));
         }
 
         //Pass Counter to view
         $counter = 0;
-        return view('reports.step2', compact(['performanceRules','counter']))->with('employee',$employee->id);
+        return view('reports.step2', compact(['counter']))
+            ->with(['employee' => $employee->id, 'performanceRules' => $performanceRules]);
     }
 
     /**
      * Store a newly created resource in storage.
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -118,22 +117,19 @@ class ReportController extends Controller
         //Validate Request
         $this->validateReport($request);
 
-        try
-        {
-            $employee = $this->userService->userRepository->getUserById($request->employee);
+        try {
+            $employee = $this->userService->userRepository->getItem($request->employee);
 
             $this->userService->onlyEmployee($employee);
 
             $this->reportService->addReport($employee, $request->input('scores'), $request->input('rules'));
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             //if not created, redirect to reports index and show error message
-            Session::flash('error',$e->getMessage());
+            Session::flash('error', $e->getMessage());
             return redirect(route('report.index'));
         }
 
-        Session::flash('flash_message',trans('reports.created_first'));
+        Session::flash('flash_message', trans('reports.created_first'));
         return redirect(route('report.index'));
     }
 
@@ -144,9 +140,8 @@ class ReportController extends Controller
      */
     public function getParticipate($id)
     {
-        try
-        {
-            $report = $this->reportService->reportRepository->getReportById($id);
+        try {
+            $report = $this->reportService->reportRepository->getItem($id);
 
             //Can current user participate?
             $this->reportService->canParticipate($report, Auth::user());
@@ -159,16 +154,14 @@ class ReportController extends Controller
 
             //load rules based on employee type
             $performanceRules = $this->performanceRuleService->performanceRuleRepository->getRulesByType($employee->employee_type);
-        }
-        catch(\Exception $e)
-        {
-            Session::flash('error',$e->getMessage());
+        } catch (\Exception $e) {
+            Session::flash('error', $e->getMessage());
             return redirect(route('report.index'));
         }
 
         //Pass Counter to view
         $counter = 0;
-        return view('reports.participate', compact(['performanceRules','counter', 'report']));
+        return view('reports.participate', compact(['performanceRules', 'counter', 'report']));
     }
 
     /**
@@ -181,22 +174,20 @@ class ReportController extends Controller
         //Validate Request
         $this->validateReport($request);
 
-        try
-        {
+        try {
             $this->reportService->reportParticipate($id, $request->scores, $request->rules);
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             //report not found, redirect to reports index and show error message
             Session::flash('error', $e->getMessage());
             return redirect(route('report.index'));
         }
 
         //Add success message and return
-        Session::flash('flash_message',trans('reports.created_first'));
+        Session::flash('flash_message', trans('reports.created_first'));
 
-        if($this->reportService->redirectTo)
+        if ($this->reportService->redirectTo) {
             return redirect($this->reportService->redirectTo);
+        }
 
         return redirect(route('report.index'));
     }
@@ -204,94 +195,55 @@ class ReportController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
-        //Report array
-        $reviewersScores = array();
+        try {
+            //Load report with scores
+            $report = $this->reportService->reportRepository->getItem($id, ['scores']);
 
-        //Unique reviewers
-        $reviewers = array();
+            $this->reportService->allowedView($report, Auth::user());
 
-        //Unique Rules
-        $rules = array();
-
-        
-        $report = $this->reportService->reportRepository->getReportById($id);
-
-        $this->reportService->allowedView($report, Auth::user());
-
-        /*
-         * List Data in rules by reviewer matrix
-         */
-        $scores = $report->scores()->get();
-        //TODO
-        foreach($scores as $score)
-        {
-            $reviewersScores[$score->pivot->rule_id][$score->pivot->reviewer_id] = $score->pivot->score;
-
-            //List all unique reviewers
-            $reviewers[$score->pivot->reviewer_id] = User::find($score->pivot->reviewer_id);
-
-            //List all unique rules
-            $rules[$score->pivot->rule_id] = PerformanceRule::find($score->pivot->rule_id);
+            //List Data in rules x reviewer matrix
+            extract($this->reportService->getReviewsMatrix($report));
+        } catch (\Exception $e) {
+            Session::flash('error', $e->getMessage());
+            return redirect()->route('report.index');
         }
 
-        //Get avg score if overall score is set
-        $avgScores = null;
-        if($report->overall_score)
-        {
-            $avgScores = DB::table('scores')->select('rule_id',DB::raw( 'AVG(score) as avg_score' ))->where('report_id',$report->id)
-                ->where('reviewer_id', '!=', $report->user_id)->groupBy('rule_id')->get()->groupBy('rule_id')->toArray();
-        }
-
-
-        //if no rules, reviewers and reviwersScores register, abort
-        if(empty($reviewersScores) && empty($rules) && empty($rules))
-        {
-            //report not found, redirect to reports index and show error message
-            Session::flash('error',trans('reports.not_found'));
-            return redirect(route('report.index'));
-        }
-
-        return view('reports.show', compact('reviewersScores', 'reviewers', 'rules', 'id', 'avgScores','report'));
+        return view('reports.show', compact('reviewersScores', 'reviewers', 'rules', 'id', 'avgScores', 'report'));
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
+     * Show the form for editing the specified report.
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
     {
-        try
-        {
-            $report = $this->reportService->reportRepository->getReportById($id);
-
-            $this->reportService->openModification($report);
-
+        try {
             //Get scores recorded by authenticated user who attempted edit
-            $ruleScores = $this->reportService->reportRepository->getReviewerScores($report, Auth::user());
-        }
-        catch(\Exception $e)
-        {
-            Session::flash('error',$e->getMessage());
+            $reportWithScores = $this->reportService->reportRepository->getReviewerScores($id, Auth::user()->id);
+
+            $this->reportService->openModification($reportWithScores);
+        } catch (\Exception $e) {
+            Session::flash('error', $e->getMessage());
             return redirect(route('report.index'));
         }
 
         //Pass Counter to view
         $counter = 0;
-        return view('reports.edit', compact(['ruleScores', 'id', 'counter']));
+        return view('reports.edit', compact(['reportWithScores', 'id', 'counter']))
+            ->with('reportWithScores', $reportWithScores);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id Report ID
+     * @param  \Illuminate\Http\Request $request
+     * @param  int $id Report ID
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
@@ -299,39 +251,35 @@ class ReportController extends Controller
         //Validate Request
         $this->validateReport($request);
 
-        try
-        {
+        try {
             $this->reportService->updateReport($id, $request->scores, $request->rules);
-        }
-        catch(\Exception $e)
-        {
-            Session::flash('error',$e->getMessage());
+        } catch (\Exception $e) {
+            Session::flash('error', $e->getMessage());
             return redirect(route('report.index'));
         }
-        
+
         Session::flash('flash_message', trans('reports.created_first'));
         return redirect(route('report.index'));
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified report from storage.
      *
-     * @param  int  $id Report ID
+     * @param  int $id Report ID
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {
-        //TODO
         //Delete report and all corresponding stuff
-        if(!Report::destroy($id))
-        {
-            Session::flash('error',trans('reports.not_deleted'));
+        try {
+            $this->reportService->reportRepository->deleteItem($id);
+        } catch (\Exception $e) {
+            Session::flash('error', trans('reports.not_deleted'));
             return redirect(route('report.index', $id));
         }
 
-        Session::flash('flash_message',trans('reports.deleted'));
+        Session::flash('flash_message', trans('reports.deleted'));
         return redirect(route('report.index', $id));
-
     }
 
     /**
@@ -343,7 +291,7 @@ class ReportController extends Controller
         // Some defined rules that has to be achieved
         $rules = [
             'scores.*' => 'required|digits_between:1,10',
-            'rules.*'  => 'required|exists:performance_rules,id',
+            'rules.*' => 'required|exists:performance_rules,id',
         ];
 
         // Run the validator on request data
@@ -355,83 +303,25 @@ class ReportController extends Controller
      *
      * @return JSON
      */
-    //TODO
-    public function listData(Request $request,$userId=null)
+    public function listData(Request $request, $userId = null)
     {
-        $reports = Report::join('users', 'reports.user_id', '=', 'users.id')
-            ->select(['reports.id', 'users.name', 'reports.overall_score', 'reports.max_score', 'reports.created_at']);
-
-
-
-        //If user is not admin, load users reports only
-        if(!Auth::user()->hasRole('admin'))
-        {
-            $reports = $reports->where('reports.user_id',Auth::id());
-        }
-        //Consider the user id if we got one
-        //To display user's related reports only.
-        elseif($userId)
-        {
-            $reports=$reports->where('reports.user_id',$userId);
-        }
-
+        $isAdmin = Auth::user()->hasRole('admin');
+        $reports = $this->reportService->reportRepository->getReportsForAUserScope($isAdmin, Auth::id());
 
         return Datatables::of($reports)
-            ->addColumn('action', function ($report) {
-                //Current user
-
-                //returns true if reviewer participated in the evaluation process
-                $reviewerParticipated = $report->scores()->where('reviewer_id', Auth::id())->exists();
-
-                //Show link, show only if overall score is defined
-                $viewLink = "";
-                if($report->overall_score){
-                    $viewLink = "<a href=".route('report.show',$report->id)." class='btn btn-xs btn-success'>
-                    <i class='glyphicon glyphicon-eye-open'></i> ".trans('reports.final_report')."</a>&nbsp;";
-                }
-
-                //Participate link, show while overall score is not defined and reviewer has not participated in the evaluation process yet
-                $participateLink = "";
-                if(!$report->overall_score && !$reviewerParticipated)
-                {
-                    $participateLink = "<a href=".route('report.getParticipate',$report->id)." class='btn btn-xs btn-success'>
-                <i class='glyphicon glyphicon-pencil'></i> ".trans('reports.participate')."</a>&nbsp;";
-                }
-
-                //Edit link, show while overall score is not defined, admin and reviewer has participated in the evaluation process
-                $editLink = "";
-                if(!$report->overall_score && $reviewerParticipated && Auth::user()->hasRole('admin'))
-                {
-                    $editLink = "<a href=".route('report.edit',$report->id)." class='btn btn-xs btn-primary'><i class='glyphicon glyphicon-edit'></i>".trans('general.edit')."</a>";
-                }
-
-                //Delete form, show if admin
-                $deleteForm = "";
-                $formHead = "";
-                if(Auth::user()->hasRole('admin'))
-                {
-                    $formHead = "<form class='delete-form' method='POST' action='".route('report.destroy',$report->id)."'>".csrf_field();
-                    $deleteForm =
-                        "  <input type='hidden' name='_method' value='DELETE'/>
-                        <button type='submit' class='btn btn-xs btn-danger main_delete'>
-                            <i class='glyphicon glyphicon-trash'></i> ".trans('general.delete')."
-                        </button>
-                    </form>";
-                }
-
-
-                return $formHead . $viewLink . $editLink . $participateLink. $deleteForm;
-
-            }) //Change the Format of report date
+            ->addColumn('action', function ($report) use ($isAdmin) {
+                return $this->reportService->dataTableControllers($report, Auth::user());
+            })
+            //Change the Format of report date
             ->editColumn('created_at', function ($reports) {
                 return date('d M Y', strtotime($reports->created_at));
-            })->editColumn('overall_score',function($report)
-            {
-                return ($report->overall_score==0)?trans('general.not_ready'):$report->overall_score.' '.trans('of').' '.$report->max_score;
+            })->editColumn('overall_score', function ($report) {
+                return ($report->overall_score == 0) ?
+                    trans('general.not_ready') : $report->overall_score . ' ' . trans('of') . ' ' . $report->max_score;
             })
             //Remove max_score
             ->removeColumn('max_score')
+            ->removeColumn('user_id')
             ->make();
     }
-
 }

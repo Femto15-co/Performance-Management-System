@@ -11,7 +11,7 @@
         {{csrf_field()}}
         <input type="hidden" name="_method" value="put">
 
-        @foreach($ruleScores as $ruleScore)
+        @foreach($reportWithScores->scores as $ruleScore)
             <div class="row margin-bottom-md rule-block">
                 <div class="form-group {{ $errors->has('scores.'.$counter) ? 'has-error' : ''}} clearfix no-margin-bottom">
                     <label for="employee" class="col-xs-12 col-md-7 control-label text-left">{{$ruleScore->rule}}</label>

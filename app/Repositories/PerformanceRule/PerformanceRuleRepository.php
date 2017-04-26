@@ -10,13 +10,6 @@ use Illuminate\Support\Facades\DB;
  */
 class PerformanceRuleRepository extends BaseRepository implements PerformanceRuleInterface
 {
-
-    /**
-     * Holds performanceRule model
-     * @var Model
-     */
-    protected $performanceRuleModel;
-
     /**
      * PerformanceRuleRepository constructor.
      * Inject whatever passed model
@@ -24,7 +17,7 @@ class PerformanceRuleRepository extends BaseRepository implements PerformanceRul
      */
     public function __construct(Model $performanceRule)
     {
-        $this->performanceRuleModel = $performanceRule;
+        $this->setModel($performanceRule);
     }
 
     /**
@@ -36,7 +29,7 @@ class PerformanceRuleRepository extends BaseRepository implements PerformanceRul
     public function getRulesByType($type)
     {
         //load rules based on employee type
-        $performanceRules = $this->performanceRuleModel->where('employee_type', $type)->get();
+        $performanceRules = $this->getModel()->where('employee_type', $type)->get();
 
         if(!$performanceRules || $performanceRules->isEmpty())
         {
@@ -54,7 +47,7 @@ class PerformanceRuleRepository extends BaseRepository implements PerformanceRul
      */
     public function getMaxScoreByType($type)
     {
-        $maxScore=$this->performanceRuleModel->select(DB::raw('SUM(weight)*10 as final'))->where('employee_type',$type)->first();
+        $maxScore=$this->getModel()->select(DB::raw('SUM(weight)*10 as final'))->where('employee_type',$type)->first();
         if(!$maxScore)
         {
             throw new \Exception(trans('reports.no_max_score'));
@@ -70,7 +63,7 @@ class PerformanceRuleRepository extends BaseRepository implements PerformanceRul
      */
     public function getRuleById($id)
     {
-        $rule = $this->performanceRuleModel->find($id);
+        $rule = $this->getModel()->find($id);
         if(!$rule)
         {
             throw new \Exception(trans('reports.rule_not_found'));
@@ -86,7 +79,7 @@ class PerformanceRuleRepository extends BaseRepository implements PerformanceRul
      */
     public function isRuleExistsForType($employeeType, $ruleId)
     {
-        return $this->performanceRuleModel->where('employee_type', $employeeType)->where('id', $ruleId)->exists();
+        return $this->getModel()->where('employee_type', $employeeType)->where('id', $ruleId)->exists();
     }
 
 }

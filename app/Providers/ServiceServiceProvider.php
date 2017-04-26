@@ -30,35 +30,5 @@ class ServiceServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        /*
-         * Bind Report Service
-         */
-        $this->app->bind(ReportService::class, function($app){
-            return new ReportService(
-                //Inject into ReportInterface
-                $app->make(ReportInterface::class),
-                $app->make(PerformanceRuleInterface::class)
-            );
-        });
-
-        /*
-         * Bind User Service
-         */
-        $this->app->bind(UserService::class, function($app){
-            return new UserService(
-            //Inject into UserInterface
-                $app->make(UserInterface::class)
-            );
-        });
-
-        /*
-         * Bind PerformanceRule Service
-         */
-        $this->app->bind(PerformanceRuleService::class, function($app){
-            return new PerformanceRuleService(
-            //Inject into ReportInterface
-                $app->make(PerformanceRuleInterface::class)
-            );
-        });
     }
 }

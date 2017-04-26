@@ -30,4 +30,9 @@ return [
     'not_ready' => 'Not ready yet',
     'of' => 'Of',
     'month' => 'Month',
+    'not_found' => 'This Item Not Found!',
+    'not_deleted' => 'This Item Not Deleted!',
+    'not_updated' => 'This Item Not Updated!',
+    'not_created' => 'This Item Not Created!',
+    'no_data' => 'There Is No Data Passed'
 ];

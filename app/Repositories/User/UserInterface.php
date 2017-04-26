@@ -8,8 +8,13 @@ namespace App\Repositories\User;
  */
 interface UserInterface
 {
-    public function getUserById($id);
+    /**
+     * Get All users with role employee
+     * @return \App\User[]
+     * @throws \Exception
+     */
     public function getAllEmployees();
+
     /**
      * Query scope that gets bonuses for a user
      * @param bool $isAdmin
@@ -34,4 +39,16 @@ interface UserInterface
     */
     public function getDefectsRelatedToUser($defectAttachmentId, $userId)
 
+    /**
+     * Attach role to user
+     * @param $role
+     */
+    public function attachRole($role);
+
+    /**
+     * Get Users for a role query scope
+     * @param $roleId
+     * @return mixed
+     */
+    public function getUsersForRoleScope($roleId);
 }
