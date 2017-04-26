@@ -3,7 +3,7 @@
 namespace App\Repositories\Defect;
 
 /**
- * Interface BonusInterface
+ * Interface DefectInterface
  * Simple contract to force implementation of below functions
  */
 interface DefectInterface

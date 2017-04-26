@@ -22,7 +22,7 @@ class DefectController extends Controller {
 	protected $userService;
 
     /**
-     * Bonus service
+     * defect service
      * @var
      */
 	protected $defectService;

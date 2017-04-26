@@ -51,4 +51,28 @@ interface UserInterface
      * @return mixed
      */
     public function getUsersForRoleScope($roleId);
+
+      /**
+    * attach defect to user
+    * @param $user
+    * @param $defectId
+    * @throws \Exception
+    */
+    public function attachDefectToUser($user,$defectId);
+
+     /**
+    * delete defects from database
+    * @param $defectAttachmentId
+    * @throws \Exception
+    */
+    public function detachDefectFromUser($defectAttachmentId);
+
+     /**
+    * update defect of user
+    * @param $userId
+    * @param $defectAttachmentId
+    * @param $requestDefect
+    * @throws \Exception
+    */
+    public function updateDefectOfUser($userId, $defectAttachmentId,$requestDefect);
 }

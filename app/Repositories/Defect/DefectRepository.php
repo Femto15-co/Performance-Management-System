@@ -7,7 +7,7 @@ use App\Repositories\BaseRepository;
 
 
 /**
- * BonusRepository is a class that contains common queries for bonuses
+ * DefectRepository is a class that contains common queries for bonuses
  */
 class DefectRepository extends BaseRepository implements DefectInterface
 {
@@ -15,7 +15,7 @@ class DefectRepository extends BaseRepository implements DefectInterface
     
 
     /**
-    * UserRepository constructor.
+    * DefectRepository constructor.
     * Inject whatever passed model
     * @param Model $bonusModel
     */
@@ -24,18 +24,5 @@ class DefectRepository extends BaseRepository implements DefectInterface
         $this->setModel($model);
         $this->originalModel = $this->getModel();
     }
-
-    
-   
-   
-    
-
-
-   
-
-
-    
-
-
 
 }

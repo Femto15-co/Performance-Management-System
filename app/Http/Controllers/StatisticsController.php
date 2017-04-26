@@ -5,11 +5,29 @@ namespace App\Http\Controllers;
 use App\Bonus;
 use App\Defect;
 use App\Report;
+use App\User;
+use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 
 class StatisticsController extends Controller
 {
+    /**
+     * User Repository
+     * @var
+     */
+    protected $userService;
+
+    
+    public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
+        $this->statistics = Config::get('bmf.statistics');
+
+       
+      
+    }
 
     public function index()
     {
@@ -22,6 +40,7 @@ class StatisticsController extends Controller
      */
     public function get(Request $request)
     {
+
     	$result=['0 EGP','0 (0 Days)','0 of 0'];
     	if (!$request->has('month'))
     	{
@@ -38,13 +57,16 @@ class StatisticsController extends Controller
     	$bonusesTotal=0;
     	$bonuses=Auth::user()->bonuses()->where('created_at','>=',$dateStart)
     	->where('created_at','<',$dateEnd)->get();
+
+
     	//Go through bonuses and add them up
     	foreach ($bonuses as $bonus) {
     		$bonusesTotal+=$bonus->value;
+
     	}
     	//Update bonuses result
     	$result[0]=($bonusesTotal)?number_format($bonusesTotal, 2, '.', '')." EGP":$result[0];
-
+    dd($bonusesTotal);
     	//Defects
     	$defectsTotal=0;
     	$defects=Auth::user()->defects()->where('defect_user.created_at','>=',$dateStart)

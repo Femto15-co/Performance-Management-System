@@ -175,6 +175,18 @@ class UserRepository extends BaseRepository implements UserInterface
         }
     }
 
+    /**
+    * Get all bonuses of user within that month
+    * @param $userId
+    * @param $defectAttachmentId
+    * @param $requestDefect
+    * @throws \Exception
+    */
+    public function bonusesOfUser()
+    {
+        
+    }
+
 
      
 }
