@@ -31,7 +31,7 @@
             <thead>
             <tr>
                 <th >{{ trans('defects.defect_id') }}</th>
-                <th >{{ trans('users.employee_name') }}</th>
+                <th >{{ trans('defects.defect_title') }}</th>
                 <th >{{ trans('defects.score') }}</th>
                 <th >{{ trans('general.date') }}</th>
                 <th data-sortable="false" data-searchable="false">{{ trans('general.actions') }}</th>

@@ -86,4 +86,95 @@ class UserRepository extends BaseRepository implements UserInterface
 
         $this->model->attachRole($role);
     }
+    /**
+    * Query scope that gets defects for a user
+    * @param bool $isAdmin
+    * @param Integer $loggedInUserId
+    * @param Integer $sentUserId
+    * @return mixed
+    */
+    public function getDefectsForUserScope($isAdmin, $loggedInUserId, $sentUserId)
+    {
+        //Get defects related to a user by userId
+        $defects = $this->getModel()->join('defect_user', 'users.id', 'defect_user.user_id')->join('defects', 'defect_user.defect_id', 'defects.id')->select(['defect_user.id', 'defects.title', 'defects.score', 'defect_user.created_at']);
+
+        //Make sure that user can't see other users data
+        if ($isAdmin) {
+            $defects = $defects->where('users.id', $sentUserId);
+        } else {
+            $defects = $defects->where('users.id', $loggedInUserId);
+        }
+
+        return $defects;
+    }
+
+    /**
+    * Query gets defects that related to  a user by userId
+    * @param Integer $defectAttachmentId
+    * @param Integer $userId
+    * @return mixed
+    */
+    public function getDefectsRelatedToUser($defectAttachmentId, $userId)
+    {
+        //Get defects related to a user by userId
+        $userDefects = $this->getModel()->with(['defects' => function ($query) use ($defectAttachmentId) {
+            $query->where('defect_user.id', $defectAttachmentId);
+        }])->where('id', $userId)->first();
+
+        //Didn't get a user
+        if (empty($userDefects)) {
+            throw new \Exception(trans('users.no_employee'));
+        } 
+        //Defect id isn't correct
+        if (!isset($userDefects->defects[0]->pivot)) {
+             throw new \Exception(trans('defects.no_defect'));
+        }
+
+        return $userDefects;
+    }
+
+    /**
+    * attach defect to user
+    * @param $user
+    * @param $defectId
+    * @throws \Exception
+    */
+    public function attachDefectToUser($user,$defectId){
+        $this->ensureBooted();
+        $user->defects()->attach($defectId);
+    }
+    /**
+    * delete defects from database
+    * @param $defectAttachmentId
+    * @throws \Exception
+    */
+    public function detachDefectFromUser($defectAttachmentId){
+
+        if(!\DB::table('defect_user')->where('id', $defectAttachmentId)->delete()){
+            throw new \Exception('defects.not_deleted');
+        }
+    }
+
+     /**
+    * update defect of user
+    * @param $userId
+    * @param $defectAttachmentId
+    * @param $requestDefect
+    * @throws \Exception
+    */
+    public function updateDefectOfUser($userId, $defectAttachmentId,$requestDefect)
+    {
+        //Update defect
+        if(!\DB::table('defect_user')->where(
+                [
+                    'id' => $defectAttachmentId,
+                    'user_id' => $userId,
+                ])->update(['defect_id' => $requestDefect]))
+        {
+            throw new \Exception('reports.not_updated');
+        }
+    }
+
+
+     
 }

@@ -18,8 +18,13 @@ use App\Repositories\User\UserRepository;
 use App\PerformanceRule;
 use App\Repositories\PerformanceRule\PerformanceRuleRepository;
 
+
+use App\Defect;
+use App\Repositories\Defect\DefectRepository;
+
 use App\EmployeeType;
 use App\Repositories\EmployeeType\EmployeeTypeRepository;
+
 
 use Illuminate\Support\ServiceProvider;
 
@@ -71,17 +76,24 @@ class RepositoryServiceProvider extends ServiceProvider
         });
 
         /*
-         * Bind EmployeeType Repository
-         */
+        * Bind Defect Repository
+        */
+        $this->app->bind('App\Repositories\Defect\DefectInterface', function(){
+            return new DefectRepository(new Defect());
+        });
+        /*
+        * Bind EmployeeType Repository
+        */
         $this->app->bind('App\Repositories\EmployeeType\EmployeeTypeInterface', function(){
             return new EmployeeTypeRepository(new EmployeeType());
         });
 
         /*
-         * Bind Role Repository
-         */
+        * Bind Role Repository
+        */
         $this->app->bind('App\Repositories\Role\RoleInterface', function(){
             return new RoleRepository(new Role());
+
         });
     }
 }

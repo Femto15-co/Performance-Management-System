@@ -15,6 +15,7 @@ return [
     'defect_id' => 'ID',
     'score' => 'Score',
     'title' => 'Defects',
+    'defect_title'=>'Defect Title',
     'add_new_defect' => 'Add New Defect',
     'added'=>'Defect Added Succesfully!',
     'updated'=>'Defect Updated Succesfully!',
