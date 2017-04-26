@@ -43,7 +43,7 @@ class DefectService
         try
         {
             //Get the user with the selected defect.
-            $this->userRepository->getDefectsForUserScope($userId, $defectAttachmentId);
+            $this->userRepository->getDefectsRelatedToUser($userId, $defectAttachmentId);
         }
         catch(\Exception $e)
         {

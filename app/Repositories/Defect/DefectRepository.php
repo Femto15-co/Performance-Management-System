@@ -19,20 +19,20 @@ class BonusRepository extends BaseRepository implements DefectInterface
     protected $defectModel;
 
     /**
-     * UserRepository constructor.
-     * Inject whatever passed model
-     * @param Model $bonusModel
-     */
+    * UserRepository constructor.
+    * Inject whatever passed model
+    * @param Model $bonusModel
+    */
     public function __construct(Model $defectModel)
     {
         $this->defectModel = $defectModel;
     }
-    
+
     /**
-     * get all defects
-     * @throws \Exception
-     * @return defect[]
-     */
+    * get all defects
+    * @throws \Exception
+    * @return defect[]
+    */
     public function getAll()
     {
         $defect = $this->defectModel->all();
@@ -42,10 +42,10 @@ class BonusRepository extends BaseRepository implements DefectInterface
         return $defect;
     }
     /**
-     * update defect
-     * @param $data
-     * @throws \Exception
-     */
+    * update defect
+    * @param $data
+    * @throws \Exception
+    */
     public function update($userId, $defectAttachmentId,$requestDefect)
     {
         //Update defect
@@ -58,9 +58,25 @@ class BonusRepository extends BaseRepository implements DefectInterface
             throw new \Exception('reports.not_updated');
         }
     }
+    /**
+    * attach defect to user
+    * @param $user
+    * @param $defectId
+    * @throws \Exception
+    */
     public function attachToUser($user,$defectId){
         if(!$user->defects()->attach($defectId)){
             throw new \Exception('reports.not_created');
+        }
+    }
+    /**
+    * delete defects from database
+    * @param $defectAttachmentId
+    * @throws \Exception
+    */
+    public function destroy($defectAttachmentId){
+        if(!DB::table('defect_user')->where('id', $defectAttachmentId)->delete()){
+            throw new \Exception('defects.not_deleted');
         }
     }
     

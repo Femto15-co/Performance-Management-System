@@ -113,7 +113,7 @@ class DefectController extends Controller {
 		try
         {
             //get all defects
-            $defect = $this->defectService->getAll();
+            $defects = $this->defectService->getAll();
         }
         catch(\Exception $e)
         {
@@ -135,13 +135,15 @@ class DefectController extends Controller {
 	 */
 	public function update(Request $request, $userId, $defectAttachmentId) {
 		//Verify that the defect belongs to the given user id
-		$user = $this->defectService->verifyDefectUser($userId, $defectAttachmentId);
-		//Update defect
-		DB::table('defect_user')->where(
-			[
-				'id' => $defectAttachmentId,
-				'user_id' => $userId,
-			])->update(['defect_id' => $request->defect]);
+		$this->defectService->verifyDefectUser($userId, $defectAttachmentId);
+		try{
+			//Update defect
+			$this->defectService->update($userId, $defectAttachmentId,$request->defect);
+		}
+		catch{
+		 	Session::flash('alert', $e->getMessage());
+            return redirect()->route('home');
+		}
 		Session::flash('flash_message', trans('defects.updated'));
 		return redirect()->route('defect.index', [$userId]);
 	}
@@ -153,15 +155,20 @@ class DefectController extends Controller {
 	 * @return \Illuminate\Http\Response
 	 */
 	public function destroy($defectAttachmentId) {
-
-		//Defect deleted
-		if (DB::table('defect_user')->where('id', $defectAttachmentId)->delete()) {
-			Session::flash('flash_message', trans('defects.deleted'));
-			return redirect()->back();
+		try{
+			//Defect deleted
+			$this->defectService->destroy($defectAttachmentId);
 		}
-		//Couldn't delete defect
-		Session::flash('error', trans('defects.not_deleted'));
+		catch{
+			//Couldn't delete defect
+		 	Session::flash('alert', $e->getMessage());
+            return redirect()->back();
+		}
+		Session::flash('flash_message', trans('defects.deleted'));
 		return redirect()->back();
+		
+		
+		
 	}
 	/**
 	 * Function to validate request
@@ -177,17 +184,14 @@ class DefectController extends Controller {
 	 * @return JSON
 	 */
 	public function listData($userId) {
+		
+	 	$isAdmin = Auth::user()->hasRole('admin');
 		//Get defects related to a user by userId
-		$defects = User::join('defect_user', 'users.id', 'defect_user.user_id')->join('defects', 'defect_user.defect_id', 'defects.id')->select(['defect_user.id', 'defects.title', 'defects.score', 'defect_user.created_at']);
-		//Maks sure that user can't see other users data
-		if (Auth::user()->hasRole('admin')) {
-			$defects = $defects->where('users.id', $userId);
-		} else {
-			$defects = $defects->where('users.id', Auth::id());
-		}
+		$defects = $this->userService->userRepository->getDefectsForUserScope($isAdmin, Auth::id(), $userId);
+		
 		return Datatables::of($defects)
 			->addColumn('action', function ($defects) use ($userId) {
-				if (Auth::user()->hasRole('admin')) {
+				if ($isAdmin) {
 					$formHead = "<form class='delete-form' method='POST' action='" . route('defect.destroy', $defects->id) . "'>" . csrf_field();
 					$editLink = "<a href=" . route('defect.edit', [$userId, $defects->id]) . " class='btn btn-xs btn-primary'><i class='glyphicon glyphicon-edit'></i>" . trans('general.edit') . "</a>";
 					$deleteForm =

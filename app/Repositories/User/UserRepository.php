@@ -86,14 +86,35 @@ class UserRepository extends BaseRepository implements UserInterface
 
         return $bonuses;
     }
+    /**
+    * Query scope that gets defects for a user
+    * @param bool $isAdmin
+    * @param Integer $loggedInUserId
+    * @param Integer $sentUserId
+    * @return mixed
+    */
+    public function getDefectsForUserScope($isAdmin, $loggedInUserId, $sentUserId)
+    {
+        //Get defects related to a user by userId
+        $defects = $this->userModel->join('defect_user', 'users.id', 'defect_user.user_id')->join('defects', 'defect_user.defect_id', 'defects.id')->select(['defect_user.id', 'defects.title', 'defects.score', 'defect_user.created_at']);
+
+        //Make sure that user can't see other users data
+        if ($isAdmin) {
+            $defects = $defects->where('users.id', $sentUserId);
+        } else {
+            $defects = $defects->where('users.id', $loggedInUserId);
+        }
+
+        return $defects;
+    }
 
     /**
-     * Query scope that gets defects for a user
-     * @param Integer $defectAttachmentId
-     * @param Integer $userId
-     * @return mixed
-     */
-    public function getDefectsForUserScope($defectAttachmentId, $userId)
+    * Query gets defects that related to  a user by userId
+    * @param Integer $defectAttachmentId
+    * @param Integer $userId
+    * @return mixed
+    */
+    public function getDefectsRelatedToUser($defectAttachmentId, $userId)
     {
         //Get defects related to a user by userId
         $userDefects = $this->userModel->with(['defects' => function ($query) use ($defectAttachmentId) {
