@@ -86,13 +86,14 @@ class UserRepository extends BaseRepository implements UserInterface
 
         $this->model->attachRole($role);
     }
+
     /**
-    * Query scope that gets defects for a user
-    * @param bool $isAdmin
-    * @param Integer $loggedInUserId
-    * @param Integer $sentUserId
-    * @return mixed
-    */
+     * Query scope that gets defects for a user
+     * @param bool $isAdmin
+     * @param Integer $loggedInUserId
+     * @param Integer $sentUserId
+     * @return mixed
+     */
     public function getDefectsForUserScope($isAdmin, $loggedInUserId, $sentUserId)
     {
         //Get defects related to a user by userId
@@ -109,12 +110,13 @@ class UserRepository extends BaseRepository implements UserInterface
     }
 
     /**
-    * Query gets defects that related to  a user by userId
-    * @param Integer $defectAttachmentId
-    * @param Integer $userId
-    * @return mixed
-    */
-    public function getDefectsRelatedToUser($defectAttachmentId, $userId)
+     * Query gets defects that related to  a user by userId
+     * @param int $defectAttachmentId
+     * @param int $userId
+     * @return Model|null|static
+     * @throws \Exception
+     */
+    public function getDefectRelatedToUser($defectAttachmentId, $userId)
     {
         //Get defects related to a user by userId
         $userDefects = $this->getModel()->with(['defects' => function ($query) use ($defectAttachmentId) {
@@ -124,57 +126,58 @@ class UserRepository extends BaseRepository implements UserInterface
         //Didn't get a user
         if (empty($userDefects)) {
             throw new \Exception(trans('users.no_employee'));
-        } 
+        }
         //Defect id isn't correct
         if (!isset($userDefects->defects[0]->pivot)) {
-             throw new \Exception(trans('defects.no_defect'));
+            throw new \Exception(trans('defects.no_defect'));
         }
 
-        return $userDefects;
+        return $userDefects->defects[0];
     }
 
     /**
-    * attach defect to user
-    * @param $user
-    * @param $defectId
-    * @throws \Exception
-    */
-    public function attachDefectToUser($user,$defectId){
+     * attach defect to user
+     * @param $user
+     * @param $defectId
+     * @throws \Exception
+     */
+    public function attachDefectToUser($user, $defectId)
+    {
         $this->ensureBooted();
         $user->defects()->attach($defectId);
     }
-    /**
-    * delete defects from database
-    * @param $defectAttachmentId
-    * @throws \Exception
-    */
-    public function detachDefectFromUser($defectAttachmentId){
 
-        if(!\DB::table('defect_user')->where('id', $defectAttachmentId)->delete()){
+    /**
+     * delete defects from database
+     * @param $defectAttachmentId
+     * @throws \Exception
+     */
+    public function detachDefectFromUser($defectAttachmentId)
+    {
+
+        if (!\DB::table('defect_user')->where('id', $defectAttachmentId)->delete()) {
             throw new \Exception('defects.not_deleted');
         }
     }
 
-     /**
-    * update defect of user
-    * @param $userId
-    * @param $defectAttachmentId
-    * @param $requestDefect
-    * @throws \Exception
-    */
-    public function updateDefectOfUser($userId, $defectAttachmentId,$requestDefect)
+    /**
+     * update defect of user
+     * @param $userId
+     * @param $defectAttachmentId
+     * @param $requestDefect
+     * @throws \Exception
+     */
+    public function updateDefectOfUser($userId, $defectAttachmentId, $requestDefect)
     {
         //Update defect
-        if(!\DB::table('defect_user')->where(
-                [
-                    'id' => $defectAttachmentId,
-                    'user_id' => $userId,
-                ])->update(['defect_id' => $requestDefect]))
-        {
+        if (!\DB::table('defect_user')->where([
+                'id' => $defectAttachmentId,
+                'user_id' => $userId,
+            ])->update(['defect_id' => $requestDefect])
+        ) {
             throw new \Exception('reports.not_updated');
         }
     }
 
 
-     
 }

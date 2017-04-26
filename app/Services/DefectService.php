@@ -24,8 +24,9 @@ class DefectService
      */
     public function dataTableControllers($userId, $defect)
     {
-        $formHead = "<form class='delete-form' method='POST' action='" . route('bonus.destroy', $defect->id) . "'>" . csrf_field();
-        $editLink = "<a href=" . route('bonus.edit', [$userId, $defect->id]) . " class='btn btn-xs btn-primary'><i class='glyphicon glyphicon-edit'></i>" . trans('general.edit') . "</a>";
+        $formHead = "<form class='delete-form' method='POST' action='" . route('defect.destroy', $defect->id) . "'>" . csrf_field();
+        $editLink = "<a href=" . route('defect.edit', [$userId, $defect->id]) . " class='btn btn-xs btn-primary'>".
+            "<i class='glyphicon glyphicon-edit'></i>" . trans('general.edit') . "</a>";
         $deleteForm =
             "  <input type='hidden' name='_method' value='DELETE'/>
                             <button type='submit' class='btn btn-xs btn-danger main_delete'>

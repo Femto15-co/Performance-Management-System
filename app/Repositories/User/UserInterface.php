@@ -37,7 +37,7 @@ interface UserInterface
     * @param Integer $userId
     * @return mixed
     */
-    public function getDefectsRelatedToUser($defectAttachmentId, $userId);
+    public function getDefectRelatedToUser($defectAttachmentId, $userId);
 
     /**
      * Attach role to user
