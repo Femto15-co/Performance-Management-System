@@ -138,11 +138,10 @@ class UserRepository extends BaseRepository implements UserInterface
 
     /**
      * attach defect to user
-     * @param $user
      * @param $defectId
      * @throws \Exception
      */
-    public function attachDefects($user, $defectId)
+    public function attachDefect($defectId)
     {
         $this->ensureBooted();
         $this->getModel()->defects()->attach($defectId);
@@ -182,12 +181,12 @@ class UserRepository extends BaseRepository implements UserInterface
 
 
     /**
-     * Get all bonuses of user within that month
-     * @param $dateStart
-     * @param $dateEnd
-     * return $result[0]
-     */
-    public function getBonuses($dateStart, $dateEnd)
+    * Get all bonuses of user within that month
+    * @param $dateStart
+    * @param $dateEnd
+    * return bonusesTotal
+    */
+    public function getBonuses($dateStart,$dateEnd)
     {
         $this->ensureBooted();
         //get sum of user's bonuses
@@ -199,12 +198,12 @@ class UserRepository extends BaseRepository implements UserInterface
     }
 
     /**
-     * Get all defects of user within that month
-     * @param $dateStart
-     * @param $dateEnd
-     * return $result[1]
-     */
-    public function sumScoreOfDefects($dateStart, $dateEnd)
+    * Get all defects of user within that month
+    * @param $dateStart
+    * @param $dateEnd
+    * return score
+    */
+    public function sumScoreOfDefects($dateStart,$dateEnd)
     {
         $this->ensureBooted();
         //get sum of user's defects
@@ -215,62 +214,60 @@ class UserRepository extends BaseRepository implements UserInterface
     }
 
     /**
-     * get reports of user
-     * @param $userId
-     * @param $dateStart
-     * @param $dateEnd
-     * @return mixed
-     */
-    public function reportsInPeriodScope($dateStart, $dateEnd)
+    * get reports of user
+    * @param $dateStart
+    * @param $dateEnd
+    * @return mixed
+    */
+    public function reportsInPeriodScope($dateStart,$dateEnd)
     {
         $this->ensureBooted();
         return $this->getModel()->reports()->where('created_at', '>=', $dateStart)->where('created_at', '<', $dateEnd);
     }
 
     /**
-     * get sum overall score of report
-     * @param $dateStart
-     * @param $dateEnd
-     * @return mixed
-     */
-    public function sumOverAllScoreOfReport($dateStart, $dateEnd)
+    * get sum overall score of report
+    * @param $dateStart
+    * @param $dateEnd
+    * @return overall_score
+    */
+    public function sumOverAllScoreOfReport($dateStart,$dateEnd)
     {
         //return sum of overall score
         return $this->reportsInPeriodScope($dateStart, $dateEnd)->sum('overall_score');
     }
 
     /**
-     * get sum max score of report
-     * @param $dateStart
-     * @param $dateEnd
-     * @return mixed
-     */
-    public function sumMaxScoreOfReport($dateStart, $dateEnd)
+    * get sum max score of report
+    * @param $dateStart
+    * @param $dateEnd
+    * @return max_score
+    */
+    public function sumMaxScoreOfReport($dateStart,$dateEnd)
     {
         //return sum of max score
         return $this->reportsInPeriodScope($dateStart, $dateEnd)->sum('max_score');
     }
 
     /**
-     * get count  of reports
-     * @param $dateStart
-     * @param $dateEnd
-     * @return mixed
-     */
-    public function sumCountOfReports($dateStart, $dateEnd)
+    * get count  of reports
+    * @param $dateStart
+    * @param $dateEnd
+    * @return count of reports
+    */
+    public function sumCountOfReports($dateStart,$dateEnd)
     {
         //return count  of reports
         return $this->reportsInPeriodScope($dateStart, $dateEnd)->count();
     }
 
     /**
-     * Get all reports of user within that month
-     * @param $userId
-     * @param $dateStart
-     * @param $dateEnd
-     * return $result[2]
-     */
-    public function getPerformanceScore($dateStart, $dateEnd)
+    * Get all reports of user within that month
+    * @param $dateStart
+    * @param $dateEnd
+    * return $result
+    */
+    public function getPerformanceScore($dateStart,$dateEnd)
     {
         $result = "0 of 0";
         //return sum of overall score
