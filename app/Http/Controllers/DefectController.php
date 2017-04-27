@@ -107,7 +107,7 @@ class DefectController extends Controller
             $this->userService->userRepository->attachDefect($request->defect);
             //un-boot model
             $this->userService->userRepository->resetModel();
-            
+
         } catch (\Exception $e) {
             Session::flash('alert', $e->getMessage());
             return redirect()->route('home');
@@ -156,7 +156,7 @@ class DefectController extends Controller
     public function update(Request $request, $userId, $defectAttachmentId)
     {
         try {
-            //Update defect
+			//Update defect
             $this->userService->userRepository->updateDefect($userId, $defectAttachmentId, $request->defect);
         } catch (\Exception $e) {
             Session::flash('alert', $e->getMessage());
