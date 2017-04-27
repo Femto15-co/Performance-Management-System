@@ -175,7 +175,7 @@ class UserRepository extends BaseRepository implements UserInterface
             'user_id' => $userId,
         ])->update(['defect_id' => $requestDefect])
         ) {
-            throw new \Exception('reports.not_updated');
+           // throw new \Exception('reports.not_updated');
         }
     }
 

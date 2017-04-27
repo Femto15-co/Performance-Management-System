@@ -155,7 +155,7 @@ class DefectController extends Controller
     public function update(Request $request, $userId, $defectAttachmentId)
     {
         try {
-            //Update defect
+			//Update defect
             $this->userService->userRepository->updateDefect($userId, $defectAttachmentId, $request->defect);
         } catch (\Exception $e) {
             Session::flash('alert', $e->getMessage());
