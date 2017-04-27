@@ -103,7 +103,7 @@ class DefectController extends Controller
             //Boot model
             $this->userService->userRepository->setModel($user);
             //Attache defect to the user.
-            $this->userService->userRepository->attachDefectToUser($user, $request->defect);
+            $this->userService->userRepository->attachDefect($request->defect);
             //un-boot model
             $this->userService->userRepository->resetModel();
         } catch (\Exception $e) {

@@ -137,14 +137,13 @@ class UserRepository extends BaseRepository implements UserInterface
 
     /**
      * attach defect to user
-     * @param $user
      * @param $defectId
      * @throws \Exception
      */
-    public function attachDefectToUser($user, $defectId)
+    public function attachDefect($defectId)
     {
         $this->ensureBooted();
-        $user->defects()->attach($defectId);
+        $this->getModel()->defects()->attach($defectId);
     }
 
     /**
