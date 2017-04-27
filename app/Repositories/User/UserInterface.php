@@ -104,8 +104,6 @@ interface UserInterface
 
     /**
     * get sum overall score of report
-    * 
-    * @param $userId
     * @param $dateStart
     * @param $dateEnd
     * @return mixed
@@ -114,8 +112,6 @@ interface UserInterface
 
     /**
     * get sum max score of report
-    * 
-    * @param $userId
     * @param $dateStart
     * @param $dateEnd
     * @return mixed
@@ -124,7 +120,6 @@ interface UserInterface
 
     /**
     * get count  of reports
-    * 
     * @param $userId
     * @param $dateStart
     * @param $dateEnd
@@ -134,8 +129,6 @@ interface UserInterface
 
     /**
     * Get all reports of user within that month
-    * 
-    * @param $userId
     * @param $dateStart
     * @param $dateEnd
     * return $result[2]
