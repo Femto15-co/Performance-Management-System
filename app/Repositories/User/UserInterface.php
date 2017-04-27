@@ -76,12 +76,7 @@ interface UserInterface
     */
     public function updateDefectOfUser($userId, $defectAttachmentId,$requestDefect);
 
-    /**
-    * in case of no results to user
-    * 
-    * @return $result[]
-    */
-    public function emptyResult();
+    
 
     /**
     * Get all bonuses of user within that month
@@ -90,7 +85,7 @@ interface UserInterface
     * @param $bonusesTotal
     * return $result[0]
     */
-    public function bonusesOfUser($dateStart,$dateEnd,$bonusesTotal);
+    public function bonusesOfUser($user,$dateStart,$dateEnd,$bonusesTotal);
 
      /**
     * Get all defects of user within that month
@@ -99,7 +94,7 @@ interface UserInterface
     * @param $defectsTotal
     * return $result[1]
     */
-    public function defectsOfUser($dateStart,$dateEnd,$defectsTotal);
+    public function defectsOfUser($user,$dateStart,$dateEnd,$defectsTotal);
 
     /**
     * get reports of user
@@ -107,7 +102,31 @@ interface UserInterface
     * @param $dateEnd
     * @return mixed
     */
-    public function userReportsScope($dateStart,$dateEnd);
+    public function reportsInPeriodScope($user,$userId,$dateStart,$dateEnd);
+    
+    /**
+    * get sum overall score of report
+    * @param $dateStart
+    * @param $dateEnd
+    * @return mixed
+    */
+    public function sumOverAllScoreOfReport($user,$userId,$dateStart,$dateEnd);
+
+    /**
+    * get sum max score of report
+    * @param $dateStart
+    * @param $dateEnd
+    * @return mixed
+    */
+    public function sumMaxScoreOfReport($user,$userId,$dateStart,$dateEnd);
+
+    /**
+    * get count  of reports
+    * @param $dateStart
+    * @param $dateEnd
+    * @return mixed
+    */
+    public function sumCountOfReports($user,$userId,$dateStart,$dateEnd);
 
     /**
     * Get all reports of user within that month
@@ -116,5 +135,5 @@ interface UserInterface
     * @param $reportsCount
     * return $result[2]
     */
-    public function getScoreOfUserReport($dateStart,$dateEnd,$reportsCount);
+    public function getScoreOfReport($user,$userId,$dateStart,$dateEnd,$reportsCount);
 }

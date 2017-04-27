@@ -40,31 +40,38 @@ class StatisticsController extends Controller
      */
     public function get(Request $request)
     {
-        $result=$this->userService->userRepository->emptyResult();
+        //get EGP from config
+        $currency[]="0 ".$this->statistics['Currency'];
+       
+        $result=[$currency,'0 (0 Days)','0 of 0'];
 
     	if (!$request->has('month'))
-    	{
+        {
     		return $result;
     	}
     	//Date formating for start and end
     	$timeStamp=strtotime("01-".$request->month);
     	$dateStart=date('Y-m-d',$timeStamp);
     	$dateEnd=date('Y-m-d',strtotime('next month',$timeStamp));
-    	/**
-    	 * Get all bonuses defects and reports within that month
-    	 */
+        $user=Auth::User();
+        
+        /**
+        * Get all bonuses defects and reports within that month
+        */
     	//Bonuses
         $bonusesTotal=0;
-        $result[0]=$this->userService->userRepository->bonusesOfUser($dateStart,$dateEnd,$bonusesTotal);
-        
+        $result[0]=$this->userService->userRepository->bonusesOfUser($user,$dateStart,$dateEnd,$bonusesTotal);
+        $result[0]=$result[0] ." ".$this->statistics['Currency'];
+
     	//Defects
     	$defectsTotal=0;
-    	$result[1]=$this->userService->userRepository->defectsOfUser($dateStart,$dateEnd,$defectsTotal);
+    	$result[1]=$this->userService->userRepository->defectsOfUser($user,$dateStart,$dateEnd,$defectsTotal);
 
     	//Reports
     	$reportsCount=0;
-	    $result[2]=$this->userService->userRepository->getScoreOfUserReport($dateStart,$dateEnd,$reportsCount);
+	    $result[2]=$this->userService->userRepository->getScoreOfReport($user,Auth::id(),$dateStart,$dateEnd,$reportsCount);
         
     	return $result;
     }
+
 }

@@ -5,8 +5,6 @@ namespace App\Repositories\User;
 use App\User;
 use Illuminate\Database\Eloquent\Model;
 use App\Repositories\BaseRepository;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Config;
 
 
 /**
@@ -23,7 +21,7 @@ class UserRepository extends BaseRepository implements UserInterface
     {
         $this->setModel($user);
         $this->originalModel = $this->getModel();
-        $this->statistics = Config::get('bmf.statistics');
+       
     }
 
     /**
@@ -178,91 +176,119 @@ class UserRepository extends BaseRepository implements UserInterface
             throw new \Exception('reports.not_updated');
         }
     }
-    /**
-    * in case of no results to user
-    * 
-    * @return $result[]
-    */
-    public function emptyResult()
-    {
-        //get EGP from config
-        $currency[]="0 ".$this->statistics['Currency'];
-        //return zero's of result
-        return $result=[$currency,'0 (0 Days)','0 of 0'];
-    }
+   
 
     /**
     * Get all bonuses of user within that month
+    * @param $user
     * @param $dateStart
     * @param $dateEnd
     * @param $bonusesTotal
     * return $result[0]
     */
-    public function bonusesOfUser($dateStart,$dateEnd,$bonusesTotal)
+    public function bonusesOfUser($user,$dateStart,$dateEnd,$bonusesTotal)
     {
-        //return zero's of result
-        $result=$this->emptyResult();
-
-        $bonusesTotal=Auth::User()->bonuses()->where('created_at','>=',$dateStart)
+        //get sum of user's bonuses
+        $bonusesTotal=$user->bonuses()->where('created_at','>=',$dateStart)
         ->where('created_at','<',$dateEnd)->sum('value');
       
         //Update bonuses result
-        $result[0]=($bonusesTotal)?number_format($bonusesTotal, 2, '.', '')." ".$this->statistics['Currency']:$result[0];
+        $result[0]=($bonusesTotal)?number_format($bonusesTotal, 2, '.', ''):"0 ";
 
         return $result[0];
     }
 
     /**
     * Get all defects of user within that month
+    * @param $user
     * @param $dateStart
     * @param $dateEnd
     * @param $defectsTotal
     * return $result[1]
     */
-    public function defectsOfUser($dateStart,$dateEnd,$defectsTotal)
+    public function defectsOfUser($user,$dateStart,$dateEnd,$defectsTotal)
     {
-        //return zero's of result
-        $result=$this->emptyResult();
-
-        $defectsTotal=Auth::User()->defects()->where('defect_user.created_at','>=',$dateStart)
+        //get sum of user's defects
+        $defectsTotal=$user->defects()->where('defect_user.created_at','>=',$dateStart)
         ->where('defect_user.created_at','<',$dateEnd)->sum('score');
       
         //Update defects result
         $defectsDays=number_format($defectsTotal/6,2,'.','');
-        $result[1]=($defectsTotal)?$defectsTotal." ($defectsDays Days)":$result[1];  
+        $result[1]=($defectsTotal)?$defectsTotal." ($defectsDays Days)":"0 (0 Days)";  
 
         return $result[1];
     }
 
     /**
     * get reports of user
+    * @param $user
+    * @param $userId
     * @param $dateStart
     * @param $dateEnd
     * @return mixed
     */
-    public function userReportsScope($dateStart,$dateEnd)
+    public function reportsInPeriodScope($user,$userId,$dateStart,$dateEnd)
     {
-        return Auth::user()->reports()->where('user_id',Auth::id())
+        return $user->reports()->where('user_id',$userId)
         ->where('created_at','>=',$dateStart)->where('created_at','<',$dateEnd);
     }
     /**
+    * get sum overall score of report
+    * @param $user
+    * @param $userId
+    * @param $dateStart
+    * @param $dateEnd
+    * @return mixed
+    */
+    public function sumOverAllScoreOfReport($user,$userId,$dateStart,$dateEnd)
+    {
+        //return sum of overall score
+        return $reportsOverall=$this->reportsInPeriodScope($user,$userId,$dateStart,$dateEnd)->sum('overall_score');
+    }
+    /**
+    * get sum max score of report
+    * @param $user
+    * @param $userId
+    * @param $dateStart
+    * @param $dateEnd
+    * @return mixed
+    */
+    public function sumMaxScoreOfReport($user,$userId,$dateStart,$dateEnd)
+    {
+        //return sum of max score
+        return $reportsOverall=$this->reportsInPeriodScope($user,$userId,$dateStart,$dateEnd)->sum('max_score');
+    }
+    /**
+    * get count  of reports
+    * @param $user
+    * @param $userId
+    * @param $dateStart
+    * @param $dateEnd
+    * @return mixed
+    */
+    public function sumCountOfReports($user,$userId,$dateStart,$dateEnd)
+    {
+        //return count  of reports
+        return $reportsOverall=$this->reportsInPeriodScope($user,$userId,$dateStart,$dateEnd)->count();
+    }
+    /**
     * Get all reports of user within that month
+    * @param $user
+    * @param $userId
     * @param $dateStart
     * @param $dateEnd
     * @param $reportsCount
     * return $result[2]
     */
-    public function getScoreOfUserReport($dateStart,$dateEnd,$reportsCount)
+    public function getScoreOfReport($user,$userId,$dateStart,$dateEnd,$reportsCount)
     {
-        //return zero's of result
-        $result=$this->emptyResult();
-
+        $result[2]="0 of 0";
         //return sum of overall score
-        $reportsOverall=$this->userReportsScope($dateStart,$dateEnd)->sum('overall_score');
+        $reportsOverall=$this->sumOverAllScoreOfReport($user,$userId,$dateStart,$dateEnd);
         //return sum of max score
-        $reportsMax=$this->userReportsScope($dateStart,$dateEnd)->sum('max_score');
+        $reportsMax=$this->sumMaxScoreOfReport($user,$userId,$dateStart,$dateEnd);
         //return count of reports
-        $reportsCount=$this->userReportsScope($dateStart,$dateEnd)->count();
+        $reportsCount=$this->sumCountOfReports($user,$userId,$dateStart,$dateEnd);
         //We got some good reports
         if ($reportsCount>0)
         {
