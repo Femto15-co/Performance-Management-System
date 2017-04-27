@@ -82,68 +82,63 @@ interface UserInterface
     * Get all bonuses of user within that month
     * @param $dateStart
     * @param $dateEnd
-    * @param $bonusesTotal
     * return $result[0]
     */
-    public function bonusesOfUser($user,$dateStart,$dateEnd,$bonusesTotal);
+    public function getBonuses($dateStart,$dateEnd);
 
      /**
     * Get all defects of user within that month
     * @param $dateStart
     * @param $dateEnd
-    * @param $defectsTotal
     * return $result[1]
     */
-    public function defectsOfUser($user,$dateStart,$dateEnd,$defectsTotal);
+    public function getDefects($dateStart,$dateEnd);
 
     /**
     * get reports of user
-    * @param $user
-    * @param $userId
     * @param $dateStart
     * @param $dateEnd
     * @return mixed
     */
-    public function reportsInPeriodScope($user,$userId,$dateStart,$dateEnd);
+    public function reportsInPeriodScope($dateStart,$dateEnd);
 
     /**
     * get sum overall score of report
-    * @param $user
+    * 
     * @param $userId
     * @param $dateStart
     * @param $dateEnd
     * @return mixed
     */
-    public function sumOverAllScoreOfReport($user,$userId,$dateStart,$dateEnd);
+    public function sumOverAllScoreOfReport($dateStart,$dateEnd);
 
     /**
     * get sum max score of report
-    * @param $user
+    * 
     * @param $userId
     * @param $dateStart
     * @param $dateEnd
     * @return mixed
     */
-    public function sumMaxScoreOfReport($user,$userId,$dateStart,$dateEnd);
+    public function sumMaxScoreOfReport($dateStart,$dateEnd);
 
     /**
     * get count  of reports
-    * @param $user
+    * 
     * @param $userId
     * @param $dateStart
     * @param $dateEnd
     * @return mixed
     */
-    public function sumCountOfReports($user,$userId,$dateStart,$dateEnd);
+    public function sumCountOfReports($dateStart,$dateEnd);
 
     /**
     * Get all reports of user within that month
-    * @param $user
+    * 
     * @param $userId
     * @param $dateStart
     * @param $dateEnd
-    * @param $reportsCount
     * return $result[2]
     */
-    public function getScoreOfReport($user,$userId,$dateStart,$dateEnd,$reportsCount);
+    public function getScoreOfReport($dateStart,$dateEnd);
 }

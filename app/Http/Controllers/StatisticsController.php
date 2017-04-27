@@ -41,7 +41,7 @@ class StatisticsController extends Controller
     public function get(Request $request)
     {
         //get EGP from config
-        $currency[]="0 ".$this->statistics['Currency'];
+        $currency="0 ".$this->statistics['Currency'];
        
         $result=[$currency,'0 (0 Days)','0 of 0'];
 
@@ -54,22 +54,32 @@ class StatisticsController extends Controller
     	$dateStart=date('Y-m-d',$timeStamp);
     	$dateEnd=date('Y-m-d',strtotime('next month',$timeStamp));
         $user=Auth::User();
+        try {
 
-        /**
-        * Get all bonuses defects and reports within that month
-        */
-    	//Bonuses
-        $bonusesTotal=0;
-        $result[0]=$this->userService->userRepository->bonusesOfUser($user,$dateStart,$dateEnd,$bonusesTotal);
-        $result[0]=$result[0] ." ".$this->statistics['Currency'];
+            /**
+            * Get all bonuses defects and reports within that month
+            */
+           
+            //Boot model
+            $this->userService->userRepository->setModel($user);
 
-    	//Defects
-    	$defectsTotal=0;
-    	$result[1]=$this->userService->userRepository->defectsOfUser($user,$dateStart,$dateEnd,$defectsTotal);
+            //Bonuses
+            $result[0]=$this->userService->userRepository->getBonuses($dateStart,$dateEnd);
+            $result[0]=$result[0] ." ".$this->statistics['Currency'];
 
-    	//Reports
-    	$reportsCount=0;
-	    $result[2]=$this->userService->userRepository->getScoreOfReport($user,Auth::id(),$dateStart,$dateEnd,$reportsCount);
+            //Defects
+            $result[1]=$this->userService->userRepository->getDefects($dateStart,$dateEnd);
+
+            //Reports
+            $result[2]=$this->userService->userRepository->getScoreOfReport($dateStart,$dateEnd);
+
+            //un-boot model
+            $this->userService->userRepository->resetModel();
+            
+         } catch (\Exception $e) {
+            return json_encode($e->getMessage());
+        }
+        
         
     	return $result;
     }
