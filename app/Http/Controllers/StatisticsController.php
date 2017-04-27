@@ -40,8 +40,8 @@ class StatisticsController extends Controller
      */
     public function get(Request $request)
     {
+        $result=$this->userService->userRepository->emptyResult();
 
-    	$result=['0 EGP','0 (0 Days)','0 of 0'];
     	if (!$request->has('month'))
     	{
     		return $result;
@@ -54,56 +54,17 @@ class StatisticsController extends Controller
     	 * Get all bonuses defects and reports within that month
     	 */
     	//Bonuses
-    	$bonusesTotal=0;
-    	$bonuses=Auth::user()->bonuses()->where('created_at','>=',$dateStart)
-    	->where('created_at','<',$dateEnd)->get();
-
-
-    	//Go through bonuses and add them up
-    	foreach ($bonuses as $bonus) {
-    		$bonusesTotal+=$bonus->value;
-
-    	}
-    	//Update bonuses result
-    	$result[0]=($bonusesTotal)?number_format($bonusesTotal, 2, '.', '')." EGP":$result[0];
-    dd($bonusesTotal);
+        $bonusesTotal=0;
+        $result[0]=$this->userService->userRepository->bonusesOfUser($dateStart,$dateEnd,$bonusesTotal);
+        
     	//Defects
     	$defectsTotal=0;
-    	$defects=Auth::user()->defects()->where('defect_user.created_at','>=',$dateStart)
-    	->where('defect_user.created_at','<',$dateEnd)->get();
-    	foreach ($defects as $defect) {
-    		$defectsTotal+=$defect->score;
-    	}
-		//Update bonuses result
-		$defectsDays=number_format($defectsTotal/6,2,'.','');
-    	$result[1]=($defectsTotal)?$defectsTotal." ($defectsDays Days)":$result[1];    	
-    	//Reports
-    	$reportsOverall=0;
-    	$reportsMax=0;
-    	$reportsCount=0;
-    	$reports=Auth::user()->reports()->where('user_id',Auth::id())
-    	->where('created_at','>=',$dateStart)->where('created_at','<',$dateEnd)->get();
-    	//Go through reports
-    	foreach ($reports as $report) {
-    		//The report isn't ready yet
-    		if ($report->overall_score==0)
-    		{
-    			continue;
-    		}
-    		$reportsOverall+=$report->overall_score;
-    		$reportsMax+=$report->max_score;
-    		//Increase the number of valid reports
-    		$reportsCount++;
-    	}
+    	$result[1]=$this->userService->userRepository->defectsOfUser($dateStart,$dateEnd,$defectsTotal);
 
-    	//We got some good reports
-    	if ($reportsCount>0)
-    	{
-    		$reportsOverall=$reportsOverall/$reportsCount;
-    		$reportsMax=$reportsMax/$reportsCount;
-    		//Update result
-    		$result[2]="$reportsOverall of $reportsMax";
-    	}
+    	//Reports
+    	$reportsCount=0;
+	    $result[2]=$this->userService->userRepository->getScoreOfUserReport($dateStart,$dateEnd,$reportsCount);
+        
     	return $result;
     }
 }
