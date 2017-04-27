@@ -8,8 +8,4 @@ namespace App\Repositories\Defect;
  */
 interface DefectInterface
 {
-   
- 	
- 
-  
 }

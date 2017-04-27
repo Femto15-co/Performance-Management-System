@@ -88,6 +88,7 @@ class UserRepository extends BaseRepository implements UserInterface
 
         $this->model->attachRole($role);
     }
+
     /**
     * Query scope that gets defects for a user
     * @param bool $isAdmin
@@ -126,13 +127,13 @@ class UserRepository extends BaseRepository implements UserInterface
         //Didn't get a user
         if (empty($userDefects)) {
             throw new \Exception(trans('users.no_employee'));
-        } 
+        }
         //Defect id isn't correct
         if (!isset($userDefects->defects[0]->pivot)) {
-             throw new \Exception(trans('defects.no_defect'));
+            throw new \Exception(trans('defects.no_defect'));
         }
 
-        return $userDefects;
+        return $userDefects->defects[0];
     }
 
     /**
@@ -143,8 +144,9 @@ class UserRepository extends BaseRepository implements UserInterface
     */
     public function attachDefects($user,$defectId){
         $this->ensureBooted();
-        $user->defects()->attach($defectId);
+        $this->getModel()->defects()->attach($defectId);
     }
+
     /**
     * delete defects from database
     * @param $defectAttachmentId
@@ -152,7 +154,7 @@ class UserRepository extends BaseRepository implements UserInterface
     */
     public function detachDefect($defectAttachmentId){
 
-        if(!\DB::table('defect_user')->where('id', $defectAttachmentId)->delete()){
+        if (!\DB::table('defect_user')->where('id', $defectAttachmentId)->delete()) {
             throw new \Exception('defects.not_deleted');
         }
     }
@@ -167,12 +169,11 @@ class UserRepository extends BaseRepository implements UserInterface
     public function updateDefect($userId, $defectAttachmentId,$requestDefect)
     {
         //Update defect
-        if(!\DB::table('defect_user')->where(
-                [
-                    'id' => $defectAttachmentId,
-                    'user_id' => $userId,
-                ])->update(['defect_id' => $requestDefect]))
-        {
+        if (!\DB::table('defect_user')->where([
+                'id' => $defectAttachmentId,
+                'user_id' => $userId,
+            ])->update(['defect_id' => $requestDefect])
+        ) {
             throw new \Exception('reports.not_updated');
         }
     }
@@ -294,5 +295,4 @@ class UserRepository extends BaseRepository implements UserInterface
 
 
 
-     
 }
