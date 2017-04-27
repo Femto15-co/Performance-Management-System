@@ -75,4 +75,46 @@ interface UserInterface
     * @throws \Exception
     */
     public function updateDefectOfUser($userId, $defectAttachmentId,$requestDefect);
+
+    /**
+    * in case of no results to user
+    * 
+    * @return $result[]
+    */
+    public function emptyResult();
+
+    /**
+    * Get all bonuses of user within that month
+    * @param $dateStart
+    * @param $dateEnd
+    * @param $bonusesTotal
+    * return $result[0]
+    */
+    public function bonusesOfUser($dateStart,$dateEnd,$bonusesTotal);
+
+     /**
+    * Get all defects of user within that month
+    * @param $dateStart
+    * @param $dateEnd
+    * @param $defectsTotal
+    * return $result[1]
+    */
+    public function defectsOfUser($dateStart,$dateEnd,$defectsTotal);
+
+    /**
+    * get reports of user
+    * @param $dateStart
+    * @param $dateEnd
+    * @return mixed
+    */
+    public function userReportsScope($dateStart,$dateEnd);
+
+    /**
+    * Get all reports of user within that month
+    * @param $dateStart
+    * @param $dateEnd
+    * @param $reportsCount
+    * return $result[2]
+    */
+    public function getScoreOfUserReport($dateStart,$dateEnd,$reportsCount);
 }
