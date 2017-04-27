@@ -134,7 +134,7 @@ class UserController extends Controller
         try {
             //get role named admin
             $role = $this->userService->roleRepository->getItem('admin', [], 'name');
-            $users = $this->userService->userRepository->getUsersForRoleScope($role->id);
+            $users = $this->userService->userRepository->getRoleScope($role->id);
         } catch (\Exception $e) {
             return json_encode($e->getMessage());
         }

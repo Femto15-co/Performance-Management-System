@@ -193,7 +193,7 @@ class BonusController extends Controller
     {
         $isAdmin = Auth::user()->hasRole('admin');
 
-        $bonuses = $this->userService->userRepository->getBonusesForUserScope($isAdmin, Auth::id(), $userId);
+        $bonuses = $this->userService->userRepository->getBonusesScope($isAdmin, Auth::id(), $userId);
 
         return Datatables::of($bonuses)
             ->addColumn('action', function ($bonus) use ($userId, $isAdmin) {

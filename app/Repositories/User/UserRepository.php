@@ -6,6 +6,7 @@ use App\User;
 use Illuminate\Database\Eloquent\Model;
 use App\Repositories\BaseRepository;
 
+
 /**
  * UserRepository is a class that contains common queries for users
  */
@@ -20,6 +21,7 @@ class UserRepository extends BaseRepository implements UserInterface
     {
         $this->setModel($user);
         $this->originalModel = $this->getModel();
+       
     }
 
     /**
@@ -47,7 +49,7 @@ class UserRepository extends BaseRepository implements UserInterface
      * @param Integer $sentUserId
      * @return mixed
      */
-    public function getBonusesForUserScope($isAdmin, $loggedInUserId, $sentUserId)
+    public function getBonusesScope($isAdmin, $loggedInUserId, $sentUserId)
     {
         //Get bonuses related to a user by userId
         $bonuses = $this->getModel()->join('bonuses', 'users.id', 'bonuses.user_id')
@@ -66,7 +68,7 @@ class UserRepository extends BaseRepository implements UserInterface
      * @param $roleId
      * @return mixed
      */
-    public function getUsersForRoleScope($roleId)
+    public function getRoleScope($roleId)
     {
         $users = $this->model->join('role_user', 'users.id', '=', 'role_user.user_id')
             ->join('employee_types', 'users.employee_type', '=', 'employee_types.id')
@@ -88,13 +90,13 @@ class UserRepository extends BaseRepository implements UserInterface
     }
 
     /**
-     * Query scope that gets defects for a user
-     * @param bool $isAdmin
-     * @param Integer $loggedInUserId
-     * @param Integer $sentUserId
-     * @return mixed
-     */
-    public function getDefectsForUserScope($isAdmin, $loggedInUserId, $sentUserId)
+    * Query scope that gets defects for a user
+    * @param bool $isAdmin
+    * @param Integer $loggedInUserId
+    * @param Integer $sentUserId
+    * @return mixed
+    */
+    public function getDefectsScope($isAdmin, $loggedInUserId, $sentUserId)
     {
         //Get defects related to a user by userId
         $defects = $this->getModel()->join('defect_user', 'users.id', 'defect_user.user_id')->join('defects', 'defect_user.defect_id', 'defects.id')->select(['defect_user.id', 'defects.title', 'defects.score', 'defect_user.created_at']);
@@ -110,13 +112,12 @@ class UserRepository extends BaseRepository implements UserInterface
     }
 
     /**
-     * Query gets defects that related to  a user by userId
-     * @param int $defectAttachmentId
-     * @param int $userId
-     * @return Model|null|static
-     * @throws \Exception
-     */
-    public function getDefectRelatedToUser($defectAttachmentId, $userId)
+    * Query gets defects that related to  a user by userId
+    * @param Integer $defectAttachmentId
+    * @param Integer $userId
+    * @return mixed
+    */
+    public function getDefects($defectAttachmentId, $userId)
     {
         //Get defects related to a user by userId
         $userDefects = $this->getModel()->with(['defects' => function ($query) use ($defectAttachmentId) {
@@ -136,37 +137,36 @@ class UserRepository extends BaseRepository implements UserInterface
     }
 
     /**
-     * attach defect to user
-     * @param $defectId
-     * @throws \Exception
-     */
-    public function attachDefect($defectId)
-    {
+    * attach defect to user
+    * @param $user
+    * @param $defectId
+    * @throws \Exception
+    */
+    public function attachDefects($user,$defectId){
         $this->ensureBooted();
         $this->getModel()->defects()->attach($defectId);
     }
 
     /**
-     * delete defects from database
-     * @param $defectAttachmentId
-     * @throws \Exception
-     */
-    public function detachDefectFromUser($defectAttachmentId)
-    {
+    * delete defects from database
+    * @param $defectAttachmentId
+    * @throws \Exception
+    */
+    public function detachDefect($defectAttachmentId){
 
         if (!\DB::table('defect_user')->where('id', $defectAttachmentId)->delete()) {
             throw new \Exception('defects.not_deleted');
         }
     }
 
-    /**
-     * update defect of user
-     * @param $userId
-     * @param $defectAttachmentId
-     * @param $requestDefect
-     * @throws \Exception
-     */
-    public function updateDefectOfUser($userId, $defectAttachmentId, $requestDefect)
+     /**
+    * update defect of user
+    * @param $userId
+    * @param $defectAttachmentId
+    * @param $requestDefect
+    * @throws \Exception
+    */
+    public function updateDefect($userId, $defectAttachmentId,$requestDefect)
     {
         //Update defect
         if (!\DB::table('defect_user')->where([
@@ -177,6 +177,122 @@ class UserRepository extends BaseRepository implements UserInterface
             throw new \Exception('reports.not_updated');
         }
     }
+   
+
+    /**
+    * Get all bonuses of user within that month
+    * @param $dateStart
+    * @param $dateEnd
+    * return $result[0]
+    */
+    public function getBonuses($dateStart,$dateEnd)
+    {
+        $this->ensureBooted();
+        //get sum of user's bonuses
+        $bonusesTotal=$this->getModel()->bonuses()->where('created_at','>=',$dateStart)
+        ->where('created_at','<',$dateEnd)->sum('value');
+      
+        //Update bonuses result
+        return ($bonusesTotal)?number_format($bonusesTotal, 2, '.', ''):"0 ";
+    }
+
+    /**
+    * Get all defects of user within that month
+    * @param $dateStart
+    * @param $dateEnd
+    * return $result[1]
+    */
+    public function sumScoreOfDefects($dateStart,$dateEnd)
+    {
+        $this->ensureBooted();
+        //get sum of user's defects
+        $defectsTotal=$this->getModel()->defects()->where('defect_user.created_at','>=',$dateStart)
+        ->where('defect_user.created_at','<',$dateEnd)->sum('score');
+      
+        //Update defects result
+        $defectsDays=number_format($defectsTotal/6,2,'.','');
+        return ($defectsTotal)?$defectsTotal." ($defectsDays Days)":"0 (0 Days)";  
+
+         
+    }
+
+    /**
+    * get reports of user
+    * @param $userId
+    * @param $dateStart
+    * @param $dateEnd
+    * @return mixed
+    */
+    public function reportsInPeriodScope($dateStart,$dateEnd)
+    {
+        $this->ensureBooted();
+        return $this->getModel()->reports()->where('created_at','>=',$dateStart)->where('created_at','<',$dateEnd);
+    }
+    /**
+    * get sum overall score of report
+    * @param $userId
+    * @param $dateStart
+    * @param $dateEnd
+    * @return mixed
+    */
+    public function sumOverAllScoreOfReport($dateStart,$dateEnd)
+    {
+        //return sum of overall score
+        return $this->reportsInPeriodScope($dateStart,$dateEnd)->sum('overall_score');
+    }
+    /**
+    * get sum max score of report
+    * @param $userId
+    * @param $dateStart
+    * @param $dateEnd
+    * @return mixed
+    */
+    public function sumMaxScoreOfReport($dateStart,$dateEnd)
+    {
+        //return sum of max score
+        return $this->reportsInPeriodScope($dateStart,$dateEnd)->sum('max_score');
+    }
+    /**
+    * get count  of reports
+    * @param $userId
+    * @param $dateStart
+    * @param $dateEnd
+    * @return mixed
+    */
+    public function sumCountOfReports($dateStart,$dateEnd)
+    {
+        //return count  of reports
+        return $this->reportsInPeriodScope($dateStart,$dateEnd)->count();
+    }
+    /**
+    * Get all reports of user within that month
+    * @param $userId
+    * @param $dateStart
+    * @param $dateEnd
+    * return $result[2]
+    */
+    public function getPerformanceScore($dateStart,$dateEnd)
+    {
+        $result="0 of 0";
+        //return sum of overall score
+        $reportsOverall=$this->sumOverAllScoreOfReport($dateStart,$dateEnd);
+        //return sum of max score
+        $reportsMax=$this->sumMaxScoreOfReport($dateStart,$dateEnd);
+        //return count of reports
+        $reportsCount=$this->sumCountOfReports($dateStart,$dateEnd);
+        //We got some good reports
+        if ($reportsCount>0)
+        {
+            $reportsOverall=$reportsOverall/$reportsCount;
+            $reportsMax=$reportsMax/$reportsCount;
+            //Update result
+            $result="$reportsOverall of $reportsMax";
+        }
+
+        return $result;
+    }
+
+
 
 
 }

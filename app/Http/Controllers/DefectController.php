@@ -23,7 +23,7 @@ class DefectController extends Controller
     protected $userService;
 
     /**
-     * Bonus service
+     * defect service
      * @var
      */
     protected $defectService;
@@ -128,6 +128,7 @@ class DefectController extends Controller
             //get all defects
             $defects = $this->defectService->defectRepository->getAllItems();
             //Verify that the defect belongs to the given user id
+
             $selectedDefect = $this->userService->userRepository->getDefectRelatedToUser($defectAttachmentId, $userId);
         } catch (\Exception $e) {
             Session::flash('alert', $e->getMessage());
