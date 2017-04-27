@@ -21,7 +21,7 @@ class UserRepository extends BaseRepository implements UserInterface
     {
         $this->setModel($user);
         $this->originalModel = $this->getModel();
-       
+
     }
 
     /**
@@ -88,13 +88,14 @@ class UserRepository extends BaseRepository implements UserInterface
 
         $this->model->attachRole($role);
     }
+
     /**
-    * Query scope that gets defects for a user
-    * @param bool $isAdmin
-    * @param Integer $loggedInUserId
-    * @param Integer $sentUserId
-    * @return mixed
-    */
+     * Query scope that gets defects for a user
+     * @param bool $isAdmin
+     * @param Integer $loggedInUserId
+     * @param Integer $sentUserId
+     * @return mixed
+     */
     public function getDefectsScope($isAdmin, $loggedInUserId, $sentUserId)
     {
         //Get defects related to a user by userId
@@ -111,11 +112,11 @@ class UserRepository extends BaseRepository implements UserInterface
     }
 
     /**
-    * Query gets defects that related to  a user by userId
-    * @param Integer $defectAttachmentId
-    * @param Integer $userId
-    * @return mixed
-    */
+     * Query gets defects that related to  a user by userId
+     * @param Integer $defectAttachmentId
+     * @param Integer $userId
+     * @return mixed
+     */
     public function getDefects($defectAttachmentId, $userId)
     {
         //Get defects related to a user by userId
@@ -126,57 +127,59 @@ class UserRepository extends BaseRepository implements UserInterface
         //Didn't get a user
         if (empty($userDefects)) {
             throw new \Exception(trans('users.no_employee'));
-        } 
+        }
         //Defect id isn't correct
         if (!isset($userDefects->defects[0]->pivot)) {
-             throw new \Exception(trans('defects.no_defect'));
+            throw new \Exception(trans('defects.no_defect'));
         }
 
-        return $userDefects;
+        return $userDefects->defects[0];
     }
 
     /**
-    * attach defect to user
-    * @param $user
-    * @param $defectId
-    * @throws \Exception
-    */
-    public function attachDefects($user,$defectId){
+     * attach defect to user
+     * @param $user
+     * @param $defectId
+     * @throws \Exception
+     */
+    public function attachDefects($user, $defectId)
+    {
         $this->ensureBooted();
-        $user->defects()->attach($defectId);
+        $this->getModel()->defects()->attach($defectId);
     }
-    /**
-    * delete defects from database
-    * @param $defectAttachmentId
-    * @throws \Exception
-    */
-    public function detachDefect($defectAttachmentId){
 
-        if(!\DB::table('defect_user')->where('id', $defectAttachmentId)->delete()){
+    /**
+     * delete defects from database
+     * @param $defectAttachmentId
+     * @throws \Exception
+     */
+    public function detachDefect($defectAttachmentId)
+    {
+
+        if (!\DB::table('defect_user')->where('id', $defectAttachmentId)->delete()) {
             throw new \Exception('defects.not_deleted');
         }
     }
 
-     /**
-    * update defect of user
-    * @param $userId
-    * @param $defectAttachmentId
-    * @param $requestDefect
-    * @throws \Exception
-    */
-    public function updateDefect($userId, $defectAttachmentId,$requestDefect)
+    /**
+     * update defect of user
+     * @param $userId
+     * @param $defectAttachmentId
+     * @param $requestDefect
+     * @throws \Exception
+     */
+    public function updateDefect($userId, $defectAttachmentId, $requestDefect)
     {
         //Update defect
-        if(!\DB::table('defect_user')->where(
-                [
-                    'id' => $defectAttachmentId,
-                    'user_id' => $userId,
-                ])->update(['defect_id' => $requestDefect]))
-        {
+        if (!\DB::table('defect_user')->where([
+            'id' => $defectAttachmentId,
+            'user_id' => $userId,
+        ])->update(['defect_id' => $requestDefect])
+        ) {
             throw new \Exception('reports.not_updated');
         }
     }
-   
+
 
     /**
     * Get all bonuses of user within that month
@@ -188,11 +191,11 @@ class UserRepository extends BaseRepository implements UserInterface
     {
         $this->ensureBooted();
         //get sum of user's bonuses
-        $bonusesTotal=$this->getModel()->bonuses()->where('created_at','>=',$dateStart)
-        ->where('created_at','<',$dateEnd)->sum('value');
-      
+        $bonusesTotal = $this->getModel()->bonuses()->where('created_at', '>=', $dateStart)
+            ->where('created_at', '<', $dateEnd)->sum('value');
+
         //Update bonuses result
-        return ($bonusesTotal)?number_format($bonusesTotal, 2, '.', ''):"0 ";
+        return ($bonusesTotal) ? number_format($bonusesTotal, 2, '.', '') : "0 ";
     }
 
     /**
@@ -205,14 +208,10 @@ class UserRepository extends BaseRepository implements UserInterface
     {
         $this->ensureBooted();
         //get sum of user's defects
-        $defectsTotal=$this->getModel()->defects()->where('defect_user.created_at','>=',$dateStart)
-        ->where('defect_user.created_at','<',$dateEnd)->sum('score');
-      
-        //Update defects result
-        $defectsDays=number_format($defectsTotal/6,2,'.','');
-        return ($defectsTotal)?$defectsTotal." ($defectsDays Days)":"0 (0 Days)";  
+        $defectsTotal = $this->getModel()->defects()->where('defect_user.created_at', '>=', $dateStart)
+            ->where('defect_user.created_at', '<', $dateEnd)->sum('score');
 
-         
+        return $defectsTotal;
     }
 
     /**
@@ -224,8 +223,9 @@ class UserRepository extends BaseRepository implements UserInterface
     public function reportsInPeriodScope($dateStart,$dateEnd)
     {
         $this->ensureBooted();
-        return $this->getModel()->reports()->where('created_at','>=',$dateStart)->where('created_at','<',$dateEnd);
+        return $this->getModel()->reports()->where('created_at', '>=', $dateStart)->where('created_at', '<', $dateEnd);
     }
+
     /**
     * get sum overall score of report
     * @param $dateStart
@@ -235,8 +235,9 @@ class UserRepository extends BaseRepository implements UserInterface
     public function sumOverAllScoreOfReport($dateStart,$dateEnd)
     {
         //return sum of overall score
-        return $this->reportsInPeriodScope($dateStart,$dateEnd)->sum('overall_score');
+        return $this->reportsInPeriodScope($dateStart, $dateEnd)->sum('overall_score');
     }
+
     /**
     * get sum max score of report
     * @param $dateStart
@@ -246,8 +247,9 @@ class UserRepository extends BaseRepository implements UserInterface
     public function sumMaxScoreOfReport($dateStart,$dateEnd)
     {
         //return sum of max score
-        return $this->reportsInPeriodScope($dateStart,$dateEnd)->sum('max_score');
+        return $this->reportsInPeriodScope($dateStart, $dateEnd)->sum('max_score');
     }
+
     /**
     * get count  of reports
     * @param $dateStart
@@ -257,8 +259,9 @@ class UserRepository extends BaseRepository implements UserInterface
     public function sumCountOfReports($dateStart,$dateEnd)
     {
         //return count  of reports
-        return $this->reportsInPeriodScope($dateStart,$dateEnd)->count();
+        return $this->reportsInPeriodScope($dateStart, $dateEnd)->count();
     }
+
     /**
     * Get all reports of user within that month
     * @param $dateStart
@@ -267,27 +270,23 @@ class UserRepository extends BaseRepository implements UserInterface
     */
     public function getPerformanceScore($dateStart,$dateEnd)
     {
-        $result="0 of 0";
+        $result = "0 of 0";
         //return sum of overall score
-        $reportsOverall=$this->sumOverAllScoreOfReport($dateStart,$dateEnd);
+        $reportsOverall = $this->sumOverAllScoreOfReport($dateStart, $dateEnd);
         //return sum of max score
-        $reportsMax=$this->sumMaxScoreOfReport($dateStart,$dateEnd);
+        $reportsMax = $this->sumMaxScoreOfReport($dateStart, $dateEnd);
         //return count of reports
-        $reportsCount=$this->sumCountOfReports($dateStart,$dateEnd);
+        $reportsCount = $this->sumCountOfReports($dateStart, $dateEnd);
         //We got some good reports
-        if ($reportsCount>0)
-        {
-            $reportsOverall=$reportsOverall/$reportsCount;
-            $reportsMax=$reportsMax/$reportsCount;
+        if ($reportsCount > 0) {
+            $reportsOverall = $reportsOverall / $reportsCount;
+            $reportsMax = $reportsMax / $reportsCount;
             //Update result
-            $result="$reportsOverall of $reportsMax";
+            $result = "$reportsOverall of $reportsMax";
         }
 
         return $result;
     }
 
 
-
-
-     
 }

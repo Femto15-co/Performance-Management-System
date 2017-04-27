@@ -11,13 +11,10 @@ use App\Repositories\BaseRepository;
  */
 class DefectRepository extends BaseRepository implements DefectInterface
 {
-
-    
-
     /**
     * DefectRepository constructor.
     * Inject whatever passed model
-    * @param Model $bonusModel
+    * @param Model $model
     */
     public function __construct(Model $model)
     {
