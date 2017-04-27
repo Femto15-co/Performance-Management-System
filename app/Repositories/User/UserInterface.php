@@ -54,11 +54,10 @@ interface UserInterface
 
       /**
     * attach defect to user
-    * @param $user
     * @param $defectId
     * @throws \Exception
     */
-    public function attachDefects($user,$defectId);
+    public function attachDefect($defectId);
 
      /**
     * delete defects from database
