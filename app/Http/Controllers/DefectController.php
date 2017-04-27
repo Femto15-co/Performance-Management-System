@@ -129,7 +129,7 @@ class DefectController extends Controller
             $defects = $this->defectService->defectRepository->getAllItems();
             //Verify that the defect belongs to the given user id
 
-            $selectedDefect = $this->userService->userRepository->getDefectRelatedToUser($defectAttachmentId, $userId);
+            $selectedDefect = $this->userService->userRepository->getDefects($defectAttachmentId, $userId);
         } catch (\Exception $e) {
             Session::flash('alert', $e->getMessage());
             return redirect()->route('home');
@@ -202,7 +202,7 @@ class DefectController extends Controller
     {
         //Get defects related to a user by userId
         $defects = $this->userService->userRepository
-            ->getDefectsForUserScope(Auth::user()->hasRole('admin'), Auth::id(), $userId);
+            ->getDefectsScope(Auth::user()->hasRole('admin'), Auth::id(), $userId);
 
         return Datatables::of($defects)
             ->addColumn('action', function ($defect) use ($userId) {
