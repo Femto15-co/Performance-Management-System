@@ -138,11 +138,10 @@ class UserRepository extends BaseRepository implements UserInterface
 
     /**
      * attach defect to user
-     * @param $user
      * @param $defectId
      * @throws \Exception
      */
-    public function attachDefect($user, $defectId)
+    public function attachDefect($defectId)
     {
         $this->ensureBooted();
         $this->getModel()->defects()->attach($defectId);
@@ -180,12 +179,11 @@ class UserRepository extends BaseRepository implements UserInterface
         }
     }
 
-
     /**
      * Get all bonuses of user within that month
      * @param $dateStart
      * @param $dateEnd
-     * return $result[0]
+     * @return string
      */
     public function getBonuses($dateStart, $dateEnd)
     {
@@ -202,7 +200,7 @@ class UserRepository extends BaseRepository implements UserInterface
      * Get all defects of user within that month
      * @param $dateStart
      * @param $dateEnd
-     * return $result[1]
+     * return score
      */
     public function sumScoreOfDefects($dateStart, $dateEnd)
     {
@@ -216,7 +214,6 @@ class UserRepository extends BaseRepository implements UserInterface
 
     /**
      * get reports of user
-     * @param $userId
      * @param $dateStart
      * @param $dateEnd
      * @return mixed
@@ -231,7 +228,7 @@ class UserRepository extends BaseRepository implements UserInterface
      * get sum overall score of report
      * @param $dateStart
      * @param $dateEnd
-     * @return mixed
+     * @return overall_score
      */
     public function sumOverAllScoreOfReport($dateStart, $dateEnd)
     {
@@ -243,7 +240,7 @@ class UserRepository extends BaseRepository implements UserInterface
      * get sum max score of report
      * @param $dateStart
      * @param $dateEnd
-     * @return mixed
+     * @return max_score
      */
     public function sumMaxScoreOfReport($dateStart, $dateEnd)
     {
@@ -255,7 +252,7 @@ class UserRepository extends BaseRepository implements UserInterface
      * get count  of reports
      * @param $dateStart
      * @param $dateEnd
-     * @return mixed
+     * @return count of reports
      */
     public function sumCountOfReports($dateStart, $dateEnd)
     {
@@ -265,10 +262,9 @@ class UserRepository extends BaseRepository implements UserInterface
 
     /**
      * Get all reports of user within that month
-     * @param $userId
      * @param $dateStart
      * @param $dateEnd
-     * return $result[2]
+     * @return string
      */
     public function getPerformanceScore($dateStart, $dateEnd)
     {
@@ -289,6 +285,4 @@ class UserRepository extends BaseRepository implements UserInterface
 
         return $result;
     }
-
-
 }

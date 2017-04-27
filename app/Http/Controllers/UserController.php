@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Repositories\EmployeeType\EmployeeTypeInterface;
 use App\Services\UserService;
-use App\User;
-use App\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;

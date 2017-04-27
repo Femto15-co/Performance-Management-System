@@ -23,20 +23,22 @@ interface UserInterface
      * @return mixed
      */
     public function getBonusesScope($isAdmin, $loggedInUserId, $sentUserId);
+
     /**
-    * Query scope that gets defects for a user
-    * @param bool $isAdmin
-    * @param Integer $loggedInUserId
-    * @param Integer $sentUserId
-    * @return mixed
-    */
+     * Query scope that gets defects for a user
+     * @param bool $isAdmin
+     * @param Integer $loggedInUserId
+     * @param Integer $sentUserId
+     * @return mixed
+     */
     public function getDefectsScope($isAdmin, $loggedInUserId, $sentUserId);
+
     /**
-    * Query gets defects that related to  a user by userId
-    * @param Integer $defectAttachmentId
-    * @param Integer $userId
-    * @return mixed
-    */
+     * Query gets defects that related to  a user by userId
+     * @param Integer $defectAttachmentId
+     * @param Integer $userId
+     * @return mixed
+     */
     public function getDefects($defectAttachmentId, $userId);
 
     /**
@@ -52,93 +54,83 @@ interface UserInterface
      */
     public function getRoleScope($roleId);
 
-      /**
-    * attach defect to user
-    * @param $user
-    * @param $defectId
-    * @throws \Exception
-    */
-    public function attachDefect($user,$defectId);
+    /**
+     * attach defect to user
+     * @param $defectId
+     * @throws \Exception
+     */
+    public function attachDefect($defectId);
 
-     /**
-    * delete defects from database
-    * @param $defectAttachmentId
-    * @throws \Exception
-    */
+    /**
+     * delete defects from database
+     * @param $defectAttachmentId
+     * @throws \Exception
+     */
     public function detachDefect($defectAttachmentId);
 
-     /**
-    * update defect of user
-    * @param $userId
-    * @param $defectAttachmentId
-    * @param $requestDefect
-    * @throws \Exception
-    */
-    public function updateDefect($userId, $defectAttachmentId,$requestDefect);
+    /**
+     * update defect of user
+     * @param $userId
+     * @param $defectAttachmentId
+     * @param $requestDefect
+     * @throws \Exception
+     */
+    public function updateDefect($userId, $defectAttachmentId, $requestDefect);
 
-    
 
     /**
-    * Get all bonuses of user within that month
-    * @param $dateStart
-    * @param $dateEnd
-    * return $result[0]
-    */
-    public function getBonuses($dateStart,$dateEnd);
-
-     /**
-    * Get all defects of user within that month
-    * @param $dateStart
-    * @param $dateEnd
-    * return $result[1]
-    */
-    public function sumScoreOfDefects($dateStart,$dateEnd);
+     * Get all bonuses of user within that month
+     * @param $dateStart
+     * @param $dateEnd
+     * return bonusesTotal
+     */
+    public function getBonuses($dateStart, $dateEnd);
 
     /**
-    * get reports of user
-    * @param $dateStart
-    * @param $dateEnd
-    * @return mixed
-    */
-    public function reportsInPeriodScope($dateStart,$dateEnd);
+     * Get all defects of user within that month
+     * @param $dateStart
+     * @param $dateEnd
+     * return score
+     */
+    public function sumScoreOfDefects($dateStart, $dateEnd);
 
     /**
-    * get sum overall score of report
-    * 
-    * @param $userId
-    * @param $dateStart
-    * @param $dateEnd
-    * @return mixed
-    */
-    public function sumOverAllScoreOfReport($dateStart,$dateEnd);
+     * get reports of user
+     * @param $dateStart
+     * @param $dateEnd
+     * @return mixed
+     */
+    public function reportsInPeriodScope($dateStart, $dateEnd);
 
     /**
-    * get sum max score of report
-    * 
-    * @param $userId
-    * @param $dateStart
-    * @param $dateEnd
-    * @return mixed
-    */
-    public function sumMaxScoreOfReport($dateStart,$dateEnd);
+     * get sum overall score of report
+     * @param $dateStart
+     * @param $dateEnd
+     * @return overall_score
+     */
+    public function sumOverAllScoreOfReport($dateStart, $dateEnd);
 
     /**
-    * get count  of reports
-    * 
-    * @param $userId
-    * @param $dateStart
-    * @param $dateEnd
-    * @return mixed
-    */
-    public function sumCountOfReports($dateStart,$dateEnd);
+     * get sum max score of report
+     * @param $dateStart
+     * @param $dateEnd
+     * @return max_score
+     */
+    public function sumMaxScoreOfReport($dateStart, $dateEnd);
 
     /**
-    * Get all reports of user within that month
-    * 
-    * @param $userId
-    * @param $dateStart
-    * @param $dateEnd
-    * return $result[2]
-    */
-    public function getPerformanceScore($dateStart,$dateEnd);
+     * get count  of reports
+     * @param $dateStart
+     * @param $dateEnd
+     * @return count of reports
+     */
+    public function sumCountOfReports($dateStart, $dateEnd);
+
+    /**
+     * Get all reports of user within that month
+     * @param $dateStart
+     * @param $dateEnd
+     * return $result
+     */
+    public function getPerformanceScore($dateStart, $dateEnd);
 }
