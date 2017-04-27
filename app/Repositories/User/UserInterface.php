@@ -98,14 +98,18 @@ interface UserInterface
 
     /**
     * get reports of user
+    * @param $user
+    * @param $userId
     * @param $dateStart
     * @param $dateEnd
     * @return mixed
     */
     public function reportsInPeriodScope($user,$userId,$dateStart,$dateEnd);
-    
+
     /**
     * get sum overall score of report
+    * @param $user
+    * @param $userId
     * @param $dateStart
     * @param $dateEnd
     * @return mixed
@@ -114,6 +118,8 @@ interface UserInterface
 
     /**
     * get sum max score of report
+    * @param $user
+    * @param $userId
     * @param $dateStart
     * @param $dateEnd
     * @return mixed
@@ -122,6 +128,8 @@ interface UserInterface
 
     /**
     * get count  of reports
+    * @param $user
+    * @param $userId
     * @param $dateStart
     * @param $dateEnd
     * @return mixed
@@ -130,6 +138,8 @@ interface UserInterface
 
     /**
     * Get all reports of user within that month
+    * @param $user
+    * @param $userId
     * @param $dateStart
     * @param $dateEnd
     * @param $reportsCount

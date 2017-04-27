@@ -23,7 +23,7 @@ class StatisticsController extends Controller
     public function __construct(UserService $userService)
     {
         $this->userService = $userService;
-        $this->statistics = Config::get('bmf.statistics');
+        $this->statistics = Config::get('pms.statistics');
 
        
       
@@ -54,7 +54,7 @@ class StatisticsController extends Controller
     	$dateStart=date('Y-m-d',$timeStamp);
     	$dateEnd=date('Y-m-d',strtotime('next month',$timeStamp));
         $user=Auth::User();
-        
+
         /**
         * Get all bonuses defects and reports within that month
         */
