@@ -22,7 +22,7 @@ interface UserInterface
      * @param Integer $sentUserId
      * @return mixed
      */
-    public function getBonusesForUserScope($isAdmin, $loggedInUserId, $sentUserId);
+    public function getBonusesScope($isAdmin, $loggedInUserId, $sentUserId);
     /**
     * Query scope that gets defects for a user
     * @param bool $isAdmin
@@ -30,14 +30,14 @@ interface UserInterface
     * @param Integer $sentUserId
     * @return mixed
     */
-    public function getDefectsForUserScope($isAdmin, $loggedInUserId, $sentUserId);
+    public function getDefectsScope($isAdmin, $loggedInUserId, $sentUserId);
     /**
     * Query gets defects that related to  a user by userId
     * @param Integer $defectAttachmentId
     * @param Integer $userId
     * @return mixed
     */
-    public function getDefectsRelatedToUser($defectAttachmentId, $userId);
+    public function getDefects($defectAttachmentId, $userId);
 
     /**
      * Attach role to user
@@ -50,7 +50,7 @@ interface UserInterface
      * @param $roleId
      * @return mixed
      */
-    public function getUsersForRoleScope($roleId);
+    public function getRoleScope($roleId);
 
       /**
     * attach defect to user
@@ -58,14 +58,14 @@ interface UserInterface
     * @param $defectId
     * @throws \Exception
     */
-    public function attachDefectToUser($user,$defectId);
+    public function attachDefects($user,$defectId);
 
      /**
     * delete defects from database
     * @param $defectAttachmentId
     * @throws \Exception
     */
-    public function detachDefectFromUser($defectAttachmentId);
+    public function detachDefect($defectAttachmentId);
 
      /**
     * update defect of user
@@ -74,7 +74,7 @@ interface UserInterface
     * @param $requestDefect
     * @throws \Exception
     */
-    public function updateDefectOfUser($userId, $defectAttachmentId,$requestDefect);
+    public function updateDefect($userId, $defectAttachmentId,$requestDefect);
 
     
 
@@ -92,7 +92,7 @@ interface UserInterface
     * @param $dateEnd
     * return $result[1]
     */
-    public function getDefects($dateStart,$dateEnd);
+    public function sumScoreOfDefects($dateStart,$dateEnd);
 
     /**
     * get reports of user
@@ -140,5 +140,5 @@ interface UserInterface
     * @param $dateEnd
     * return $result[2]
     */
-    public function getScoreOfReport($dateStart,$dateEnd);
+    public function getPerformanceScore($dateStart,$dateEnd);
 }

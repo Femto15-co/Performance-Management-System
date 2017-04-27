@@ -92,7 +92,7 @@ class DefectController extends Controller {
        		//Boot model
             $this->userService->userRepository->setModel($user);
            	//Attache defect to the user.
-			$this->userService->userRepository->attachDefectToUser($user,$request->defect);
+			$this->userService->userRepository->attachDefects($user,$request->defect);
 			//un-boot model
             $this->userService->userRepository->resetModel();
             
@@ -118,7 +118,7 @@ class DefectController extends Controller {
             //get all defects
             $defects = $this->defectService->defectRepository->getAllItems();
             //Verify that the defect belongs to the given user id
-			$user = $this->userService->userRepository->getDefectsRelatedToUser($defectAttachmentId ,$userId);
+			$user = $this->userService->userRepository->getDefects($defectAttachmentId ,$userId);
         } catch(\Exception $e) {
             Session::flash('alert', $e->getMessage());
             return redirect()->route('home');
@@ -138,9 +138,9 @@ class DefectController extends Controller {
 	public function update(Request $request, $userId, $defectAttachmentId) {
 		try {
 		 	//Verify that the defect belongs to the given user id
-			$this->userService->userRepository->getDefectsRelatedToUser($defectAttachmentId ,$userId);
+			$this->userService->userRepository->getDefects($defectAttachmentId ,$userId);
 			//Update defect
-			$this->userService->userRepository->updateDefectOfUser($userId, $defectAttachmentId,$request->defect);
+			$this->userService->userRepository->updateDefect($userId, $defectAttachmentId,$request->defect);
 		} catch(\Exception $e){
 		 	Session::flash('alert', $e->getMessage());
             return redirect()->route('home');
@@ -159,7 +159,7 @@ class DefectController extends Controller {
 
 		try {
 			//Defect deleted
-			$this->userService->userRepository->detachDefectFromUser($defectAttachmentId);
+			$this->userService->userRepository->detachDefect($defectAttachmentId);
 		} catch(\Exception $e) {
 			
 			//Couldn't delete defect
@@ -189,7 +189,7 @@ class DefectController extends Controller {
 	public function listData($userId) {
 
 	 	//Get defects related to a user by userId
-		$defects = $this->userService->userRepository->getDefectsForUserScope(Auth::user()->hasRole('admin'), Auth::id(), $userId);
+		$defects = $this->userService->userRepository->getDefectsScope(Auth::user()->hasRole('admin'), Auth::id(), $userId);
 		
 		return Datatables::of($defects)
 			->addColumn('action', function ($defects) use ($userId) {

@@ -49,7 +49,7 @@ class UserRepository extends BaseRepository implements UserInterface
      * @param Integer $sentUserId
      * @return mixed
      */
-    public function getBonusesForUserScope($isAdmin, $loggedInUserId, $sentUserId)
+    public function getBonusesScope($isAdmin, $loggedInUserId, $sentUserId)
     {
         //Get bonuses related to a user by userId
         $bonuses = $this->getModel()->join('bonuses', 'users.id', 'bonuses.user_id')
@@ -68,7 +68,7 @@ class UserRepository extends BaseRepository implements UserInterface
      * @param $roleId
      * @return mixed
      */
-    public function getUsersForRoleScope($roleId)
+    public function getRoleScope($roleId)
     {
         $users = $this->model->join('role_user', 'users.id', '=', 'role_user.user_id')
             ->join('employee_types', 'users.employee_type', '=', 'employee_types.id')
@@ -95,7 +95,7 @@ class UserRepository extends BaseRepository implements UserInterface
     * @param Integer $sentUserId
     * @return mixed
     */
-    public function getDefectsForUserScope($isAdmin, $loggedInUserId, $sentUserId)
+    public function getDefectsScope($isAdmin, $loggedInUserId, $sentUserId)
     {
         //Get defects related to a user by userId
         $defects = $this->getModel()->join('defect_user', 'users.id', 'defect_user.user_id')->join('defects', 'defect_user.defect_id', 'defects.id')->select(['defect_user.id', 'defects.title', 'defects.score', 'defect_user.created_at']);
@@ -116,7 +116,7 @@ class UserRepository extends BaseRepository implements UserInterface
     * @param Integer $userId
     * @return mixed
     */
-    public function getDefectsRelatedToUser($defectAttachmentId, $userId)
+    public function getDefects($defectAttachmentId, $userId)
     {
         //Get defects related to a user by userId
         $userDefects = $this->getModel()->with(['defects' => function ($query) use ($defectAttachmentId) {
@@ -141,7 +141,7 @@ class UserRepository extends BaseRepository implements UserInterface
     * @param $defectId
     * @throws \Exception
     */
-    public function attachDefectToUser($user,$defectId){
+    public function attachDefects($user,$defectId){
         $this->ensureBooted();
         $user->defects()->attach($defectId);
     }
@@ -150,7 +150,7 @@ class UserRepository extends BaseRepository implements UserInterface
     * @param $defectAttachmentId
     * @throws \Exception
     */
-    public function detachDefectFromUser($defectAttachmentId){
+    public function detachDefect($defectAttachmentId){
 
         if(!\DB::table('defect_user')->where('id', $defectAttachmentId)->delete()){
             throw new \Exception('defects.not_deleted');
@@ -164,7 +164,7 @@ class UserRepository extends BaseRepository implements UserInterface
     * @param $requestDefect
     * @throws \Exception
     */
-    public function updateDefectOfUser($userId, $defectAttachmentId,$requestDefect)
+    public function updateDefect($userId, $defectAttachmentId,$requestDefect)
     {
         //Update defect
         if(!\DB::table('defect_user')->where(
@@ -186,6 +186,7 @@ class UserRepository extends BaseRepository implements UserInterface
     */
     public function getBonuses($dateStart,$dateEnd)
     {
+        $this->ensureBooted();
         //get sum of user's bonuses
         $bonusesTotal=$this->getModel()->bonuses()->where('created_at','>=',$dateStart)
         ->where('created_at','<',$dateEnd)->sum('value');
@@ -200,8 +201,9 @@ class UserRepository extends BaseRepository implements UserInterface
     * @param $dateEnd
     * return $result[1]
     */
-    public function getDefects($dateStart,$dateEnd)
+    public function sumScoreOfDefects($dateStart,$dateEnd)
     {
+        $this->ensureBooted();
         //get sum of user's defects
         $defectsTotal=$this->getModel()->defects()->where('defect_user.created_at','>=',$dateStart)
         ->where('defect_user.created_at','<',$dateEnd)->sum('score');
@@ -222,6 +224,7 @@ class UserRepository extends BaseRepository implements UserInterface
     */
     public function reportsInPeriodScope($dateStart,$dateEnd)
     {
+        $this->ensureBooted();
         return $this->getModel()->reports()->where('created_at','>=',$dateStart)->where('created_at','<',$dateEnd);
     }
     /**
@@ -267,7 +270,7 @@ class UserRepository extends BaseRepository implements UserInterface
     * @param $dateEnd
     * return $result[2]
     */
-    public function getScoreOfReport($dateStart,$dateEnd)
+    public function getPerformanceScore($dateStart,$dateEnd)
     {
         $result="0 of 0";
         //return sum of overall score

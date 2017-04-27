@@ -68,10 +68,10 @@ class StatisticsController extends Controller
             $result[0]=$result[0] ." ".$this->statistics['Currency'];
 
             //Defects
-            $result[1]=$this->userService->userRepository->getDefects($dateStart,$dateEnd);
+            $result[1]=$this->userService->userRepository->sumScoreOfDefects($dateStart,$dateEnd);
 
             //Reports
-            $result[2]=$this->userService->userRepository->getScoreOfReport($dateStart,$dateEnd);
+            $result[2]=$this->userService->userRepository->getPerformanceScore($dateStart,$dateEnd);
 
             //un-boot model
             $this->userService->userRepository->resetModel();
