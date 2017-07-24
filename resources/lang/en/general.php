@@ -34,5 +34,7 @@ return [
     'not_deleted' => 'This Item Not Deleted!',
     'not_updated' => 'This Item Not Updated!',
     'not_created' => 'This Item Not Created!',
-    'no_data' => 'There Is No Data Passed'
+    'no_data' => 'There Is No Data Passed',
+    'write_comment' => 'Leave your Comment Here!',
+    'show_comments' => 'Comments'
 ];

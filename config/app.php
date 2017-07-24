@@ -169,6 +169,8 @@ return [
 
         Zizaco\Entrust\EntrustServiceProvider::class,
         Yajra\Datatables\DatatablesServiceProvider::class,
+        Barryvdh\Debugbar\ServiceProvider::class,
+
 
         /*
          * Application Service Providers...

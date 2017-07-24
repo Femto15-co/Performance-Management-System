@@ -26,7 +26,11 @@
                 </div>
             </div>
         @endforeach
-
+        <div class="form-group">
+            <label for="comment">{{ trans('general.write_comment') }}</label>
+            <textarea name="comment" id="comment" class="form-control" rows="3">{{ 
+                $comment ? $comment : "" }}</textarea>
+        </div>
         <div class="form-group">
             <div class="col-sm-offset-3 col-sm-3">
                 <button type="submit" class="btn btn-primary form-control">{{trans('general.update')}}</button>

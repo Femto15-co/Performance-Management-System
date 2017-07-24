@@ -9,6 +9,9 @@ use App\Repositories\Bonus\BonusRepository;
 use App\Report;
 use App\Repositories\Report\ReportRepository;
 
+use App\Comment;
+use App\Repositories\Comment\CommentRepository;
+
 use App\Role;
 use App\Repositories\Role\RoleRepository;
 
@@ -53,7 +56,12 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind('App\Repositories\Report\ReportInterface', function(){
             return new ReportRepository(new Report());
         });
-
+        /*
+         * Bind Comment Repository
+         */
+        $this->app->bind('App\Repositories\Comment\CommentInterface', function(){
+            return new CommentRepository(new Comment());
+        });
         /*
          * Bind User Repository
          */

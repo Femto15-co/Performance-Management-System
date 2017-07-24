@@ -5,6 +5,7 @@ namespace App\Repositories\Report;
 use Illuminate\Database\Eloquent\Model;
 use App\Repositories\BaseRepository;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * ReportRepository is a class that contains common queries for reports
@@ -59,13 +60,14 @@ class ReportRepository extends BaseRepository implements ReportInterface
      * Get report with scores recorded by authenticated user who attempted edit
      * @param $reportId
      * @param $userId
+     * @param array $relations to eager load
      * @return mixed scores
      * @throws \Exception
      */
-    public function getReviewerScores($reportId, $userId)
+    public function getReviewerScores($reportId, $userId, $relations = [])
     {
         $reportWithScores = $this->getModel()->where('id', $reportId)->hasReviewed($userId)
-            ->withReviewer($userId)->first();
+            ->withReviewer($userId)->with($relations)->first();
 
         if (!$reportWithScores) {
             throw new \Exception(trans('reports.no_scores_recorded'));
@@ -157,5 +159,29 @@ class ReportRepository extends BaseRepository implements ReportInterface
         }
 
         return $reports;
+    }
+
+    /**
+     * get the comment written by the logged in user on report
+     * @param  Report $report
+     * @return Comment or null if there is no Comment
+     */
+    public function getUserComment($report)
+    {
+        $comment = $report->comments->where('user_id', Auth::id());
+        if (count($comment) > 0) {
+            return $comment->first();
+        }
+        return null;
+    }
+
+    /**
+     * gets all comments on report
+     * @param  Report $report all report data
+     * @return Collection     collection of reports
+     */
+    public function getAllComments($report)
+    {
+        return $report->comments;
     }
 }

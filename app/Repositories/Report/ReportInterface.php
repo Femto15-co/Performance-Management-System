@@ -25,9 +25,10 @@ interface ReportInterface
     /**
      * @param $reportId
      * @param $userId
+     * @param array $relations to eager load
      * @return mixed
      */
-    public function getReviewerScores($reportId, $userId);
+    public function getReviewerScores($reportId, $userId, $relations = []);
 
     /**
      * Get Reports for a specified user or for all users if current
@@ -72,4 +73,18 @@ interface ReportInterface
      */
     public function getAvgScore($id, $reportUserId);
 
+    /**
+     * get the comment written by the logged in user on report
+     * @param  Report $report
+     * @return Comment or null if there is no Comment
+     */
+    public function getUserComment($report);
+
+    /**
+     * gets all comments on report
+     * @param  Report $report all report data
+     * @return Collection     collection of reports
+     */
+    public function getAllComments($report);
+    
 }
