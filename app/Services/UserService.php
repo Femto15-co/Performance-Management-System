@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Repositories\Role\RoleInterface;
 use App\Repositories\User\UserInterface;
+use App\Repositories\EmployeeType\EmployeeTypeInterface;
 use Illuminate\Support\Facades\Auth;
 
 class UserService
@@ -18,10 +19,21 @@ class UserService
      */
     public $roleRepository;
 
-    public function __construct(UserInterface $userRepository, RoleInterface $roleRepository)
+    /**
+     * @var EmployeeTypeInterface
+     */
+    public $employeeTypeRepository;
+
+    public function __construct(
+        UserInterface $userRepository,
+        RoleInterface $roleRepository,
+        EmployeeTypeInterface $employeeTypeRepository
+        )
     {
         $this->userRepository = $userRepository;
         $this->roleRepository = $roleRepository;
+        $this->employeeTypeRepository = $employeeTypeRepository;
+           
     }
 
     /**
@@ -55,12 +67,16 @@ class UserService
 
     /**
      * Get User Role From Type
-     * @param $type
+     * @param integer $type represents the id of employee type
      * @return mixed
      */
     public function getRoleFromType($type)
     {
-        if (strtolower($type) == 'admin') {
+        //get employee role
+        $role = $this->employeeTypeRepository->getItem($type);
+
+        //check if the employee has admin role
+        if (strtolower($role->type) == 'admin') {
             //Get admin role
             return $this->roleRepository->getItem('admin', [], 'name');
         }
