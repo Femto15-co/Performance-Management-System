@@ -103,9 +103,12 @@ class DefectController extends Controller
             $this->userService->onlyEmployee($user);
             //Boot model
             $this->userService->userRepository->setModel($user);
-            //Create Comment and get its object back
-            $comment = $this->defectService->addComment($request->comment, Auth::id());
-
+            //check if there is a comment
+            if(!empty(trim($request->comment)))
+            {
+                //Create Comment and get its object back
+                $comment = $this->defectService->addComment(trim($request->comment), Auth::id());
+            }
             //Attach defect and its comment to the user.
             $this->userService->userRepository->attachDefect(
                 $request->defect, 
@@ -167,12 +170,14 @@ class DefectController extends Controller
     public function update(Request $request, $userId, $defectAttachmentId)
     {
         try {
-            //Update Comment and adds it if not existed before
-            $commentId = $this->defectService->updateComment(
-                $defectAttachmentId,
-                $request->comment,
-                Auth::id());
-
+            if(!empty(trim($request->comment)))
+            {
+                //Update Comment and adds it if not existed before
+                $commentId = $this->defectService->updateComment(
+                    $defectAttachmentId,
+                    trim($request->comment),
+                    Auth::id());
+            }
             //Update defect
             $this->userService->userRepository->updateDefect($userId, $defectAttachmentId, $request->defect, $commentId);
 

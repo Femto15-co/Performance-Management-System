@@ -126,7 +126,8 @@ class ReportController extends Controller
                 $employee,
                 $request->input('scores'),
                 $request->input('rules'),
-                $request->input('comment'));
+                trim($request->input('comment'))
+                );
         } catch (\Exception $e) {
             //if not created, redirect to reports index and show error message
             Session::flash('error', $e->getMessage());
@@ -183,7 +184,8 @@ class ReportController extends Controller
                 $id,
                 $request->scores,
                 $request->rules,
-                $request->comment);
+                trim($request->comment)
+                );
         } catch (\Exception $e) {
             //report not found, redirect to reports index and show error message
             Session::flash('error', $e->getMessage());
@@ -272,7 +274,11 @@ class ReportController extends Controller
         $this->validateReport($request);
 
         try {
-            $this->reportService->updateReport($id, $request->scores, $request->rules, $request->comment);
+            $this->reportService->updateReport(
+                $id,
+                $request->scores,
+                $request->rules,
+                trim($request->comment));
         } catch (\Exception $e) {
             Session::flash('error', $e->getMessage());
             return redirect(route('report.index'));

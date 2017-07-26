@@ -52,16 +52,12 @@ class DefectService
      */
     public function addComment($comment, $user_id)
     {
-        $comment = trim($comment);
         //Create Comment
-        if(!empty($comment)){
-            $comment_created = $this->commentRepository->addItem([
-                'comment' => $comment,
-                'user_id' => $user_id
-                ]);
-            return $comment_created;
-        }
-        return null;
+        $comment_created = $this->commentRepository->addItem([
+            'comment' => $comment,
+            'user_id' => $user_id
+            ]);
+        return $comment_created;
     }
     /**
      * get Comment by defect_user id
@@ -90,7 +86,6 @@ class DefectService
      */
     public function updateComment($defectAttachmentId, $comment, $user_id)
     {
-        $comment = trim($comment);
         //get comment id from defect_user id
         $commentId = $this->defectRepository->getCommentId($defectAttachmentId);
         //checks if there is a comment before

@@ -73,7 +73,7 @@ class ReportService
         $this->addScores($scores, $rules, $report, $employee);
 
         //Check if there is a comment
-        if($comment && strlen(trim($comment)) > 0)
+        if(!empty($comment))
         {
             $this->addComment($comment, $report);
         }
@@ -85,7 +85,6 @@ class ReportService
      */
     public function addComment($comment, $report)
     {
-        $comment = trim($comment);
         //Create Comment
         $comment_created = $this->commentRepository->addItem([
             'comment' => $comment,
@@ -117,7 +116,7 @@ class ReportService
         $this->addScores($scores, $rules, $report, $employee);
 
         //Check if there is a comment
-        if($comment && strlen(trim($comment)) > 0)
+        if(!empty($comment))
         {
             $this->addComment($comment, $report);
         }
@@ -150,13 +149,17 @@ class ReportService
 
         //get user comment (return null if there is no comment before)
         $user_comment = $this->reportRepository->getUserComment($report);
-        //update comment if existed otherwise create new one
+        //update comment if existed
         if($user_comment)
         {
             //update comment
             $this->commentRepository->editItem($user_comment->id, ['comment' => $comment]);
-        }else{
-            //create comment
+            return;
+        }
+
+        //creates new comment if not comment isn't empty string
+        if(!empty($comment))
+        {
             $this->addComment($comment, $report);
         }
     }
