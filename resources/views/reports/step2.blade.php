@@ -37,14 +37,12 @@
                 </div>
             </div>
         @endforeach
-
-        @if (!isset($buttonText))
+        @role ('admin')
             <div class="form-group">
                 <label for="comment">{{ trans('general.write_comment') }}</label>
                 <textarea name="comment" id="comment" class="form-control" rows="3"></textarea>
             </div>
-        @endif
-        
+        @endrole
         <div class="form-group">
             <div class="col-sm-offset-3 col-sm-3">
                 <button type="submit" class="btn btn-primary form-control">{{isset($buttonText)? $buttonText: trans('general.create')}}</button>

@@ -103,7 +103,7 @@ class ReportService
      * @param $rules
      * @throws \Exception
      */
-    public function reportParticipate($id, $scores, $rules)
+    public function reportParticipate($id, $scores, $rules, $comment)
     {
         $report = $this->reportRepository->getItem($id);
 
@@ -116,6 +116,11 @@ class ReportService
         //Attach scores to report
         $this->addScores($scores, $rules, $report, $employee);
 
+        //Check if there is a comment
+        if($comment && strlen(trim($comment)) > 0)
+        {
+            $this->addComment($comment, $report);
+        }
         //If employee is evaluating himself, calculate overall score and prevent further participation
         if ($employee->id == Auth::id()) {
             $this->closeReport($report);
@@ -355,6 +360,9 @@ class ReportService
         try {
             //Show participate link if only user can participate
             $this->canParticipate($report, $loggedInUser);
+            //Still open for participation?
+            $this->reportService->openModification($report);
+
             $participateLink =
                 "<a href=" . route('report.getParticipate', $report->id) .
                 " class='btn btn-xs btn-success'><i class='glyphicon glyphicon-pencil'></i> " .

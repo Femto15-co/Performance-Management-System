@@ -30,6 +30,7 @@ return [
     'not_deleted' => 'Report not Deleted',
     'deleted' => 'Report Deleted!',
     'participate_in_review' => 'Participate in reviewing yourself',
+    'participate_in_review_admin' => 'Participate in reviewing this report',
     'participate' => 'Participate',
     'final_score' => 'Final Score',
     'final_report'=>'Final report',
@@ -39,5 +40,5 @@ return [
     'no_prior_evaluation'=>'No prior evaluation found',
     'update_no_longer_allowed'=>'Report modification is no longer allowed',
     'no_operation' => 'No operation is allowed',
-    'no_max_score' => 'Max score is not defined'
+    'no_max_score' => 'Max score is not defined',
 ];

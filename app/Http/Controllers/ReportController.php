@@ -179,7 +179,11 @@ class ReportController extends Controller
         $this->validateReport($request);
 
         try {
-            $this->reportService->reportParticipate($id, $request->scores, $request->rules);
+            $this->reportService->reportParticipate(
+                $id,
+                $request->scores,
+                $request->rules,
+                $request->comment);
         } catch (\Exception $e) {
             //report not found, redirect to reports index and show error message
             Session::flash('error', $e->getMessage());

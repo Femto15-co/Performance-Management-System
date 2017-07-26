@@ -57,7 +57,9 @@
         @if (count($comments) > 0)
             @foreach ($comments as $comment)
                 <div class="form-group">
-                        <p><strong> {{ $comment->user->name }}</strong> Wrote</p>
+                        <p title="{{(new Carbon\Carbon($comment->created_at))
+                            ->format('l, d M Y, h:i:s A')}}">
+                            <strong>{{ $comment->user->name }}</strong> Wrote</p>
                         <blockquote>
                         <p class="lead">{{$comment->comment}}</p>
                         </blockquote>
