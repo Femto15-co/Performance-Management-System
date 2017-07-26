@@ -131,7 +131,7 @@ class UserRepository extends BaseRepository implements UserInterface
             throw new \Exception(trans('users.no_employee'));
         }
         //Defect id isn't correct
-        if (!isset($userDefects->defects[0]->pivot)) {
+        if (!isset($userDefects->defects[0])) {
             throw new \Exception(trans('defects.no_defect'));
         }
 

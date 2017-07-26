@@ -169,6 +169,7 @@ class DefectController extends Controller
      */
     public function update(Request $request, $userId, $defectAttachmentId)
     {
+        $this->validateDefect($request);
         try {
             if(!empty(trim($request->comment)))
             {

@@ -168,9 +168,9 @@ class ReportRepository extends BaseRepository implements ReportInterface
      */
     public function getUserComment($report)
     {
-        $comment = $report->comments->where('user_id', Auth::id());
-        if (count($comment) > 0) {
-            return $comment->first();
+        $comment = $report->comments->where('user_id', Auth::id())->first();
+        if ($comment) {
+            return $comment;
         }
         return null;
     }
