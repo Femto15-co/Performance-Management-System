@@ -22,5 +22,6 @@ return [
     'deleted'=>'Defect Deleted Succesfully!',
     'not_deleted'=>"Defect Couldn't Be Deleted!",
     'no_defect'=>"No defect attached!",
+    'comment' => 'Comment'
 
 ];

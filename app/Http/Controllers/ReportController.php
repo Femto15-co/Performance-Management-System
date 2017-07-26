@@ -242,7 +242,7 @@ class ReportController extends Controller
             if($comment){
                 $comment = $comment->comment;
             }
-            //dd($comment);
+           
             $this->reportService->openModification($reportWithScores);
         } catch (\Exception $e) {
             Session::flash('error', $e->getMessage());

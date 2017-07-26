@@ -57,9 +57,10 @@ interface UserInterface
     /**
      * attach defect to user
      * @param $defectId
+     * @param $commentId
      * @throws \Exception
      */
-    public function attachDefect($defectId);
+    public function attachDefect($defectId, $commentId);
 
     /**
      * delete defects from database
@@ -73,9 +74,10 @@ interface UserInterface
      * @param $userId
      * @param $defectAttachmentId
      * @param $requestDefect
+     * @param $commentId
      * @throws \Exception
      */
-    public function updateDefect($userId, $defectAttachmentId, $requestDefect);
+    public function updateDefect($userId, $defectAttachmentId, $requestDefect, $commentId);
 
 
     /**

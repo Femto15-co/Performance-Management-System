@@ -33,6 +33,7 @@
                 <th >{{ trans('defects.defect_id') }}</th>
                 <th >{{ trans('defects.defect_title') }}</th>
                 <th >{{ trans('defects.score') }}</th>
+                <th >{{ trans('defects.comment') }}</th>
                 <th >{{ trans('general.date') }}</th>
                 <th data-sortable="false" data-searchable="false">{{ trans('general.actions') }}</th>
             </tr>

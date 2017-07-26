@@ -14,6 +14,10 @@
 			</select>
 			{!! $errors->first('defect', '<p class="help-block">:message</p>') !!}
 		</div>
+		<div class="form-group">
+                <label for="comment">{{ trans('general.write_comment') }}</label>
+                <textarea name="comment" id="comment" class="form-control" rows="3"></textarea>
+        </div>
 		<button type="submit" class="btn btn-primary">Submit</button>
 	</form>
 </div>

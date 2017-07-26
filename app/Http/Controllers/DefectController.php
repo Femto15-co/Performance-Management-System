@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Yajra\Datatables\Datatables;
+use Carbon\Carbon;
 
 class DefectController extends Controller
 {
@@ -102,8 +103,16 @@ class DefectController extends Controller
             $this->userService->onlyEmployee($user);
             //Boot model
             $this->userService->userRepository->setModel($user);
-            //Attache defect to the user.
-            $this->userService->userRepository->attachDefect($request->defect);
+            //Create Comment and get its object back
+            $comment = $this->defectService->addComment($request->comment, Auth::id());
+
+            //Attach defect and its comment to the user.
+            $this->userService->userRepository->attachDefect(
+                $request->defect, 
+                isset($comment->id)? $comment->id: null
+            );
+            
+
             //un-boot model
             $this->userService->userRepository->resetModel();
 
@@ -129,8 +138,10 @@ class DefectController extends Controller
             //get all defects
             $defects = $this->defectService->defectRepository->getAllItems();
             //Verify that the defect belongs to the given user id
-
             $selectedDefect = $this->userService->userRepository->getDefects($defectAttachmentId, $userId);
+            //get defect comment
+            $comment = $this->defectService->getComment($defectAttachmentId);
+           
         } catch (\Exception $e) {
             Session::flash('alert', $e->getMessage());
             return redirect()->route('home');
@@ -141,7 +152,8 @@ class DefectController extends Controller
             'selectedDefect' => $selectedDefect->id,
             'defectAttachmentId' => $defectAttachmentId,
             'userId' => $userId,
-            'defects' => $defects
+            'defects' => $defects,
+            'comment' => isset($comment->comment)? $comment->comment : ""
         ]);
     }
 
@@ -155,8 +167,15 @@ class DefectController extends Controller
     public function update(Request $request, $userId, $defectAttachmentId)
     {
         try {
-			//Update defect
-            $this->userService->userRepository->updateDefect($userId, $defectAttachmentId, $request->defect);
+            //Update Comment and adds it if not existed before
+            $commentId = $this->defectService->updateComment(
+                $defectAttachmentId,
+                $request->comment,
+                Auth::id());
+
+            //Update defect
+            $this->userService->userRepository->updateDefect($userId, $defectAttachmentId, $request->defect, $commentId);
+
         } catch (\Exception $e) {
             Session::flash('alert', $e->getMessage());
             return redirect()->route('home');
@@ -213,8 +232,8 @@ class DefectController extends Controller
                 //Not admin so no actions
                 return '-';
             })//Change the Format of report date
-            ->editColumn('created_at', function ($defects) {
-                return date('d M Y', strtotime($defects->created_at));
+            ->editColumn('created_at', function ($defect) {
+                return (new Carbon($defect->created_at))->format('d M Y');
             })// To Update the Offdays Section and Convert it to String
             ->make();
     }

@@ -99,7 +99,9 @@ class UserRepository extends BaseRepository implements UserInterface
     public function getDefectsScope($isAdmin, $loggedInUserId, $sentUserId)
     {
         //Get defects related to a user by userId
-        $defects = $this->getModel()->join('defect_user', 'users.id', 'defect_user.user_id')->join('defects', 'defect_user.defect_id', 'defects.id')->select(['defect_user.id', 'defects.title', 'defects.score', 'defect_user.created_at']);
+        $defects = $this->getModel()->join('defect_user', 'users.id', 'defect_user.user_id')->join('defects', 'defect_user.defect_id', 'defects.id')
+        ->leftjoin('comments', 'comments.id', 'defect_user.comment_id')
+        ->select(['defect_user.id', 'defects.title', 'defects.score','comments.comment', 'defect_user.created_at']);
 
         //Make sure that user can't see other users data
         if ($isAdmin) {
@@ -139,12 +141,13 @@ class UserRepository extends BaseRepository implements UserInterface
     /**
      * attach defect to user
      * @param $defectId
+     * @param $commentId
      * @throws \Exception
      */
-    public function attachDefect($defectId)
+    public function attachDefect($defectId, $commentId)
     {
         $this->ensureBooted();
-        $this->getModel()->defects()->attach($defectId);
+        $this->getModel()->defects()->attach($defectId, ['comment_id' => $commentId]);
     }
 
     /**
@@ -165,15 +168,16 @@ class UserRepository extends BaseRepository implements UserInterface
      * @param $userId
      * @param $defectAttachmentId
      * @param $requestDefect
+     * @param $commentId
      * @throws \Exception
      */
-    public function updateDefect($userId, $defectAttachmentId, $requestDefect)
+    public function updateDefect($userId, $defectAttachmentId, $requestDefect, $commentId)
     {
         //Update defect
         if (!\DB::table('defect_user')->where([
             'id' => $defectAttachmentId,
             'user_id' => $userId,
-        ])->update(['defect_id' => $requestDefect])
+        ])->update(['defect_id' => $requestDefect, 'comment_id' => $commentId])
         ) {
            // throw new \Exception('reports.not_updated');
         }
