@@ -326,7 +326,7 @@ class ReportController extends Controller
     public function listData(Request $request, $userId = null)
     {
         $isAdmin = Auth::user()->hasRole('admin');
-        $reports = $this->reportService->reportRepository->getReportsForAUserScope($isAdmin, Auth::id());
+        $reports = $this->reportService->reportRepository->getReportsForAUserScope($isAdmin, Auth::id(), $userId);
 
         return Datatables::of($reports)
             ->addColumn('action', function ($report) use ($isAdmin) {
