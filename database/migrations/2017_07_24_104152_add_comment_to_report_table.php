@@ -15,8 +15,8 @@ class AddCommentToReportTable extends Migration
     {
         Schema::create('comment_report', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('comment_id');
-            $table->integer('report_id');
+            $table->integer('comment_id')->unsigned();
+            $table->integer('report_id')->unsigned();
             $table->foreign('comment_id')->references('id')->on('comments')
                     ->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('report_id')->references('id')->on('reports')

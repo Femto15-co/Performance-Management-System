@@ -15,8 +15,8 @@ class CreateCommentDefectTable extends Migration
     {
         Schema::create('comment_defect', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('comment_id');
-            $table->integer('defect_id');
+            $table->integer('comment_id')->unsigned();
+            $table->integer('defect_id')->unsigned();
             $table->foreign('comment_id')->references('id')->on('comments')
                     ->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('defect_id')->references('id')->on('reports')

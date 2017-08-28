@@ -82,4 +82,20 @@ class PerformanceRuleRepository extends BaseRepository implements PerformanceRul
         return $this->getModel()->where('employee_type', $employeeType)->where('id', $ruleId)->exists();
     }
 
+    /**
+     * Get all rules
+     */
+
+    public function getAll()
+    {
+        $rules = $this->getModel()->join('employee_types', 'performance_rules.employee_type', '=', 'employee_types.id')
+        ->select([
+            'performance_rules.id', 'performance_rules.rule', 'performance_rules.weight',
+            'employee_types.type'
+        ]);
+
+        return $rules;
+    }
+
+
 }

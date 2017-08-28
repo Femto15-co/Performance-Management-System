@@ -74,6 +74,20 @@ Route::group(['prefix' => 'bonus','middleware'=>'auth'], function () {
 });
 
 /**
+ *  Performance rule routes
+ */
+Route::group(['prefix'=>'rule', 'middleware' => 'auth'], function () {
+    Route::get('/', ['as'=>'rule.index', 'uses'=>'PerformanceController@index'])->middleware('role:admin');
+    Route::get('/create', ['as'=>'rule.create', 'uses'=>'PerformanceController@create'])->middleware('role:admin');
+    Route::get('/data', ['as'=>'rule.list', 'uses'=>'PerformanceController@listData'])->middleware('role:admin');
+    Route::post('/create', ['as'=>'rule.store', 'uses'=>'PerformanceController@store'])->middleware('role:admin');
+    Route::get('{id}/edit', ['as'=>'rule.edit', 'uses'=>'PerformanceController@edit'])->middleware('role:admin');
+    Route::put('{id}', ['as'=>'rule.update', 'uses'=>'PerformanceController@update'])->middleware('role:admin');
+    Route::delete('{id}', ['as'=>'rule.destroy', 'uses'=>'PerformanceController@destroy'])->middleware('role:admin');
+});
+
+
+/**
  * User routes
  */
 Route::group(['middleware' => ['auth', 'role:admin']], function () {

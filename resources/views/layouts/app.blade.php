@@ -72,6 +72,7 @@
                         <li><a href="{{ route('statistics.view') }}">{{trans('statistics.title')}}</a></li>
                     @elseif (Auth::user()->hasRole('admin'))
                         <li><a href="{{ route('user.index') }}">{{trans('users.employees')}}</a></li>
+                        <li><a href="{{ route('rule.index') }}">{{trans('rules.rule')}}</a></li>
                     @endif
                 @endif
                 </ul>
