@@ -124,7 +124,6 @@ class PerformanceController extends Controller
      */
     public function update(Request $request, $id)
     {
-//        dd($request);
         //Validate Request
         $this->validateRule($request);
         try {

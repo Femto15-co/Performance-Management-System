@@ -73,6 +73,7 @@
                     @elseif (Auth::user()->hasRole('admin'))
                         <li><a href="{{ route('user.index') }}">{{trans('users.employees')}}</a></li>
                         <li><a href="{{ route('rule.index') }}">{{trans('rules.rule')}}</a></li>
+                        <li><a href="{{ route('project.index') }}">{{trans('projects.project')}}</a></li>
                     @endif
                 @endif
                 </ul>

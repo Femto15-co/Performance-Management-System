@@ -88,6 +88,20 @@ Route::group(['prefix'=>'rule', 'middleware' => 'auth'], function () {
 
 
 /**
+ *  Project routes
+ */
+Route::group(['prefix'=>'project', 'middleware' => 'auth'], function () {
+    Route::get('/', ['as'=>'project.index', 'uses'=>'ProjectController@index']);
+    Route::get('/create', ['as'=>'project.create', 'uses'=>'ProjectController@create'])->middleware('role:admin');
+    Route::get('/data', ['as'=>'project.list', 'uses'=>'ProjectController@listData'])->middleware('role:admin');
+    Route::post('/create', ['as'=>'project.store', 'uses'=>'ProjectController@store'])->middleware('role:admin');
+    Route::get('{id}/edit', ['as'=>'project.edit', 'uses'=>'ProjectController@edit'])->middleware('role:admin');
+    Route::put('{id}', ['as'=>'project.update', 'uses'=>'ProjectController@update'])->middleware('role:admin');
+    Route::delete('{id}', ['as'=>'project.destroy', 'uses'=>'ProjectController@destroy'])->middleware('role:admin');
+});
+
+
+/**
  * User routes
  */
 Route::group(['middleware' => ['auth', 'role:admin']], function () {
