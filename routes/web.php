@@ -102,6 +102,20 @@ Route::group(['prefix'=>'project', 'middleware' => 'auth'], function () {
 
 
 /**
+ *  sheets routes
+ */
+Route::group(['prefix'=>'sheet', 'middleware' => 'auth'], function () {
+    Route::get('/', ['as'=>'sheet.index', 'uses'=>'SheetController@index']);
+    Route::get('/create', ['as'=>'sheet.create', 'uses'=>'SheetController@create']);
+    Route::get('/data', ['as'=>'sheet.list', 'uses'=>'SheetController@listData']);
+    Route::post('/create', ['as'=>'sheet.store', 'uses'=>'SheetController@store']);
+    Route::get('{id}/edit', ['as'=>'sheet.edit', 'uses'=>'SheetController@edit']);
+    Route::put('{id}', ['as'=>'sheet.update', 'uses'=>'SheetController@update']);
+    Route::delete('{id}', ['as'=>'sheet.destroy', 'uses'=>'SheetController@destroy']);
+});
+
+
+/**
  * User routes
  */
 Route::group(['middleware' => ['auth', 'role:admin']], function () {
