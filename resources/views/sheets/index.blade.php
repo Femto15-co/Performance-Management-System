@@ -4,7 +4,7 @@
     <div class="container">
         <div class="row">
             <div class="col-xs-12">
-                <h1>{{ trans('sheets.sheet') }}</h1>
+                <h1>{{ trans('sheets.sheets') }}</h1>
                 <hr/>
             </div>
         </div>
@@ -29,7 +29,7 @@
                 @role ('admin')
                     <th >{{ trans('users.employee_name') }}</th>
                 @endrole
-                <th style="width: 5%">{{ trans('sheets.duration') }}</th>
+                <th style="width: 10%">{{ trans('sheets.sheet_duration') }}</th>
                 <th >{{ trans('projects.project_name') }}</th>
                 <th data-sortable="false" data-searchable="false">{{ trans('general.actions') }}</th>
             </tr>

@@ -4,7 +4,7 @@
     <div class="container">
         <div class="row">
             <div class="col-xs-12">
-                <h1>{{ trans('projects.rule') }}</h1>
+                <h1>{{ trans('projects.projects') }}</h1>
                 <hr/>
             </div>
         </div>
@@ -30,7 +30,7 @@
             <tr>
                 <th >{{ trans('projects.project_id') }}</th>
                 <th >{{ trans('projects.project_name') }}</th>
-                <th >{{ trans('projects.status') }}</th>
+                <th >{{ trans('projects.project_status') }}</th>
                 <th data-sortable="false" data-searchable="false">{{ trans('general.actions') }}</th>
             </tr>
             </thead>

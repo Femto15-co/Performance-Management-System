@@ -56,7 +56,12 @@ class PerformanceController extends Controller
      * @return \Illuminate\View\View
      */
     public function create(){
-        $employeeTypes = $this->userService->employeeTypeRepository->getAllItems();
+        try {
+            $employeeTypes = $this->userService->employeeTypeRepository->getAllItems();
+        } catch (\Exception $e) {
+            Session::flash('error', $e->getMessage());
+            return redirect(route('rule.index'));
+        }
         return view('rules.create')->with('employeeTypes', $employeeTypes);
     }
 
@@ -80,7 +85,7 @@ class PerformanceController extends Controller
             );
         } catch (\Exception $e) {
             //if not created, redirect to reports index and show error message
-            Session::flash('rule error', $e->getMessage());
+            Session::flash('error', $e->getMessage());
             return redirect(route('rule.index'));
         }
 
@@ -96,8 +101,13 @@ class PerformanceController extends Controller
      */
     public function edit($id)
     {
-        $rule = $this->performanceRuleService->performanceRuleRepository->getRuleById($id);
-        $employeeTypes = $this->userService->employeeTypeRepository->getAllItems();
+        try {
+            $rule = $this->performanceRuleService->performanceRuleRepository->getRuleById($id);
+            $employeeTypes = $this->userService->employeeTypeRepository->getAllItems();
+        } catch (\Exception $e) {
+            Session::flash('error', $e->getMessage());
+            return redirect(route('rule.index'));
+        }
         return view('rules.edit', compact('rule', 'employeeTypes', 'id'));
     }
 
@@ -107,7 +117,7 @@ class PerformanceController extends Controller
         try {
             $this->performanceRuleService->performanceRuleRepository->deleteItem($id);
         } catch (\Exception $e) {
-            Session::flash('error', trans('rules.not_deleted'));
+            Session::flash('error', $e->getMessage());
             return redirect(route('rule.index'));
         }
 
@@ -150,9 +160,9 @@ class PerformanceController extends Controller
     {
         // Some defined rules that has to be achieved
         $rules = [
-            'rule' => 'required',
-            'desc' => 'required',
-            'weight' => 'required|min:1|max:10',
+            'rule' => 'required|max:255',
+            'desc' => 'required|max:255',
+            'weight' => 'required|integer|max:10',
             'etype' => 'required|exists:employee_types,id'
         ];
 

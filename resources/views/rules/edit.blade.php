@@ -1,50 +1,56 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container">
+<div class="container">
 
-        <h1>
-            @section('add_title')
-                Edit Performance Rule
-            @show
-        </h1>
-        <hr/>
-        <form action="{{route('rule.update', $id)}}" method="post">
+    <h1>{{trans('rules.edit_rule', ['id'=>$id])}}</h1>
+    <hr/>
+    <form action="{{route('rule.update', $id)}}" method="post">
 
-            {{csrf_field()}}
+        {{csrf_field()}}
 
-            <input type="hidden" name="_method" value="put">
+        <input type="hidden" name="_method" value="put">
 
-            <div class="form-group">
-                <label for="rule">Rule</label>
-                <input type="text" class="form-control" name="rule" value="{{ $rule->rule }}" required><br><br>
-                <label for="desc">Description</label>
-                <textarea class="form-control" name="desc" required>{{ $rule->desc }}</textarea><br><br>
-                <label for="weight">Weight</label>
-                <select class="form-control" name="weight">
-                    @for ($i = 1; $i <= 10; $i++)
-                        @if ($rule->weight == $i)
-                            <option value="{{ $i }}" selected>{{ $i }}</option>
-                        @else
-                            <option value="{{ $i }}">{{ $i }}</option>
-                        @endif
-                    @endfor
-                </select><br><br>
-                <label for="etype">Employee type</label>
-                <select class="form-control" name="etype">
-                    @foreach($employeeTypes as $type)
-                        @if ($rule->employee_type == $type->id)
-                            <option value="{{ $type->id }}" selected>{{ $type->type }}</option>
-                        @else
-                            <option value="{{ $type->id }}">{{ $type->type }}</option>
-                        @endif
-                    @endforeach
-                </select><br><br>
+        <div class="form-group {{($errors->has('rule'))?'has-error':''}}">
+            <label for="rule">{{ trans('rules.rule_name') }}</label>
+            <input type="text" class="form-control" name="rule" value="{{ $rule->rule }}" required>
+            {!! $errors->first('rule', '<p class="help-block">:message</p>') !!}
+        </div>
+
+        <div class="form-group {{($errors->has('desc'))?'has-error':''}}">
+            <label for="desc">{{ trans('rules.rule_description') }}</label>
+            <textarea class="form-control" name="desc" required>{{ $rule->desc }}</textarea>
+            {!! $errors->first('desc', '<p class="help-block">:message</p>') !!}
+        </div>
+
+        <div class="form-group {{($errors->has('weight'))?'has-error':''}}">
+            <label for="weight">{{ trans('rules.rule_weight') }}</label>
+            <select class="form-control" name="weight">
+                @for ($i = 1; $i <= 10; $i++)
+                    <option value="{{ $i }}" {{($rule->weight == $i)?"selected":""}}>{{ $i }}</option>
+                @endfor
+            </select>
+            {!! $errors->first('weight', '<p class="help-block">:message</p>') !!}
+        </div>
+
+        <div class="form-group {{($errors->has('etype'))?'has-error':''}}">
+            <label for="etype">{{ trans('rules.employee_type') }}</label>
+            <select class="form-control" name="etype">
+                @foreach($employeeTypes as $type)
+                    <option value="{{ $type->id }}" {{($rule->employee_type == $type->id)?"selected":""}}>{{ $type->type }}</option>
+                @endforeach
+            </select>
+            {!! $errors->first('etype', '<p class="help-block">:message</p>') !!}
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-3 col-sm-3">
+                <button type="submit" class="btn btn-primary form-control">{{trans('general.update')}}</button>
             </div>
-            <input type="submit" value="Save" class="btn btn-success"><br>
+        </div>
+    </form>
 
-        </form>
-        <br><br>
 
-    </div>
+
+</div>
 @endsection

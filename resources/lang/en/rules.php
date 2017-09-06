@@ -10,13 +10,15 @@ return [
     |
     */
 
-    'rule' => 'Performance Rules',
-    'add_new_rule' => 'Add new rule',
+    'rules' => 'Performance Rules',
+    'add_new_rule' => 'Add New Rule',
     'rule_id' => 'ID',
-    'rule_name' => 'Rule Name',
-    'rule_weight' => 'Rule Weight',
+    'rule_name' => 'Name',
+    'rule_description' => 'Rule Description',
+    'rule_weight' => 'Weight',
     'employee_type' => 'Employee Type',
-    'created' => 'New Rule added',
-    'deleted' => 'Rule deleted!',
-    'updated' => 'Rule updated!'
+    'created' => 'Rule Added successfully!',
+    'updated' => 'Rule Updated!',
+    'deleted' => 'Rule Deleted!',
+    'edit_rule' => 'Edit Rule #:id'
 ];

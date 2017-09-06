@@ -10,13 +10,14 @@ return [
     |
     */
 
-    'sheet' => 'Sheets',
-    'add_new_sheet' => 'Add new sheet',
+    'sheets' => 'Sheets',
+    'add_new_sheet' => 'Add New Sheet',
     'sheet_id' => 'ID',
-    'created' => 'New Sheet added',
-    'deleted' => 'Sheet deleted!',
-    'updated' => 'Sheet updated!',
-    'not_deleted' => 'error cannot delete!',
-    'sheet_not_found' => 'Sheet not found',
-    'duration' => 'Duration'
+    'sheet_description' => 'Description',
+    'created' => 'Sheet Added successfully!',
+    'deleted' => 'Sheet Deleted!',
+    'updated' => 'Sheet Updated!',
+    'sheet_not_found' => 'Sheet not Found',
+    'sheet_duration' => 'Duration',
+    'edit_sheet' => 'Edit Sheet #:id'
 ];

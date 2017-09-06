@@ -4,7 +4,7 @@
     <div class="container">
         <div class="row">
             <div class="col-xs-12">
-                <h1>{{ trans('rules.rule') }}</h1>
+                <h1>{{ trans('rules.rules') }}</h1>
                 <hr/>
             </div>
         </div>

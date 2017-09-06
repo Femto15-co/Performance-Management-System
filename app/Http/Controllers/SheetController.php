@@ -59,7 +59,12 @@ class SheetController extends Controller
      */
     public function create()
     {
-        $projects = $this->projectService->projectRepository->getAllItems();
+        try {
+            $projects = $this->projectService->projectRepository->getAllItems();
+        } catch (\Exception $e) {
+            Session::flash('error', $e->getMessage());
+            return redirect(route('sheet.index'));
+        }
         return view('sheets.create', compact('projects'));
     }
 
@@ -85,7 +90,7 @@ class SheetController extends Controller
             );
         } catch (\Exception $e) {
             //if not created, redirect to sheets index and show error message
-            Session::flash('Sheet error', $e->getMessage());
+            Session::flash('error', $e->getMessage());
             return redirect(route('sheet.index'));
         }
 
@@ -112,10 +117,14 @@ class SheetController extends Controller
      */
     public function edit($id)
     {
-        $sheet = $this->sheetService->sheetRepository->getItem($id);
-        $projects = $this->projectService->projectRepository->getAllItems();
+        try {
+            $sheet = $this->sheetService->sheetRepository->getItem($id);
+            $projects = $this->projectService->projectRepository->getAllItems();
+        } catch (\Exception $e) {
+            Session::flash('error', $e->getMessage());
+            return redirect(route('sheet.index'));
+        }
         return view('sheets.edit', compact('sheet', 'projects', 'id'));
-
     }
 
     /**
@@ -158,7 +167,7 @@ class SheetController extends Controller
         try {
             $this->sheetService->sheetRepository->deleteItem($id);
         } catch (\Exception $e) {
-            Session::flash('error', trans('sheets.not_deleted'));
+            Session::flash('error', $e->getMessage());
             return redirect(route('sheet.index'));
         }
 
@@ -176,9 +185,9 @@ class SheetController extends Controller
         // Some defined rules that has to be achieved
         $rules = [
             'date' => 'required|date',
-            'duration' => 'required',
+            'duration' => 'required|integer|max:24',
             'project' => 'required|exists:projects,id',
-            'desc' => 'required'
+            'desc' => 'required|max:255'
         ];
 
         // Run the validator on request data

@@ -64,7 +64,7 @@ class ProjectController extends Controller
             );
         } catch (\Exception $e) {
             //if not created, redirect to projects index and show error message
-            Session::flash('project error', $e->getMessage());
+            Session::flash('error', $e->getMessage());
             return redirect(route('project.index'));
         }
 
@@ -91,7 +91,12 @@ class ProjectController extends Controller
      */
     public function edit($id)
     {
-        $project = $this->projectService->projectRepository->getProjectById($id);
+        try {
+            $project = $this->projectService->projectRepository->getProjectById($id);
+        } catch (\Exception $e) {
+            Session::flash('error', $e->getMessage());
+            return redirect(route('project.index'));
+        }
         return view('projects.edit', compact('project', 'id'));
     }
 
@@ -132,7 +137,7 @@ class ProjectController extends Controller
         try {
             $this->projectService->projectRepository->deleteItem($id);
         } catch (\Exception $e) {
-            Session::flash('error', trans('projects.not_deleted'));
+            Session::flash('error', $e->getMessage());
             return redirect(route('project.index'));
         }
 
@@ -149,9 +154,9 @@ class ProjectController extends Controller
     {
         // Some defined rules that has to be achieved
         $rules = [
-            'name' => 'required',
-            'desc' => 'required',
-            'status' => 'required'
+            'name' => 'required|max:255',
+            'desc' => 'required|max:255',
+            'status' => 'required|boolean'
         ];
 
         // Run the validator on request data

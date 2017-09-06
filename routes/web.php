@@ -76,28 +76,28 @@ Route::group(['prefix' => 'bonus','middleware'=>'auth'], function () {
 /**
  *  Performance rule routes
  */
-Route::group(['prefix'=>'rule', 'middleware' => 'auth'], function () {
-    Route::get('/', ['as'=>'rule.index', 'uses'=>'PerformanceController@index'])->middleware('role:admin');
-    Route::get('/create', ['as'=>'rule.create', 'uses'=>'PerformanceController@create'])->middleware('role:admin');
-    Route::get('/data', ['as'=>'rule.list', 'uses'=>'PerformanceController@listData'])->middleware('role:admin');
-    Route::post('/create', ['as'=>'rule.store', 'uses'=>'PerformanceController@store'])->middleware('role:admin');
-    Route::get('{id}/edit', ['as'=>'rule.edit', 'uses'=>'PerformanceController@edit'])->middleware('role:admin');
-    Route::put('{id}', ['as'=>'rule.update', 'uses'=>'PerformanceController@update'])->middleware('role:admin');
-    Route::delete('{id}', ['as'=>'rule.destroy', 'uses'=>'PerformanceController@destroy'])->middleware('role:admin');
+Route::group(['prefix'=>'rule', ['auth', 'role:admin']], function () {
+    Route::get('/', ['as'=>'rule.index', 'uses'=>'PerformanceController@index']);
+    Route::get('/create', ['as'=>'rule.create', 'uses'=>'PerformanceController@create']);
+    Route::get('/data', ['as'=>'rule.list', 'uses'=>'PerformanceController@listData']);
+    Route::post('/create', ['as'=>'rule.store', 'uses'=>'PerformanceController@store']);
+    Route::get('{id}/edit', ['as'=>'rule.edit', 'uses'=>'PerformanceController@edit']);
+    Route::put('{id}', ['as'=>'rule.update', 'uses'=>'PerformanceController@update']);
+    Route::delete('{id}', ['as'=>'rule.destroy', 'uses'=>'PerformanceController@destroy']);
 });
 
 
 /**
  *  Project routes
  */
-Route::group(['prefix'=>'project', 'middleware' => 'auth'], function () {
+Route::group(['prefix'=>'project', ['auth', 'role:admin']], function () {
     Route::get('/', ['as'=>'project.index', 'uses'=>'ProjectController@index']);
-    Route::get('/create', ['as'=>'project.create', 'uses'=>'ProjectController@create'])->middleware('role:admin');
-    Route::get('/data', ['as'=>'project.list', 'uses'=>'ProjectController@listData'])->middleware('role:admin');
-    Route::post('/create', ['as'=>'project.store', 'uses'=>'ProjectController@store'])->middleware('role:admin');
-    Route::get('{id}/edit', ['as'=>'project.edit', 'uses'=>'ProjectController@edit'])->middleware('role:admin');
-    Route::put('{id}', ['as'=>'project.update', 'uses'=>'ProjectController@update'])->middleware('role:admin');
-    Route::delete('{id}', ['as'=>'project.destroy', 'uses'=>'ProjectController@destroy'])->middleware('role:admin');
+    Route::get('/create', ['as'=>'project.create', 'uses'=>'ProjectController@create']);
+    Route::get('/data', ['as'=>'project.list', 'uses'=>'ProjectController@listData']);
+    Route::post('/create', ['as'=>'project.store', 'uses'=>'ProjectController@store']);
+    Route::get('{id}/edit', ['as'=>'project.edit', 'uses'=>'ProjectController@edit']);
+    Route::put('{id}', ['as'=>'project.update', 'uses'=>'ProjectController@update']);
+    Route::delete('{id}', ['as'=>'project.destroy', 'uses'=>'ProjectController@destroy']);
 });
 
 
