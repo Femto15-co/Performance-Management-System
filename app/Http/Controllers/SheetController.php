@@ -60,7 +60,7 @@ class SheetController extends Controller
     public function create()
     {
         try {
-            $projects = $this->projectService->projectRepository->getAllItems();
+            $projects = $this->projectService->projectRepository->getAllActive();
         } catch (\Exception $e) {
             Session::flash('error', $e->getMessage());
             return redirect(route('sheet.index'));
@@ -95,6 +95,10 @@ class SheetController extends Controller
         }
 
         Session::flash('flash_message', trans('Sheets.created'));
+
+        if($request->input('btn1') == 'clicked')
+            return redirect(route('sheet.create'));
+
         return redirect(route('sheet.index'));
     }
 
@@ -142,7 +146,6 @@ class SheetController extends Controller
             $this->sheetService->sheetRepository
                 ->editItem($id, ['date' => $request->date,
                     'project_id' => $request->project,
-                    'user_id' => Auth::id(),
                     'duration' => $request->duration,
                     'description' => $request->desc]);
         } catch (\Exception $e) {
@@ -184,7 +187,7 @@ class SheetController extends Controller
     {
         // Some defined rules that has to be achieved
         $rules = [
-            'date' => 'required|date',
+            'date' => 'required|date|before_or_equal:'.date('Y-m-d'),
             'duration' => 'required|integer|max:24',
             'project' => 'required|exists:projects,id',
             'desc' => 'required|max:255'
@@ -210,13 +213,18 @@ class SheetController extends Controller
                 return $this->sheetService->dataTableControllers($sheet, Auth::user());
             })
             ->removeColumn('username')
-                ->make();
+            ->removeColumn('status')
+            ->removeColumn('userid')
+            ->removeColumn('projectid')
+            ->make();
         }
-        //dd(2);
         return Datatables::of($sheets)
             ->addColumn('action', function ($sheet) use ($isAdmin) {
                 return $this->sheetService->dataTableControllers($sheet, Auth::user());
             })
+            ->removeColumn('status')
+            ->removeColumn('userid')
+            ->removeColumn('projectid')
             ->make();
     }
 }

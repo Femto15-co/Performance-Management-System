@@ -171,18 +171,15 @@ class ProjectController extends Controller
     public function listData(Request $request)
     {
 
-        $rules = $this->projectService->projectRepository->getAllItems();
+        $projects = $this->projectService->projectRepository->getProjects();
 
-        return Datatables::of($rules)
+        return Datatables::of($projects)
             ->addColumn('action', function ($project) {
                 return $this->projectService->dataTableControllers($project);
             })
             ->editColumn('status', function ($project) {
                 return ($project->status) ? 'Active' : 'Inactive';
             })
-            ->removeColumn('description')
-            ->removeColumn('created_at')
-            ->removeColumn('updated_at')
             ->make();
     }
 

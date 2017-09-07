@@ -19,6 +19,7 @@ class CreatePerformanceRulesTable extends Migration
             $table->string('desc');
             $table->string('for');
             $table->tinyInteger('weight')->unsigned()->default(0);
+            $table->softDeletes();
         });
     }
 

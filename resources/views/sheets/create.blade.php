@@ -39,7 +39,13 @@
 
         <div class="form-group">
             <div class="col-sm-offset-3 col-sm-3">
-                <button type="submit" class="btn btn-primary form-control">{{trans('general.create')}}</button>
+                <button type="submit" class="btn btn-primary form-control" name="btn1" value="clicked">{{trans('sheets.save_and_add')}}</button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-3 col-sm-3">
+                <button type="submit" class="btn btn-primary form-control" name="btn2" value="clicked">{{trans('sheets.save_and_exit')}}</button>
             </div>
         </div>
 
@@ -58,7 +64,7 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script>
         $( function() {
-            $( "#datepicker" ).datepicker({ dateFormat: 'yy-mm-dd' });
+            $( "#datepicker" ).datepicker({ dateFormat: 'yy-mm-dd', maxDate: "D" });
         } );
     </script>
 @endsection

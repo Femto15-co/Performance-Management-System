@@ -36,7 +36,8 @@ class SheetRepository extends BaseRepository implements SheetInterface
             ->join('projects','sheets.project_id', '=', 'projects.id')
             ->select([
                 'sheets.id', 'sheets.date', 'users.name AS username', 'sheets.duration',
-                'projects.name AS projectname'
+                'projects.name AS projectname', 'projects.status', 'users.id AS userid',
+                'projects.id AS projectid'
             ]);
         //If user is not admin, load users reports only
         if (!$isAdmin) {
@@ -48,6 +49,19 @@ class SheetRepository extends BaseRepository implements SheetInterface
             return $sheets->where('sheets.user_id', $userId);
         }
 
+        return $sheets;
+    }
+
+    public function getTotal()
+    {
+        $sheets = $this->getModel()
+            ->join('users', 'sheets.user_id', '=', 'users.id')
+            ->join('projects','sheets.project_id', '=', 'projects.id')
+            ->select([
+                'sheets.id', 'sheets.date', 'users.name AS username', 'sheets.duration',
+                'projects.name AS projectname', 'projects.status', 'users.id AS userid',
+                'projects.id AS projectid'
+            ]);
         return $sheets;
     }
 }

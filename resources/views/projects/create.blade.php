@@ -24,8 +24,8 @@
         <div class="form-group" {{($errors->has('status'))?'has-error':''}}>
             <label for="status">{{ trans('projects.project_status') }}</label>
             <select class="form-control" name="status">
-                <option value="1" {{(old('status') == 1)? "selected":"" }}>{{ trans('projects.active') }}</option>
-                <option value="0" {{(old('status') == 0)? "selected":"" }}>{{ trans('projects.inactive') }}</option>
+                <option value="1" {{(old('status') === null || old('status') == 1)? "selected":"" }}>{{ trans('projects.active') }}</option>
+                <option value="0" {{(old('status') !== null && old('status') == 0)? "selected":"" }}>{{ trans('projects.inactive') }}</option>
             </select>
             {!! $errors->first('status', '<p class="help-block">:message</p>') !!}
         </div>

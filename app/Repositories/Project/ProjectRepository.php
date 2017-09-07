@@ -38,4 +38,20 @@ class ProjectRepository extends BaseRepository implements ProjectInterface
     }
 
 
+    /**
+     * Get all active projects
+     * @return mixed
+     */
+    public function getAllActive(){
+        $projects = $this->getModel()->get()->where('status', '=', true);
+        return $projects;
+    }
+
+    public function getProjects(){
+        $projects = $this->getModel()->select([
+            'id', 'name', 'status'
+        ]);
+
+        return $projects;
+    }
 }

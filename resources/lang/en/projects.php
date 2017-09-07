@@ -11,7 +11,7 @@ return [
     */
 
     'projects' => 'Projects',
-    'add_project' => 'Add New Project',
+    'add_new_project' => 'Add New Project',
     'project_id' => 'ID',
     'project_name' => 'Project Name',
     'project_description' => 'Project Description',

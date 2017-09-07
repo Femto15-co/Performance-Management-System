@@ -4,6 +4,7 @@ namespace App\Repositories\Report;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Repositories\BaseRepository;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 

@@ -114,6 +114,18 @@ Route::group(['prefix'=>'sheet', 'middleware' => 'auth'], function () {
     Route::delete('{id}', ['as'=>'sheet.destroy', 'uses'=>'SheetController@destroy']);
 });
 
+/**
+ *  Time Sheets Report routes
+ */
+Route::group(['prefix'=>'timesheets/report', ['auth', 'role:admin']], function () {
+    Route::get('/', ['as'=>'timesheets.index', 'uses'=>'SheetsReportController@index']);
+//    Route::get('/create', ['as'=>'project.create', 'uses'=>'ProjectController@create']);
+    Route::get('/data', ['as'=>'timesheets.list', 'uses'=>'SheetsReportController@listData']);
+//    Route::post('/create', ['as'=>'project.store', 'uses'=>'ProjectController@store']);
+//    Route::get('{id}/edit', ['as'=>'project.edit', 'uses'=>'ProjectController@edit']);
+//    Route::put('{id}', ['as'=>'project.update', 'uses'=>'ProjectController@update']);
+//    Route::delete('{id}', ['as'=>'project.destroy', 'uses'=>'ProjectController@destroy']);
+});
 
 /**
  * User routes

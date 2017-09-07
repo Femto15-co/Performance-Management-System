@@ -24,14 +24,14 @@
         <table id="data" class="table direction table-bordered table-striped dataTable text-center">
             <thead>
             <tr>
-                <th >{{ trans('sheets.sheet_id') }}</th>
-                <th >{{ trans('general.date') }}</th>
+                <th style="width: 10%">{{ trans('sheets.sheet_id') }}</th>
+                <th style="width: 15%">{{ trans('general.date') }}</th>
                 @role ('admin')
-                    <th >{{ trans('users.employee_name') }}</th>
+                    <th style="width: 20%">{{ trans('users.employee_name') }}</th>
                 @endrole
                 <th style="width: 10%">{{ trans('sheets.sheet_duration') }}</th>
-                <th >{{ trans('projects.project_name') }}</th>
-                <th data-sortable="false" data-searchable="false">{{ trans('general.actions') }}</th>
+                <th style="width: 25%">{{ trans('projects.project_name') }}</th>
+                <th style="width: 15%" data-sortable="false" data-searchable="false">{{ trans('general.actions') }}</th>
             </tr>
             </thead>
             <tbody>

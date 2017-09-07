@@ -28,6 +28,8 @@ class AddCommentidToDefectUserTable extends Migration
     public function down()
     {
         Schema::table('defect_user', function($table) {
+            $table->dropForeign(['comment_id']);
+
             $table->dropColumn('comment_id');
         });
     }

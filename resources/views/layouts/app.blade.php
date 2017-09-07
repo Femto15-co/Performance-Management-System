@@ -74,8 +74,9 @@
                         <li><a href="{{ route('user.index') }}">{{trans('users.employees')}}</a></li>
                         <li><a href="{{ route('rule.index') }}">{{trans('rules.rules')}}</a></li>
                         <li><a href="{{ route('project.index') }}">{{trans('projects.projects')}}</a></li>
-                        <li><a href="{{ route('sheet.index') }}">{{trans('sheets.sheets')}}</a></li>
+                        <li><a href="{{ route('timesheets.index') }}">{{trans('sheets.report')}}</a></li>
                     @endif
+                    <li><a href="{{ route('sheet.index') }}">{{trans('sheets.sheets')}}</a></li>
                 @endif
                 </ul>
                 <!-- Right Side Of Navbar -->

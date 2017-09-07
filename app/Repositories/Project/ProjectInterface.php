@@ -9,4 +9,6 @@ namespace App\Repositories\Project;
 interface ProjectInterface
 {
     public function getProjectById($id);
+    public function getAllActive();
+
 }
