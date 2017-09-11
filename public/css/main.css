@@ -69,3 +69,7 @@ span.performance-desc {
 .glyphicon {
     margin-right: 5px;
 }
+
+#total {
+    font-size: 1.5em;
+}

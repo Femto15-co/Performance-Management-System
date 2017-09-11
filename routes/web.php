@@ -74,6 +74,60 @@ Route::group(['prefix' => 'bonus','middleware'=>'auth'], function () {
 });
 
 /**
+ *  Performance rule routes
+ */
+Route::group(['prefix'=>'rule', ['auth', 'role:admin']], function () {
+    Route::get('/', ['as'=>'rule.index', 'uses'=>'PerformanceController@index']);
+    Route::get('/create', ['as'=>'rule.create', 'uses'=>'PerformanceController@create']);
+    Route::get('/data', ['as'=>'rule.list', 'uses'=>'PerformanceController@listData']);
+    Route::post('/create', ['as'=>'rule.store', 'uses'=>'PerformanceController@store']);
+    Route::get('{id}/edit', ['as'=>'rule.edit', 'uses'=>'PerformanceController@edit']);
+    Route::put('{id}', ['as'=>'rule.update', 'uses'=>'PerformanceController@update']);
+    Route::delete('{id}', ['as'=>'rule.destroy', 'uses'=>'PerformanceController@destroy']);
+});
+
+
+/**
+ *  Project routes
+ */
+Route::group(['prefix'=>'project', ['auth', 'role:admin']], function () {
+    Route::get('/', ['as'=>'project.index', 'uses'=>'ProjectController@index']);
+    Route::get('/create', ['as'=>'project.create', 'uses'=>'ProjectController@create']);
+    Route::get('/data', ['as'=>'project.list', 'uses'=>'ProjectController@listData']);
+    Route::post('/create', ['as'=>'project.store', 'uses'=>'ProjectController@store']);
+    Route::get('{id}/edit', ['as'=>'project.edit', 'uses'=>'ProjectController@edit']);
+    Route::put('{id}', ['as'=>'project.update', 'uses'=>'ProjectController@update']);
+    Route::delete('{id}', ['as'=>'project.destroy', 'uses'=>'ProjectController@destroy']);
+});
+
+
+/**
+ *  sheets routes
+ */
+Route::group(['prefix'=>'sheet', 'middleware' => 'auth'], function () {
+    Route::get('/', ['as'=>'sheet.index', 'uses'=>'SheetController@index']);
+    Route::get('/create', ['as'=>'sheet.create', 'uses'=>'SheetController@create']);
+    Route::get('/data', ['as'=>'sheet.list', 'uses'=>'SheetController@listData']);
+    Route::post('/create', ['as'=>'sheet.store', 'uses'=>'SheetController@store']);
+    Route::get('{id}/edit', ['as'=>'sheet.edit', 'uses'=>'SheetController@edit']);
+    Route::put('{id}', ['as'=>'sheet.update', 'uses'=>'SheetController@update']);
+    Route::delete('{id}', ['as'=>'sheet.destroy', 'uses'=>'SheetController@destroy']);
+});
+
+/**
+ *  Time Sheets Report routes
+ */
+Route::group(['prefix'=>'timesheets/report', ['auth', 'role:admin']], function () {
+    Route::get('/', ['as'=>'timesheets.index', 'uses'=>'SheetsReportController@index']);
+//    Route::get('/create', ['as'=>'project.create', 'uses'=>'ProjectController@create']);
+    Route::get('/data', ['as'=>'timesheets.list', 'uses'=>'SheetsReportController@listData']);
+//    Route::post('/create', ['as'=>'project.store', 'uses'=>'ProjectController@store']);
+//    Route::get('{id}/edit', ['as'=>'project.edit', 'uses'=>'ProjectController@edit']);
+//    Route::put('{id}', ['as'=>'project.update', 'uses'=>'ProjectController@update']);
+//    Route::delete('{id}', ['as'=>'project.destroy', 'uses'=>'ProjectController@destroy']);
+});
+
+/**
  * User routes
  */
 Route::group(['middleware' => ['auth', 'role:admin']], function () {

@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Report extends Model
 {
@@ -14,7 +15,7 @@ class Report extends Model
     public function scores()
     {
         return $this->belongsToMany('App\PerformanceRule', 'scores', 'report_id', 'rule_id')
-            ->withPivot('score', 'reviewer_id');
+            ->withPivot('score', 'reviewer_id')->withTrashed();
     }
     //Report has many comments from different users
     public function comments()

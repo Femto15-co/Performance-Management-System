@@ -12,4 +12,5 @@ interface PerformanceRuleInterface
     public function getMaxScoreByType($type);
     public function getRuleById($id);
     public function isRuleExistsForType($employeeType, $ruleId);
+    public function getAll();
 }

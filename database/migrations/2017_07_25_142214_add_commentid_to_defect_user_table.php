@@ -14,7 +14,7 @@ class AddCommentidToDefectUserTable extends Migration
     public function up()
     {
         Schema::table('defect_user', function($table) {
-            $table->integer('comment_id')->nullable();
+            $table->integer('comment_id')->nullable()->unsigned();
             $table->foreign('comment_id')->references('id')->on('comments')
                     ->onUpdate('cascade')->onDelete('cascade');
         });
@@ -28,6 +28,8 @@ class AddCommentidToDefectUserTable extends Migration
     public function down()
     {
         Schema::table('defect_user', function($table) {
+            $table->dropForeign(['comment_id']);
+
             $table->dropColumn('comment_id');
         });
     }

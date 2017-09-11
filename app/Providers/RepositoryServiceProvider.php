@@ -28,6 +28,11 @@ use App\Repositories\Defect\DefectRepository;
 use App\EmployeeType;
 use App\Repositories\EmployeeType\EmployeeTypeRepository;
 
+use App\Project;
+use App\Repositories\Project\ProjectRepository;
+
+use App\Sheet;
+use App\Repositories\Sheet\SheetRepository;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -101,6 +106,22 @@ class RepositoryServiceProvider extends ServiceProvider
         */
         $this->app->bind('App\Repositories\Role\RoleInterface', function(){
             return new RoleRepository(new Role());
+
+        });
+
+        /*
+        * Bind Project Repository
+        */
+        $this->app->bind('App\Repositories\Project\ProjectInterface', function(){
+            return new ProjectRepository(new Project());
+
+        });
+
+        /*
+        * Bind Sheet Repository
+        */
+        $this->app->bind('App\Repositories\Sheet\SheetInterface', function(){
+            return new SheetRepository(new Sheet());
 
         });
     }
