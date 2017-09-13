@@ -94,7 +94,7 @@ class SheetController extends Controller
             return redirect(route('sheet.index'));
         }
 
-        Session::flash('flash_message', trans('Sheets.created'));
+        Session::flash('flash_message', trans('sheets.created'));
 
         if($request->input('btn1') == 'clicked')
             return redirect(route('sheet.create'));
@@ -188,7 +188,7 @@ class SheetController extends Controller
         // Some defined rules that has to be achieved
         $rules = [
             'date' => 'required|date|before_or_equal:'.date('Y-m-d'),
-            'duration' => 'required|integer|max:24',
+            'duration' => 'required|regex:/[+-]?([0-9]*[.])?[0-9]+/|max:24',
             'project' => 'required|exists:projects,id',
             'desc' => 'required|max:255'
         ];
